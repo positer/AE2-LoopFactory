@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "ae2lightoptimizer:block/supercomputing_crafting_optimizer_interface"
+  }
+}

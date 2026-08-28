@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "connected=false": {
+      "model": "ae2lightoptimizer:block/supercomputing_crafting_optimizer_interface"
+    },
+    "connected=true": {
+      "model": "ae2lightoptimizer:block/supercomputing_crafting_optimizer_interface_connected"
+    }
+  }
+}

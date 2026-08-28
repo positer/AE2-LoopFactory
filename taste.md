@@ -1,0 +1,44 @@
+# Project Taste
+
+- Prefer small, explicit version adapters over conditional branches scattered through feature code.
+- Keep registry names stable, lowercase, and namespaced under the final mod ID.
+- Treat server state as authoritative; client code renders and requests actions.
+- Use data-driven recipes, tags, loot, and world generation where supported.
+- Avoid reflection across Minecraft versions when a narrow adapter is possible.
+- Add regression tests alongside behavior with meaningful compatibility risk.
+- Keep comments focused on version-specific reasons and non-obvious invariants.
+- Optimize measured AE2 hot paths only; preserve network semantics and security checks.
+- Prefer public AE2 APIs. Isolate any Mixin or internal hook behind a version-specific boundary and a regression benchmark.
+- Model recipe computation as integer resource transitions; returned plans must be replayable without negative intermediate inventory.
+- Bound graph algorithms by both depth and explored states, and never report budget exhaustion as proof that no solution exists.
+- Keep material quantities and compressed plan counts in `long`; state-count limits remain `int` because they bound allocated search memory.
+- Version adapters may expose shared solver entry points, but AE2 inventory discovery, security, and crafting-job submission stay server-authoritative and version-local.
+- All optimization blocks are UI-free AE2 network service nodes. Do not add menus, screens, or local configuration interactions; behavior activates from grid connection and server-authoritative network state.
+- Build reverse producer indexes before relevance traversal; never rescan the full recipe list for each newly required resource.
+- Compile graph recipes as sparse touched-resource transitions. Dense per-recipe vectors require benchmark evidence before introduction.
+- Preserve breadth-first minimum-application semantics and explicit budgets when optimizing; performance claims must name their bounded input and avoid claiming mathematical optimality for Pareto-frontier search.
+- Keep responsibilities strict and independently useful: the recipe-ring terminal alone owns cyclic SCC plans and material reserve policy; the supercomputing interface alone owns ordinary acyclic acceleration. When both are online, they cooperate without either becoming a prerequisite for the other's graph class.
+- Preserve at most 16 cycles of existing ring material. When stock cannot cover 16 cycles, reserve all of it and credit none; above the threshold, credit only the surplus.
+- Aggregate reachable dependencies with reverse indexes, SCC condensation, checked integer balances, and compressed executable batches. Never recursively expand repeated subtrees or tera/peta-scale pattern applications.
+- When multiple producers can satisfy one resource, consume stock-supported batches before selecting another route; never report missing material when a combination of available routes is sufficient.
+- Drive connected textures from `IGridNode.isActive()` through the node listener so visual state matches channel and power availability.
+- Prefer eliminating work through graph aggregation and compressed arithmetic before considering JNI, handwritten machine code, or other platform-specific execution paths.
+- Every internal AE2 fast path must preflight semantics and return control without mutation when qualification fails or checked arithmetic overflows.
+- Force required internal Mixin targets to transform during mod startup and verify exported target bytecode in the release gate; packaging or source-text checks alone do not prove takeover.
+- Distinguish quantity scale from distinct-graph scale without turning that distinction into a fixed admission ceiling. P-level counts stay compressed in `long`; distinct keys and nodes retain their unavoidable `Omega(V + E)` traversal cost, but every graph AE2 can enumerate remains eligible and planning capacity scales with the discovered graph.
+- Publish block documentation into AE2's existing cross-namespace `ae2guide` resource tree. Use `item_ids` for the native hold-`G` item link, mirror translations under `_zh_cn` at the same page path, and never create a standalone GuideME guide, guide item, screen, or key handler for these UI-free service blocks.
+- Express module ownership through one shared takeover policy: acyclic graphs belong only to an active optimizer interface and cyclic graphs belong only to an active ring terminal.
+- Keep the no-service gate ahead of graph discovery and the graph-ownership gate ahead of every AE2 calculation-state mutation. A declined hook must not create child state, extract stock, write missing/emitted items or pattern counts, or cancel the callback.
+- Keep PCL acceptance instances addon-only and generation-specific. Provision through an explicit dependency whitelist, require PCL independent-instance mode, forbid directory links, and never seed them from ImmortalStorage configs, saves, logs, options, or mod collections.
+- Carry every handled plan's compressed schedule into CPU execution. Ring-owned schedules are strict and never skip a blocked cyclic batch; optimizer-owned schedules avoid repeated scans of AE2's unordered task map. Unscheduled jobs must execute exactly as AE2 originally does.
+- Persist compressed execution by batch index and remaining `long` count. Never expand batch repetitions for dispatch or save data, and advance only by patterns AE2 reports as successfully pushed.
+- Keep optimizer face textures invariant under 90-degree pixel rotation so `cube_all` faces read consistently from every direction. Connected and disconnected states must share geometry while differing clearly in illumination.
+- Treat cyclic carrier stock as crafting-CPU-private state from initial extraction until job finalization. Never expose a seed to network storage or the requester while any scheduled ring operation can still consume it.
+- Deliver ring final output as net growth, not gross provider output. Persist the initial final-output reserve, flush pre-completion backlog when dispatch completes, and return the reserve through AE2's normal CPU inventory finalization.
+- Complete a ring job only when its compressed schedule is finished, requested net output is zero, and no final-output carrier remains in flight. Do not gate completion on unrelated `waitingFor` keys; AE2 finalization owns residual CPU inventory and non-final bookkeeping.
+- Treat returned cyclic net output as satisfying `remainingAmount` independently of `CraftingLink` routing. Standalone crafting-terminal jobs intentionally have no requester; zero direct routing must leave output in CPU inventory for native `finishJob -> storeItems`, not hold the CPU busy.
+- Keep simultaneous module behavior owner-local and job-local. Ring recycling must require `RING_TERMINAL`; optimizer-owned acyclic jobs must retain AE2's normal final-output path, and no cursor or reserve may be static or network-global.
+- Render the optimizer as a readable hash-grid compute core at native 16x16 size. Keep four intersections and eight rail endpoints rotationally paired; state changes may alter illumination but never geometry.
+- Use the connected recipe-ring terminal as the mod's visual identity: render its real face texture as three contiguous isometric faces, preserve hard pixel edges, and limit shading to necessary face lighting. Never add a silhouette border, seam stroke, or decorative cyan outline to the cube itself. Inset it inside a complete square PNG viewport frame that occupies all four outer canvas edges, remains visibly separate from the cube, and uses dark steel, metal-grey, cyan signal, and dark inner-edge layers.
+- Treat PCL test worlds and runtime state as immutable user data. Deployment may refresh only explicitly managed launch metadata and pinned mod JARs; it must never delete an instance directory, must reject locked worlds, and must prove save manifests unchanged before reporting success.
+- Keep AE2-lightoptimizer in its own Git root and GitHub repository. Never add ImmortalStorage as a remote, subtree, submodule, shared worktree, or source dependency; exchange only explicitly published external artifacts when a future integration requires it.

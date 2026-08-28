@@ -1,0 +1,30 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="All Rights Reserved"
+
+[[mods]]
+modId="ae2lightoptimizer"
+version="0.1.0-SNAPSHOT"
+displayName="AE2 Light Optimizer"
+description='''Lightweight, measured optimizations for Applied Energistics 2.'''
+
+[[dependencies.ae2lightoptimizer]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.235,21.2)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.ae2lightoptimizer]]
+modId="ae2"
+type="required"
+versionRange="[19.2.17,20)"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.ae2lightoptimizer]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1]"
+ordering="NONE"
+side="BOTH"

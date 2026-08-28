@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "connected=false": {
+      "model": "ae2lightoptimizer:block/recipe_ring_solver_terminal"
+    },
+    "connected=true": {
+      "model": "ae2lightoptimizer:block/recipe_ring_solver_terminal_connected"
+    }
+  }
+}

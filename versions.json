@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "mod_id": "ae2lightoptimizer",
+  "display_name": "AE2-lightoptimizer",
+  "entries": [
+    {
+      "minecraft": "1.21.1",
+      "loader": "neoforge",
+      "loader_version": "21.1.235",
+      "ae2_version": "19.2.17",
+      "java": 21,
+      "project": "versions/neoforge-1.21.1"
+    },
+    {
+      "minecraft": "26.1.2",
+      "loader": "neoforge",
+      "loader_version": "26.1.2.94",
+      "ae2_version": "26.1.10-beta",
+      "java": 25,
+      "project": "versions/neoforge-26.1.2"
+    }
+  ]
+}

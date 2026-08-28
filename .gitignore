@@ -1,0 +1,16 @@
+.gradle-user-home/
+**/.gradle/
+**/build/
+**/run/
+**/logs/
+**/src/generated/
+**/.idea/
+**/.vscode/
+**/*.launch
+*.iml
+*.class
+*.log
+out/
+.metadata/
+.DS_Store
+Thumbs.db

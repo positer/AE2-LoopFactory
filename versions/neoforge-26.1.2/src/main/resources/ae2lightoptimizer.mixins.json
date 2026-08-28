@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.example.ae2lightoptimizer.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "CraftingCalculationMixin",
+    "CraftingCpuLogicMixin",
+    "ElapsedTimeTrackerAccessor",
+    "CraftingPlanMixin",
+    "ExecutingCraftingJobMixin",
+    "ExecutingCraftingJobPersistenceMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
