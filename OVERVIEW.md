@@ -6,7 +6,7 @@ Provide a clean, dual-generation workspace for `AE2-lightoptimizer`, a UI-free A
 
 The canonical upstream is the standalone GitHub repository `https://github.com/positer/AE2-lightoptimizer`. Its Git root, history, branches, tags, and remote are independent from ImmortalStorage; no repository nesting, subtree, submodule, or shared worktree is used.
 
-Both maintained generations build, run 56 tests, start their pinned NeoForge/AE2 data environments, and pass transformed-bytecode calculation plus cyclic-output/execution takeover verification. Minecraft 1.20.1 is intentionally not maintained.
+Release 0.0.1 supports both maintained generations. They build, run 56 tests, start their pinned NeoForge/AE2 data environments, and pass transformed-bytecode calculation plus cyclic-output/execution takeover verification. Minecraft 1.20.1 is intentionally not maintained.
 
 ## Runtime flow
 
@@ -30,6 +30,7 @@ The no-service gate precedes pattern traversal and stock access. The graph-owner
 ## Root structure
 
 - `README.md`: public project description, capability boundaries, version matrix, scale evidence, and build entry points.
+- `CHANGELOG.md`: user-facing release history and compatibility notes.
 - `OVERVIEW.md`: architecture, ownership, and maintained file-tree guide.
 - `taste.md`: persistent implementation, performance, integration, and design conventions.
 - `AGENTS.md`: session protocol and isolation rules.

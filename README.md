@@ -4,6 +4,8 @@
 
 Official source repository: <https://github.com/positer/AE2-lightoptimizer>
 
+Current release: **0.0.1**
+
 | Minecraft | NeoForge | AE2 | Java |
 | --- | --- | --- | --- |
 | 1.21.1 | 21.1.235 | 19.2.17 | 21 |
@@ -105,6 +107,8 @@ From the repository root:
 ```
 
 Each launcher uses `.gradle-user-home/<version>` so dependency caches and daemons do not leak into ImmortalStorage. Set `AE2LIGHTOPTIMIZER_JAVA_HOME` to override the Gradle runtime JDK 21 and `AE2LIGHTOPTIMIZER_JAVA25_HOME` to expose an installed JDK 25 toolchain. Otherwise the launchers discover the current user's Gradle JDK cache and then use `JAVA_HOME`; Foojay remains the final toolchain-download fallback. Implement loader-independent algorithms in `shared/`; keep Minecraft, NeoForge, AE2, Mixin, resources, and persistence code inside the exact version directory.
+
+Release history is recorded in [`CHANGELOG.md`](CHANGELOG.md). GitHub release assets are generation-qualified; install exactly one JAR matching the target Minecraft version.
 
 ## Isolated PCL instances
 
