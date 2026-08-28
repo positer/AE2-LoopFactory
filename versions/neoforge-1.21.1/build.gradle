@@ -40,7 +40,10 @@ sourceSets {
     test.java.srcDir '../../shared/src/test/java'
 }
 
-tasks.named('test', Test).configure { useJUnitPlatform() }
+tasks.named('test', Test).configure {
+    useJUnitPlatform()
+    inputs.file(rootProject.file('../../CHANGELOG.md'))
+}
 
 tasks.named('processResources', ProcessResources).configure {
     def props = [mod_id: mod_id, mod_name: mod_name, mod_version: mod_version,
