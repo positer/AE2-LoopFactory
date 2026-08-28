@@ -1,9 +1,12 @@
 package com.example.ae2lightoptimizer.block;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,7 +32,7 @@ class SupercomputingOptimizerContractTest {
     }
 
     @Test
-    void packagesConnectedModelsMixinAndNoRecipe() {
+    void packagesConnectedModelsMixinAndRecipe() {
         ClassLoader loader = getClass().getClassLoader();
         assertNotNull(loader.getResource("ae2lightoptimizer.mixins.json"));
         assertNotNull(loader.getResource("assets/ae2lightoptimizer/blockstates/"
@@ -38,8 +41,24 @@ class SupercomputingOptimizerContractTest {
                 + "supercomputing_crafting_optimizer_interface_connected.json"));
         assertNotNull(loader.getResource("assets/ae2lightoptimizer/textures/block/"
                 + "supercomputing_crafting_optimizer_interface_connected.png"));
-        assertTrue(loader.getResource("data/ae2lightoptimizer/recipe/"
-                + "supercomputing_crafting_optimizer_interface.json") == null);
+        assertNotNull(loader.getResource("data/ae2lightoptimizer/recipe/"
+                + "supercomputing_crafting_optimizer_interface.json"));
+    }
+
+    @Test
+    void recipeBuildsAProcessorGridAroundACraftingAccelerator() throws IOException {
+        JsonObject recipe = JsonParser.parseString(read("src/main/resources/data/ae2lightoptimizer/recipe/"
+                + "supercomputing_crafting_optimizer_interface.json")).getAsJsonObject();
+
+        assertEquals("minecraft:crafting_shaped", recipe.get("type").getAsString());
+        assertEquals("CEC", recipe.getAsJsonArray("pattern").get(0).getAsString());
+        assertEquals("EAE", recipe.getAsJsonArray("pattern").get(1).getAsString());
+        assertEquals("CEC", recipe.getAsJsonArray("pattern").get(2).getAsString());
+        assertEquals("ae2:crafting_accelerator", ingredient(recipe, "A"));
+        assertEquals("ae2:calculation_processor", ingredient(recipe, "C"));
+        assertEquals("ae2:engineering_processor", ingredient(recipe, "E"));
+        assertEquals("ae2lightoptimizer:supercomputing_crafting_optimizer_interface",
+                recipe.getAsJsonObject("result").get("id").getAsString());
     }
 
     @Test
@@ -141,5 +160,9 @@ class SupercomputingOptimizerContractTest {
 
     private static String read(String path) throws IOException {
         return Files.readString(Path.of(path));
+    }
+
+    private static String ingredient(JsonObject recipe, String symbol) {
+        return recipe.getAsJsonObject("key").getAsJsonObject(symbol).get("item").getAsString();
     }
 }

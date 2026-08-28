@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,7 +33,7 @@ class RecipeRingSolverTerminalContractTest {
     }
 
     @Test
-    void packagesAllBlockResourcesWithoutARecipe() {
+    void packagesAllBlockResourcesWithARecipe() {
         ClassLoader loader = getClass().getClassLoader();
         assertNotNull(loader.getResource("ae2lightoptimizer.png"));
         assertNotNull(loader.getResource(
@@ -44,8 +46,26 @@ class RecipeRingSolverTerminalContractTest {
                 "assets/ae2lightoptimizer/textures/block/recipe_ring_solver_terminal.png"));
         assertNotNull(loader.getResource(
                 "data/ae2lightoptimizer/loot_table/blocks/recipe_ring_solver_terminal.json"));
-        assertTrue(loader.getResource(
-                "data/ae2lightoptimizer/recipe/recipe_ring_solver_terminal.json") == null);
+        assertNotNull(loader.getResource(
+                "data/ae2lightoptimizer/recipe/recipe_ring_solver_terminal.json"));
+    }
+
+    @Test
+    void recipeBuildsAnInputOutputRingAroundACraftingUnit() throws IOException {
+        JsonObject recipe = JsonParser.parseString(Files.readString(Path.of(
+                "src/main/resources/data/ae2lightoptimizer/recipe/recipe_ring_solver_terminal.json")))
+                .getAsJsonObject();
+
+        assertEquals("minecraft:crafting_shaped", recipe.get("type").getAsString());
+        assertEquals("FCA", recipe.getAsJsonArray("pattern").get(0).getAsString());
+        assertEquals("CUC", recipe.getAsJsonArray("pattern").get(1).getAsString());
+        assertEquals("ACF", recipe.getAsJsonArray("pattern").get(2).getAsString());
+        assertEquals("ae2:formation_core", ingredient(recipe, "F"));
+        assertEquals("ae2:annihilation_core", ingredient(recipe, "A"));
+        assertEquals("ae2:calculation_processor", ingredient(recipe, "C"));
+        assertEquals("ae2:crafting_unit", ingredient(recipe, "U"));
+        assertEquals("ae2lightoptimizer:recipe_ring_solver_terminal",
+                recipe.getAsJsonObject("result").get("id").getAsString());
     }
 
     @Test
@@ -95,5 +115,9 @@ class RecipeRingSolverTerminalContractTest {
         assertFalse(source.contains("openMenu"));
         assertFalse(source.contains("createMenu"));
         assertFalse(source.contains("AbstractContainerScreen"));
+    }
+
+    private static String ingredient(JsonObject recipe, String symbol) {
+        return recipe.getAsJsonObject("key").get(symbol).getAsString();
     }
 }

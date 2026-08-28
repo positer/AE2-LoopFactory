@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "ae2:annihilation_core"
+    },
+    "C": {
+      "item": "ae2:calculation_processor"
+    },
+    "F": {
+      "item": "ae2:formation_core"
+    },
+    "U": {
+      "item": "ae2:crafting_unit"
+    }
+  },
+  "pattern": [
+    "FCA",
+    "CUC",
+    "ACF"
+  ],
+  "result": {
+    "count": 1,
+    "id": "ae2lightoptimizer:recipe_ring_solver_terminal"
+  }
+}

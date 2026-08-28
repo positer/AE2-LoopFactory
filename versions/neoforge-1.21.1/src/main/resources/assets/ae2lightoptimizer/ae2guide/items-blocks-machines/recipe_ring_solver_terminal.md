@@ -14,6 +14,10 @@ item_ids:
 
 <BlockImage id="ae2lightoptimizer:recipe_ring_solver_terminal" scale="6" />
 
+## Crafting
+
+<RecipeFor id="ae2lightoptimizer:recipe_ring_solver_terminal" />
+
 The Recipe Ring Solver Terminal is a UI-free service for cyclic AE2 crafting calculations. Attach it to an ME Network with an available channel and power. Its face lights cyan when the managed grid node is active.
 
 This block independently takes over reachable cyclic crafting graphs and solves their strongly connected components. It deliberately leaves ordinary acyclic jobs untouched. A [Supercomputing Crafting Optimizer Interface](supercomputing_crafting_optimizer_interface.md) can independently accelerate those acyclic jobs and complements the terminal when both are online.

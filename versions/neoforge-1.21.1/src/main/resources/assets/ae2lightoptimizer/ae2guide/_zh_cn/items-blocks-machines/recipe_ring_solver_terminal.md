@@ -14,6 +14,10 @@ item_ids:
 
 <BlockImage id="ae2lightoptimizer:recipe_ring_solver_terminal" scale="6" />
 
+## 合成
+
+<RecipeFor id="ae2lightoptimizer:recipe_ring_solver_terminal" />
+
 配方环解算终端是服务于 AE2 成环合成计算的无界面网络设备。将它接入拥有空闲频道和电力的 ME 网络；托管网络节点进入活动状态后，方块正面的闭环标记会亮起青色。
 
 本方块会独立接管可达的成环合成图并解算其中的强连通分量，同时有意不接管普通无环任务。[超算合成优化接口](supercomputing_crafting_optimizer_interface.md)可独立加速无环任务；两方块同时在线时职责互补。

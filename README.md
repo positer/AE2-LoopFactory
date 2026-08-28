@@ -61,7 +61,17 @@ Both blocks have distinct offline and active-network 16x16 textures derived from
 
 The NeoForge mod icon is a transparent 64x64 isometric render of the connected recipe-ring terminal. Three contiguous faces use the real block texture and only necessary face lighting; the cube itself has no added silhouette border, seam stroke, or cyan outline. It sits inside a separate complete square viewport frame made from dark steel, metal-grey, cyan signal, and dark inner-edge layers. Every pixel along all four outer PNG edges is opaque while the framed interior remains transparent. Both generations package the same pixel-identical icon through `logoFile="ae2lightoptimizer.png"`.
 
-No crafting recipes are included yet.
+## Crafting recipes
+
+Both blocks use shaped 3x3 recipes built entirely from stable AE2 components. The Recipe Ring Solver Terminal places four calculation processors and opposing formation/annihilation cores around a crafting unit, representing cyclic input and output analysis. The Supercomputing Crafting Optimizer Interface places four calculation processors and four engineering processors around a crafting accelerator, reflecting its higher-cost global planning and dispatch role.
+
+| Recipe Ring Solver Terminal | Supercomputing Crafting Optimizer Interface |
+| --- | --- |
+| `F C A` | `C E C` |
+| `C U C` | `E A E` |
+| `A C F` | `C E C` |
+
+Ring symbols: `F` = Formation Core, `A` = Annihilation Core, `C` = Calculation Processor, `U` = Crafting Unit. Optimizer symbols: `C` = Calculation Processor, `E` = Engineering Processor, `A` = Crafting Accelerator. JEI discovers both standard shaped recipes automatically, and each GuideME page embeds its recipe.
 
 ## AE2 GuideME documentation
 
@@ -74,7 +84,7 @@ The addon contributes pages to AE2's `ae2guide` resource tree through GuideME's 
 
 ## Scale and verification
 
-Each generation runs the same 54-test suite, including the solver, global-planner stress, graph-scale envelope, compressed batch, 16-cycle reserve, takeover-policy, block, Mixin/resource, mod-icon, bilingual GuideME, and completion-gate contracts. Execution regressions replay a 1,000-operation smithing-template growth job, a three-node irreducible ring, seed survival, pre-completion output locking, standalone terminal completion with no requester, P-scale release arithmetic, final-output transit draining, and independent parallel job cursors.
+Each generation runs the same 56-test suite, including the solver, global-planner stress, graph-scale envelope, compressed batch, 16-cycle reserve, takeover-policy, block, Mixin/resource, shaped-recipe JSON, mod-icon, bilingual GuideME, and completion-gate contracts. Execution regressions replay a 1,000-operation smithing-template growth job, a three-node irreducible ring, seed survival, pre-completion output locking, standalone terminal completion with no requester, P-scale release arithmetic, final-output transit draining, and independent parallel job cursors.
 
 Stress coverage includes complex irreducible SCCs, dead 1:1 rings, multiple producer routes, shared acyclic dependencies, and peta-scale total material. The peta-scale three-pattern SCC represents `1.5×10^15` applications using 94 balance iterations and 96 compressed schedule batches, a measured work ratio of about `7.89×10^12`. A 64-component/128-route fixture plans a total of `10^15` raw items without false missing stock. Tests enforce explicit work-ratio bounds and a two-second planning deadline.
 

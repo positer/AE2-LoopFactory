@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "ae2:crafting_accelerator"
+    },
+    "C": {
+      "item": "ae2:calculation_processor"
+    },
+    "E": {
+      "item": "ae2:engineering_processor"
+    }
+  },
+  "pattern": [
+    "CEC",
+    "EAE",
+    "CEC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "ae2lightoptimizer:supercomputing_crafting_optimizer_interface"
+  }
+}

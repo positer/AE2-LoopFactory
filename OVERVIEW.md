@@ -6,7 +6,7 @@ Provide a clean, dual-generation workspace for `AE2-lightoptimizer`, a UI-free A
 
 The canonical upstream is the standalone GitHub repository `https://github.com/positer/AE2-lightoptimizer`. Its Git root, history, branches, tags, and remote are independent from ImmortalStorage; no repository nesting, subtree, submodule, or shared worktree is used.
 
-Both maintained generations build, run 54 tests, start their pinned NeoForge/AE2 data environments, and pass transformed-bytecode calculation plus cyclic-output/execution takeover verification. Minecraft 1.20.1 is intentionally not maintained.
+Both maintained generations build, run 56 tests, start their pinned NeoForge/AE2 data environments, and pass transformed-bytecode calculation plus cyclic-output/execution takeover verification. Minecraft 1.20.1 is intentionally not maintained.
 
 ## Runtime flow
 
@@ -102,7 +102,7 @@ Each version contains block states keyed by `connected=false/true`, offline and 
 
 Each version also packages the same root-level `ae2lightoptimizer.png`: a transparent 64x64 isometric three-face render of the connected ring terminal, inset within a fully closed square PNG viewport frame. The four-layer frame uses dark steel, metal-grey, cyan signal, and a dark inner edge; all four outer image edges are pixel-opaque while the interior retains transparency. `META-INF/neoforge.mods.toml` binds it as the NeoForge `logoFile`.
 
-Neither version contains recipe JSON, menus, screens, or local configuration UI. Each contributes the same GuideME tree to AE2's existing guide:
+Each version contains two standard shaped recipe JSON files. The 1.21.1 adapter uses object-form ingredients while 26.1.2 uses the generation's string-form ingredients; structured tests lock both layouts and ingredient IDs. Neither version contains menus, screens, or local configuration UI. Each contributes the same GuideME tree to AE2's existing guide:
 
 The optimizer face is an opaque 16x16 hash-grid core with identical offline/connected geometry. Connected rails and intersections use cyan-white illumination with eight amber endpoints; the offline state uses the same pixels in a dim palette. The generator enforces exact 90-degree rotational invariance. Ring-terminal textures remain unchanged.
 
@@ -146,7 +146,7 @@ Neither version references the ImmortalStorage workspace, packages, artifacts, g
 
 ## Verification state
 
-- 54 tests pass in each generation with zero failures and zero errors.
+- 56 tests pass in each generation with zero failures and zero errors.
 - Both real AE2/GuideME/Mixin data environments start successfully.
 - Calculation, plan, executing-job, CPU-logic, and elapsed-time classes pass transformed-bytecode takeover verification in both generations.
 - The 1,000-template execution model delivers exactly 1,000 net templates and returns one locked seed; a 500-round three-node SCC delivers the same net growth without skipping an unavailable node.

@@ -42,6 +42,7 @@ class GuideMeDocumentationContractTest {
         assertTrue(page.contains("parent: ae2:items-blocks-machines/items-blocks-machines-index.md"));
         assertTrue(page.contains("item_ids:\n- ae2lightoptimizer:" + itemId));
         assertTrue(page.contains("<BlockImage id=\"ae2lightoptimizer:" + itemId + "\""));
+        assertTrue(page.contains("<RecipeFor id=\"ae2lightoptimizer:" + itemId + "\" />"));
     }
 
     private String read(String relativePath) throws IOException {
