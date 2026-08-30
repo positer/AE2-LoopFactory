@@ -12,17 +12,7 @@
 - Added independent optional Create Milling and Mekanism Crushing integrations using the common `c:gems/loop_crystal` tag. Neither external mod is required.
 - Added isolated NeoForge 1.21.1 and 26.1.2 release artifacts and PCL deployment verification.
 
-## 0.0.1
-
-### English
-
-- Added the Recipe Ring Solver Terminal for cyclic AE2 crafting graphs, seed protection, compressed execution, and safe fallback.
-- Added the Supercomputing Crafting Optimizer Interface for acyclic AE2 crafting plans, shared dependency optimization, and compressed dispatch.
-- Added independent module ownership, version-local NeoForge adapters, Mixin takeover checks, bilingual GuideME pages, and isolated PCL instances.
-
-## 简体中文
-
-### 0.0.2
+### 简体中文
 
 - 统一 AE2LO 双语名称：Applied Energistics 2 Lightweight Optimization / 应用能源 2 轻量优化。
 - 新增循环水晶、循环水晶碎片、循环水晶块和循环水晶粉，包含模型、双语名称、配方、通用标签与创造模式分类注册。
@@ -32,7 +22,15 @@
 - 新增独立可选的机械动力磨粉和 Mekanism 粉碎兼容，统一使用 `c:gems/loop_crystal` 标签；两者均不是前置依赖。
 - 新增 NeoForge 1.21.1 与 26.1.2 隔离发布产物及 PCL 部署校验。
 
-### 0.0.1
+## 0.0.1
+
+### English
+
+- Added the Recipe Ring Solver Terminal for cyclic AE2 crafting graphs, seed protection, compressed execution, and safe fallback.
+- Added the Supercomputing Crafting Optimizer Interface for acyclic AE2 crafting plans, shared dependency optimization, and compressed dispatch.
+- Added independent module ownership, version-local NeoForge adapters, Mixin takeover checks, bilingual GuideME pages, and isolated PCL instances.
+
+### 简体中文
 
 - 新增配方环解算终端，用于 AE2 循环合成图、种子保护、压缩执行与安全回退。
 - 新增超算合成优化接口，用于 AE2 无环合成计划、共享依赖优化与压缩派发。
