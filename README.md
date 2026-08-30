@@ -10,7 +10,7 @@ Official source repository: <https://github.com/positer/AE2-lightoptimizer>
 
 Current release: **0.0.2**
 
-Release 0.0.2 adds Loop Crystal materials, AE2-compatible conversion recipes, and solver regression coverage for growth and no-growth multi-recipe cycles.
+Release 0.0.2 is the current release. It adds the complete Loop Crystal material family, AE2-compatible recipes and drops, generic cyclic-growth planning fixes, nested-ring pressure coverage, and additive optional machine integrations.
 
 Optional machine compatibility is additive: Create provides a conditional `create:milling` recipe and Mekanism provides a conditional `mekanism:crushing` recipe. Both use the common `c:gems/loop_crystal` item tag and convert one tagged Loop Crystal into one Loop Crystal Powder. Each recipe activates independently when its platform is loaded; neither Create nor Mekanism is an AE2LO dependency.
 
@@ -20,6 +20,25 @@ Optional machine compatibility is additive: Create provides a conditional `creat
 | 26.1.2 | 26.1.2.94 | 26.1.10-beta | 25 |
 
 Minecraft 1.20.1 is intentionally not maintained. Both supported generations are independent Gradle projects and are fully isolated from ImmortalStorage. This repository has its own Git history and GitHub remote; it does not use the ImmortalStorage repository as an upstream, subtree, or submodule.
+
+## Current release contents
+
+AE2LO 0.0.2 includes the following complete surface:
+
+- Two UI-free AE2 network services: the Recipe Ring Solver Terminal for cyclic graphs and the Supercomputing Crafting Optimizer Interface for acyclic graphs.
+- Four registered Loop Crystal materials with bilingual names, models, textures, common `c:` tags, creative-tab exposure, conversion recipes, and Mysterious Cube bonus drop.
+- Ordered Loop Crystal growth, fragment recombination, direct decomposition, block compression/decompression, and powder conversion recipes.
+- Generic SCC planning for self-growth, multi-recipe, nested, and 16-node ring graphs with compressed executable schedules.
+- Additive optional Create Milling and Mekanism Crushing compatibility; each uses `c:gems/loop_crystal`, activates only when its own mod is loaded, and adds no external dependency.
+- Version-separated NeoForge 1.21.1 and 26.1.2 artifacts, bilingual AE2 GuideME pages, Mixin takeover validation, and non-destructive PCL deployment checks.
+
+## 中文简介
+
+AE2LO（应用能源 2 轻量优化）是一个面向 AE2 的无界面 NeoForge 附属模组，用于优化服务器端合成计划、解算配方循环并安全回退到 AE2 原生流程。0.0.2 为当前版本，完整包含循环水晶材料、配方环架构修复、嵌套环压力测试、双语文档以及机械动力和 Mekanism 的可选叠加兼容。
+
+两个服务方块职责独立：配方环解算终端负责有环图的 SCC 解算、种子保护和交错调度；超算合成优化接口负责无环图的共享依赖合并、压缩计划和 CPU 派发。循环水晶、循环水晶碎片、循环水晶块、循环水晶粉均已注册并加入创造模式分类，配方和神秘方块额外掉落完整可用。
+
+机械动力使用 `create:milling`，Mekanism 使用 `mekanism:crushing`；两者都读取 `c:gems/loop_crystal` 通用标签并独立按模组加载条件生效，不互斥、不覆盖，也不作为 AE2LO 前置依赖。
 
 ## Network blocks
 
