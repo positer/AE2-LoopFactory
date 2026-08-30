@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.0.2
+
+### English
+
+- Standardized the bilingual product identity as Applied Energistics 2 Lightweight Optimization (AE2LO).
+- Added Loop Crystal, Loop Crystal Fragment, Loop Crystal Block, and Loop Crystal Powder with complete item models, names, recipes, and a dedicated creative tab.
+- Breaking AE2's Mysterious Cube additionally drops one Loop Crystal.
+- Added exact decomposition/recombination and externally fueled growth-loop solver coverage.
+- Added additive optional machine compatibility: Create Milling and Mekanism Crushing each convert the common `c:gems/loop_crystal` input tag into Loop Crystal Powder when their respective mod is loaded; neither is a required dependency.
+
+### 简体中文
+
+- 统一双语产品名称为应用能源 2 轻量优化（AE2LO）。
+- 新增循环水晶、循环水晶碎片、循环水晶块和循环水晶粉，包含完整物品模型、名称、配方与独立创造模式分类。
+- 破坏 AE2 神秘方块时额外掉落一个循环水晶。
+- 新增分解复合不增长环与外部材料驱动增殖环的解算测试。
+- 新增叠加式可选机器兼容：机械动力磨粉与 Mekanism 粉碎分别使用通用 `c:gems/loop_crystal` 输入标签转为循环水晶粉，加载哪个平台就独立启用哪个配方，均不设为前置依赖。
+
 ## 0.0.1
 
 ### English

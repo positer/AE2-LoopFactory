@@ -2,15 +2,15 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "A": "ae2:annihilation_core",
+    "I": "minecraft:iron_ingot",
     "C": "ae2:calculation_processor",
-    "F": "ae2:formation_core",
-    "U": "ae2:crafting_unit"
+    "L": "ae2:logic_processor",
+    "R": "ae2lightoptimizer:loop_crystal"
   },
   "pattern": [
-    "FCA",
-    "CUC",
-    "ACF"
+    "ICI",
+    "LRL",
+    "ICI"
   ],
   "result": {
     "id": "ae2lightoptimizer:recipe_ring_solver_terminal"

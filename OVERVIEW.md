@@ -1,4 +1,7 @@
-# AE2-lightoptimizer Project Overview
+# AE2LO — AE2-lightoptimizer Project Overview
+
+English name: Applied Energistics 2 Lightweight Optimization (AE2LO).  
+中文名称：应用能源 2 轻量优化（AE2LO）。
 
 ## Goal and status
 
@@ -6,7 +9,9 @@ Provide a clean, dual-generation workspace for `AE2-lightoptimizer`, a UI-free A
 
 The canonical upstream is the standalone GitHub repository `https://github.com/positer/AE2-lightoptimizer`. Its Git root, history, branches, tags, and remote are independent from ImmortalStorage; no repository nesting, subtree, submodule, or shared worktree is used.
 
-Release 0.0.1 supports both maintained generations. They build, run 57 tests, start their pinned NeoForge/AE2 data environments, and pass transformed-bytecode calculation plus cyclic-output/execution takeover verification. Minecraft 1.20.1 is intentionally not maintained.
+Release 0.0.2 supports both maintained generations. It adds the complete four-part Loop Crystal material family, AE2 Mysterious Cube integration, exact recipes, dedicated creative-tab exposure, and multi-recipe growth/no-growth regression coverage. Minecraft 1.20.1 is intentionally not maintained.
+
+Optional compatibility data is additive: a NeoForge `mod_loaded(create)` conditional Create Milling recipe and a `mod_loaded(mekanism)` conditional Mekanism Crushing recipe both use the common `c:gems/loop_crystal` item tag. Each is ignored independently when its platform is absent; neither external mod is a dependency or class reference.
 
 ## Runtime flow
 
@@ -62,7 +67,7 @@ The no-service gate precedes pattern traversal and stock access. The graph-owner
 - `CompressedBatchCursor`: constant-state dispatch progress over `long` batch sizes, including exact save/load restoration.
 - `RingOutputLock`: constant-state decision for withholding cyclic final output until dispatch completion and releasing only net growth above the seed reserve.
 - `RingCompletionGate`: completes a ring job only after schedule completion, zero remaining request, and zero in-flight final output; unrelated waiting keys cannot hold the CPU open.
-- `RingMaterialReservePolicy`, `RingMaterialReservePlan`: checked 16-cycle reserve accounting; only stock above the reserve threshold is credited.
+- `RingMaterialReservePolicy`, `RingMaterialReservePlan`: checked 16-cycle execution-seed metadata; global planning charges current-order external inputs without subtracting that metadata.
 
 `shared/src/test/` contains:
 

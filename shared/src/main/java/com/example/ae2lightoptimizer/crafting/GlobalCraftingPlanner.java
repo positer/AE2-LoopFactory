@@ -24,7 +24,10 @@ public final class GlobalCraftingPlanner {
             Map<String, Long> reserved = cyclic
                     ? computeExternalCycleReserve(graph, components, request.reservedCycles())
                     : Map.of();
-            Map<String, Long> usableStock = applyReserve(request.availableStock(), reserved);
+            // The reserve is a runtime seed-retention policy, not a deduction from the
+            // current order's inventory. Subtracting it here made every finite order
+            // falsely report the fixed reserve as missing external inputs.
+            Map<String, Long> usableStock = new LinkedHashMap<>(request.availableStock());
             BalanceResult balance = solveBalances(request, graph, usableStock);
             if (balance.status() != GlobalPlanStatus.SOLVED) {
                 return failed(balance.status(), cyclic, components.count(), balance.iterations(), 0);
@@ -32,7 +35,7 @@ public final class GlobalCraftingPlanner {
 
             ScheduleResult schedule = buildCompressedSchedule(
                     graph, balance.patternCounts(), request.target(),
-                    request.emittableResources(), request.budget());
+                    request.emittableResources(), usableStock, request.budget());
             if (schedule.status() != GlobalPlanStatus.SOLVED) {
                 return failed(schedule.status(), cyclic, components.count(),
                         balance.iterations(), schedule.batches());
@@ -202,7 +205,7 @@ public final class GlobalCraftingPlanner {
 
     private static ScheduleResult buildCompressedSchedule(
             Graph graph, Map<String, Long> patternCounts, String preferredSeedResource,
-            Set<String> emittable,
+            Set<String> emittable, Map<String, Long> availableStock,
             GlobalPlanningBudget budget) {
         Map<String, GlobalPattern> byId = new LinkedHashMap<>();
         graph.patterns().forEach(pattern -> byId.put(pattern.id(), pattern));
@@ -211,6 +214,8 @@ public final class GlobalCraftingPlanner {
         Map<String, Long> required = new LinkedHashMap<>();
         Map<String, Long> emitted = new LinkedHashMap<>();
         List<PatternBatch> schedule = new ArrayList<>();
+
+        seedExternalInputs(remaining, byId, stock, required, emitted, emittable);
 
         while (remaining.values().stream().anyMatch(value -> value > 0)) {
             if (schedule.size() >= budget.maxScheduleBatches()) {
@@ -237,7 +242,8 @@ public final class GlobalCraftingPlanner {
                 GlobalPattern sourceReady = chooseSourceReadyPattern(remaining, byId);
                 GlobalPattern seedPattern = sourceReady != null
                         ? sourceReady : chooseCheapestSeedPattern(
-                                remaining, byId, stock, preferredSeedResource);
+                                remaining, byId, stock, required, availableStock,
+                                emittable, preferredSeedResource);
                 if (seedPattern == null) {
                     return new ScheduleResult(GlobalPlanStatus.NO_FEASIBLE_PLAN,
                             List.of(), Map.of(), Map.of(), schedule.size());
@@ -269,6 +275,33 @@ public final class GlobalCraftingPlanner {
         return new ScheduleResult(GlobalPlanStatus.SOLVED, schedule, required, emitted, schedule.size());
     }
 
+    private static void seedExternalInputs(
+            Map<String, Long> remaining, Map<String, GlobalPattern> byId,
+            Map<String, Long> stock, Map<String, Long> required,
+            Map<String, Long> emitted, Set<String> emittable) {
+        Set<String> produced = remainingProducedResources(remaining, byId);
+        Map<String, Long> totalInputs = new LinkedHashMap<>();
+        remaining.forEach((id, repetitions) -> {
+            if (repetitions <= 0) {
+                return;
+            }
+            for (var input : byId.get(id).inputs().entrySet()) {
+                if (!produced.contains(input.getKey())) {
+                    totalInputs.merge(input.getKey(),
+                            Math.multiplyExact(input.getValue(), repetitions), Math::addExact);
+                }
+            }
+        });
+        totalInputs.forEach((resource, amount) -> {
+            stock.put(resource, amount);
+            if (emittable.contains(resource)) {
+                emitted.put(resource, amount);
+            } else {
+                required.put(resource, amount);
+            }
+        });
+    }
+
     private static GlobalPattern chooseSourceReadyPattern(Map<String, Long> remaining,
                                                           Map<String, GlobalPattern> byId) {
         Set<String> stillProduced = remainingProducedResources(remaining, byId);
@@ -298,16 +331,42 @@ public final class GlobalCraftingPlanner {
     private static GlobalPattern chooseCheapestSeedPattern(Map<String, Long> remaining,
                                                            Map<String, GlobalPattern> byId,
                                                            Map<String, Long> stock,
+                                                           Map<String, Long> required,
+                                                           Map<String, Long> availableStock,
+                                                           Set<String> emittable,
                                                            String preferredSeedResource) {
         return remaining.entrySet().stream()
                 .filter(entry -> entry.getValue() > 0)
                 .map(entry -> byId.get(entry.getKey()))
                 .min(Comparator
-                        .comparingInt((GlobalPattern pattern) ->
+                        .comparingLong((GlobalPattern pattern) -> missingFromAvailableForOne(
+                                pattern, stock, required, availableStock, emittable))
+                        .thenComparingInt(pattern ->
                                 pattern.inputs().containsKey(preferredSeedResource) ? 0 : 1)
                         .thenComparingLong(pattern -> missingForOne(pattern, stock))
                         .thenComparing(GlobalPattern::id))
                 .orElse(null);
+    }
+
+    private static long missingFromAvailableForOne(
+            GlobalPattern pattern, Map<String, Long> stock,
+            Map<String, Long> required, Map<String, Long> availableStock,
+            Set<String> emittable) {
+        long missing = 0;
+        for (var input : pattern.inputs().entrySet()) {
+            if (emittable.contains(input.getKey())) {
+                continue;
+            }
+            long increment = Math.max(0L,
+                    input.getValue() - stock.getOrDefault(input.getKey(), 0L));
+            long before = required.getOrDefault(input.getKey(), 0L);
+            long after = Math.addExact(before, increment);
+            long available = availableStock.getOrDefault(input.getKey(), 0L);
+            long newlyMissing = Math.max(0L, after - available)
+                    - Math.max(0L, before - available);
+            missing = saturatingAdd(missing, newlyMissing);
+        }
+        return missing;
     }
 
     private static long missingForOne(GlobalPattern pattern, Map<String, Long> stock) {
@@ -379,14 +438,6 @@ public final class GlobalCraftingPlanner {
         perRound.forEach((resource, amount) ->
                 reserved.put(resource, Math.multiplyExact(amount, reservedCycles)));
         return reserved;
-    }
-
-    private static Map<String, Long> applyReserve(Map<String, Long> available,
-                                                  Map<String, Long> reserved) {
-        Map<String, Long> usable = new LinkedHashMap<>(available);
-        reserved.forEach((resource, amount) -> usable.put(resource,
-                Math.max(0L, available.getOrDefault(resource, 0L) - amount)));
-        return usable;
     }
 
     private static Graph buildRelevantGraph(String target, List<GlobalPattern> patterns) {

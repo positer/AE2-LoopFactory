@@ -1,4 +1,9 @@
 {
+  "itemGroup.ae2lightoptimizer": "AE2LO - Applied Energistics 2 Lightweight Optimization",
   "block.ae2lightoptimizer.recipe_ring_solver_terminal": "Recipe Ring Solver Terminal",
-  "block.ae2lightoptimizer.supercomputing_crafting_optimizer_interface": "Supercomputing Crafting Optimizer Interface"
+  "block.ae2lightoptimizer.supercomputing_crafting_optimizer_interface": "Supercomputing Crafting Optimizer Interface",
+  "item.ae2lightoptimizer.loop_crystal": "Loop Crystal",
+  "item.ae2lightoptimizer.loop_crystal_fragment": "Loop Crystal Fragment",
+  "block.ae2lightoptimizer.loop_crystal_block": "Loop Crystal Block",
+  "item.ae2lightoptimizer.loop_crystal_powder": "Loop Crystal Powder"
 }

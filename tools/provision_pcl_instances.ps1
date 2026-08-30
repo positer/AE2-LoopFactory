@@ -27,7 +27,7 @@ $instances = @(
             'guideme-21.1.17.jar'
             'jei-1.21.1-neoforge-19.37.0.363.jar'
         )
-        Artifact = 'versions\neoforge-1.21.1\build\libs\ae2lightoptimizer-neoforge-mc1.21.1-0.0.1.jar'
+        Artifact = 'versions\neoforge-1.21.1\build\libs\ae2lightoptimizer-neoforge-mc1.21.1-0.0.2.jar'
     }
     @{
         Name = 'AE2-lightoptimizer-26.1.2'
@@ -37,7 +37,7 @@ $instances = @(
             'guideme-26.1.12-beta.jar'
             'jei-26.1.2-neoforge-29.21.0.68.jar'
         )
-        Artifact = 'versions\neoforge-26.1.2\build\libs\ae2lightoptimizer-neoforge-mc26.1.2-0.0.1.jar'
+        Artifact = 'versions\neoforge-26.1.2\build\libs\ae2lightoptimizer-neoforge-mc26.1.2-0.0.2.jar'
     }
 )
 

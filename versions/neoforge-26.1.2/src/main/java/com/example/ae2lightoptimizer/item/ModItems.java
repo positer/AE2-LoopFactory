@@ -3,6 +3,7 @@ package com.example.ae2lightoptimizer.item;
 import com.example.ae2lightoptimizer.Ae2LightOptimizer;
 import com.example.ae2lightoptimizer.block.ModBlocks;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -19,6 +20,11 @@ public final class ModItems {
             ITEMS.registerSimpleBlockItem(
                     "supercomputing_crafting_optimizer_interface",
                     ModBlocks.SUPERCOMPUTING_CRAFTING_OPTIMIZER_INTERFACE);
+
+    public static final DeferredItem<Item> LOOP_CRYSTAL = ITEMS.registerSimpleItem("loop_crystal");
+    public static final DeferredItem<Item> LOOP_CRYSTAL_FRAGMENT = ITEMS.registerSimpleItem("loop_crystal_fragment");
+    public static final DeferredItem<BlockItem> LOOP_CRYSTAL_BLOCK = ITEMS.registerSimpleBlockItem("loop_crystal_block", ModBlocks.LOOP_CRYSTAL_BLOCK);
+    public static final DeferredItem<Item> LOOP_CRYSTAL_POWDER = ITEMS.registerSimpleItem("loop_crystal_powder");
 
     private ModItems() {
     }

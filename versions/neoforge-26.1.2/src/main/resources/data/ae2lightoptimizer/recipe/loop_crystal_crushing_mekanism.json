@@ -1,0 +1,14 @@
+{
+  "neoforge:conditions": [
+    { "type": "neoforge:mod_loaded", "modid": "mekanism" }
+  ],
+  "type": "mekanism:crushing",
+  "input": {
+    "count": 1,
+    "tag": "c:gems/loop_crystal"
+  },
+  "output": {
+    "count": 1,
+    "id": "ae2lightoptimizer:loop_crystal_powder"
+  }
+}

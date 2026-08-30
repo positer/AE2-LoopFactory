@@ -1,10 +1,18 @@
-# AE2-lightoptimizer
+# AE2LO — AE2-lightoptimizer
 
-`AE2-lightoptimizer` is a lightweight Applied Energistics 2 addon for accelerating server-side crafting calculations without adding screens or menus. Its two AE2 network blocks separate cycle solving from plan optimization so unsupported recipe semantics can fall back to AE2 safely.
+**English:** Applied Energistics 2 Lightweight Optimization (**AE2LO**)
+
+**简体中文：** 应用能源 2 轻量优化（**AE2LO**）
+
+`AE2-lightoptimizer` (简称 **AE2LO**) is a lightweight Applied Energistics 2 addon for accelerating server-side crafting calculations without adding screens or menus. Its two AE2 network blocks separate cycle solving from plan optimization so unsupported recipe semantics can fall back to AE2 safely.
 
 Official source repository: <https://github.com/positer/AE2-lightoptimizer>
 
-Current release: **0.0.1**
+Current release: **0.0.2**
+
+Release 0.0.2 adds Loop Crystal materials, AE2-compatible conversion recipes, and solver regression coverage for growth and no-growth multi-recipe cycles.
+
+Optional machine compatibility is additive: Create provides a conditional `create:milling` recipe and Mekanism provides a conditional `mekanism:crushing` recipe. Both use the common `c:gems/loop_crystal` item tag and convert one tagged Loop Crystal into one Loop Crystal Powder. Each recipe activates independently when its platform is loaded; neither Create nor Mekanism is an AE2LO dependency.
 
 | Minecraft | NeoForge | AE2 | Java |
 | --- | --- | --- | --- |
@@ -19,11 +27,11 @@ Minecraft 1.20.1 is intentionally not maintained. Both supported generations are
 
 `ae2lightoptimizer:recipe_ring_solver_terminal` (`配方环解算终端`) handles cyclic crafting-tree analysis only. It requires an AE2 channel, consumes 2 AE/t, exposes its grid node on every side, and has no UI.
 
-For self-growth rings, material accounting preserves enough existing material for up to 16 further cycles:
+For self-growth rings, the 16-cycle value is execution seed metadata; it does not reduce the current order's usable inventory:
 
-- Existing material below the 16-cycle threshold is reserved in full and does not reduce calculated demand.
-- Existing material above the threshold contributes only its surplus toward calculated demand.
-- The resulting demand is `total loop demand - surplus above the reserved 16 cycles`.
+- Cyclic output seeds remain reserved by the executing CPU until dispatch completes.
+- External inputs are checked against the current order in full, so finite orders never report a fixed reserve as missing.
+- The resulting demand is the exact net material balance for the requested order.
 - All arithmetic uses checked `long`; overflow makes the fast path decline the request and AE2 retains control.
 
 The live AE2 bridge now collects the reachable network pattern graph and hands cyclic strongly connected components to the terminal. It supports single-pattern growth and multi-pattern nested growth without expanding every application. A terminal can operate independently for cyclic jobs and deliberately leaves acyclic jobs to AE2 or an optimizer interface.
@@ -130,3 +138,5 @@ Alternatively, set `PCL_ROOT` and omit `-PclRoot`.
 The script never deletes or recreates an existing instance directory. It preserves `saves`, `config`, `defaultconfigs`, `screenshots`, `resourcepacks`, `logs`, `options.txt`, and all other unmanaged runtime state. Before and after deployment it records every save file's relative path, size, timestamp, and SHA-256 and fails if any value changes; a locked world also makes deployment stop before mutation. The legacy `-Recreate` flag remains only as a safe compatibility alias and has the same non-destructive behavior.
 
 The managed `mods` directory uses a strict four-JAR whitelist. Stale AE2, GuideME, JEI, and addon JARs may be refreshed, but an unknown user-added JAR makes the script stop instead of deleting it. The script downloads only the pinned JEI artifact from its author Maven when it is not locally staged, and validates independent mode, absence of ImmortalStorage artifacts, and absence of filesystem links after deployment.
+
+- 0.0.2 texture correction: attached crystal and fragment images are now the canonical item textures in both generations.

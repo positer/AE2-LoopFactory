@@ -61,6 +61,41 @@ class RecipeRingSolverTest {
     }
 
     @Test
+    void classifiesLoopCrystalDecomposeRecombineAsNoGrowth() {
+        RingRecipe decompose = new RingRecipe("loop_crystal_to_fragments",
+                Map.of("loop_crystal", 1L), Map.of("loop_crystal_fragment", 4L));
+        RingRecipe recombine = new RingRecipe("loop_crystal_from_fragments",
+                Map.of("loop_crystal_fragment", 4L), Map.of("loop_crystal", 1L));
+
+        RingSolveResult result = solver.solve(new RingSolveRequest(
+                "loop_crystal", 2L, Map.of("loop_crystal", 1L),
+                List.of(decompose, recombine), new RingSolveBudget(16, 128)));
+
+        assertEquals(RingSolveStatus.NO_GROWTH_PATH, result.status());
+    }
+
+    @Test
+    void detectsLoopCrystalGrowthWhenTheMultiRecipeRingHasExternalInputs() {
+        RingRecipe decompose = new RingRecipe("loop_crystal_to_fragments",
+                Map.of("loop_crystal", 1L), Map.of("loop_crystal_fragment", 4L));
+        RingRecipe grow = new RingRecipe("loop_crystal_shaped_growth",
+                Map.of("certus_quartz_crystal", 4L, "fluix_crystal", 1L,
+                        "loop_crystal_fragment", 4L),
+                Map.of("loop_crystal", 4L));
+
+        RingSolveResult result = solver.solve(new RingSolveRequest(
+                "loop_crystal", 4L,
+                Map.of("loop_crystal", 1L, "certus_quartz_crystal", 4L,
+                        "fluix_crystal", 1L), List.of(decompose, grow),
+                new RingSolveBudget(16, 128)));
+
+        assertEquals(RingSolveStatus.SOLVED, result.status());
+        assertEquals(4L, result.finalStock().get("loop_crystal"));
+        assertTrue(result.applications().stream()
+                .anyMatch(step -> step.recipeId().equals("loop_crystal_shaped_growth")));
+    }
+
+    @Test
     void reportsBudgetExhaustionSeparatelyFromAnImpossibleRing() {
         RingRecipe one = new RingRecipe("one", Map.of("a", 1L), Map.of("b", 1L));
         RingRecipe two = new RingRecipe("two", Map.of("b", 1L), Map.of("c", 1L));

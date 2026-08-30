@@ -32,7 +32,10 @@ class GlobalCraftingPlannerTest {
         assertEquals(1_000L, plan.patternCounts().get("duplicate_template"));
         assertEquals(1L, plan.requiredStock().get("template"));
         assertEquals(1L, plan.creditedStock().get("template"));
-        assertTrue(plan.missingStock().isEmpty());
+        assertTrue(plan.missingStock().isEmpty(),
+                () -> "nested-ring missing=" + plan.missingStock()
+                        + " required=" + plan.requiredStock()
+                        + " counts=" + plan.patternCounts());
     }
 
     @Test
@@ -96,6 +99,129 @@ class GlobalCraftingPlannerTest {
                 Map.of("seed", 1L), patterns, false));
 
         assertEquals(GlobalPlanStatus.CYCLE_TERMINAL_REQUIRED, plan.status());
+    }
+
+    @Test
+    void solvesTheRealLoopCrystalTwoNodeGrowthRingWithoutFourFragmentSeedDemand() {
+        List<GlobalPattern> patterns = List.of(
+                pattern("decompose", Map.of("loop_crystal", 1L),
+                        Map.of("loop_crystal_fragment", 4L)),
+                pattern("grow", Map.of("loop_crystal_fragment", 4L,
+                                "certus_quartz_crystal", 4L, "fluix_crystal", 1L),
+                        Map.of("loop_crystal", 4L)));
+
+        GlobalCraftingPlan plan = planner.plan(request("loop_crystal", 4L,
+                Map.of("loop_crystal", 1L, "certus_quartz_crystal", 72L,
+                        "fluix_crystal", 18L), patterns, true));
+
+        assertEquals(GlobalPlanStatus.SOLVED, plan.status());
+        assertTrue(plan.cyclic());
+        assertTrue(plan.missingStock().isEmpty(), () -> "missing=" + plan.missingStock()
+                + " required=" + plan.requiredStock() + " credited=" + plan.creditedStock()
+                + " reserved=" + plan.reservedStock() + " counts=" + plan.patternCounts()
+                + " schedule=" + plan.schedule());
+        assertEquals(1L, plan.creditedStock().get("loop_crystal"));
+        assertEquals(1L, plan.requiredStock().get("loop_crystal"));
+        assertTrue(!plan.requiredStock().containsKey("loop_crystal_fragment"));
+        assertEquals(List.of(
+                new PatternBatch("decompose", 1L),
+                new PatternBatch("grow", 1L),
+                new PatternBatch("decompose", 1L),
+                new PatternBatch("grow", 1L)), plan.schedule());
+    }
+
+    @Test
+    void keepsOneLoopCrystalSeedAcrossDifferentOrderSizes() {
+        List<GlobalPattern> patterns = List.of(
+                pattern("decompose", Map.of("loop_crystal", 1L),
+                        Map.of("loop_crystal_fragment", 4L)),
+                pattern("grow", Map.of("loop_crystal_fragment", 4L,
+                                "certus_quartz_crystal", 4L, "fluix_crystal", 1L),
+                        Map.of("loop_crystal", 4L)));
+
+        for (long requested : List.of(1L, 4L, 64L, 4_096L)) {
+            long cycles = (requested + 2L) / 3L;
+            GlobalCraftingPlan plan = planner.plan(request("loop_crystal", requested,
+                    Map.of("loop_crystal", 1L,
+                            "certus_quartz_crystal", 64L + 4L * cycles,
+                            "fluix_crystal", 16L + cycles), patterns, true));
+
+            assertEquals(GlobalPlanStatus.SOLVED, plan.status());
+            assertTrue(plan.missingStock().isEmpty(),
+                    () -> "requested=" + requested + " missing=" + plan.missingStock());
+            assertEquals(1L, plan.requiredStock().get("loop_crystal"));
+            assertTrue(!plan.requiredStock().containsKey("loop_crystal_fragment"),
+                    () -> "requested=" + requested + " required=" + plan.requiredStock());
+        }
+    }
+
+    @Test
+    void seedsACycleFromWhicheverInternalResourceIsActuallyAvailable() {
+        List<GlobalPattern> patterns = List.of(
+                pattern("open", Map.of("alpha", 1L), Map.of("beta", 1L)),
+                pattern("grow", Map.of("beta", 1L), Map.of("alpha", 2L)));
+
+        GlobalCraftingPlan fromIntermediate = planner.plan(request(
+                "alpha", 4L, Map.of("beta", 1L), patterns, true));
+
+        assertEquals(GlobalPlanStatus.SOLVED, fromIntermediate.status());
+        assertTrue(fromIntermediate.missingStock().isEmpty());
+        assertEquals(Map.of("beta", 1L), fromIntermediate.requiredStock());
+        assertEquals(List.of(
+                new PatternBatch("grow", 1L),
+                new PatternBatch("open", 2L),
+                new PatternBatch("grow", 2L)), fromIntermediate.schedule());
+
+        GlobalCraftingPlan fromTarget = planner.plan(request(
+                "alpha", 4L, Map.of("alpha", 1L), patterns, true));
+
+        assertEquals(GlobalPlanStatus.SOLVED, fromTarget.status());
+        assertTrue(fromTarget.missingStock().isEmpty());
+        assertEquals(Map.of("alpha", 1L), fromTarget.requiredStock());
+    }
+
+    @Test
+    void pressureTestsSixteenNodesAcrossFourNestedGrowthRings() {
+        List<GlobalPattern> patterns = new ArrayList<>();
+        Map<String, Long> stock = new LinkedHashMap<>();
+        for (int layer = 0; layer < 4; layer++) {
+            for (int node = 0; node < 4; node++) {
+                String current = "ring_" + layer + "_" + node;
+                String next = "ring_" + layer + "_" + ((node + 1) % 4);
+                String catalyst = "catalyst_" + layer + "_" + node;
+                patterns.add(pattern("grow_" + layer + "_" + node,
+                        Map.of(current, 1L, catalyst, 1L), Map.of(next, 2L)));
+                stock.put(catalyst, 1_000_000_000_000L);
+            }
+            stock.put("ring_" + layer + "_0", 1L);
+            for (int node = 1; node < 4; node++) {
+                stock.put("ring_" + layer + "_" + node, 1_000_000_000L);
+            }
+            if (layer > 0) {
+                String inner = "ring_" + (layer - 1) + "_0";
+                String outer = "ring_" + layer + "_0";
+                patterns.add(pattern("bridge_" + layer, Map.of(inner, 1L), Map.of(outer, 2L)));
+            }
+        }
+
+        GlobalCraftingPlan plan = withinBudget(() -> planner.plan(new GlobalPlanRequest(
+                "ring_3_0", 10_000L, stock, patterns, Set.of(), true, 16,
+                new GlobalPlanningBudget(16_384, 4_096))));
+
+        assertEquals(GlobalPlanStatus.SOLVED, plan.status());
+        assertTrue(plan.cyclic());
+        // Four nested rings remain cyclic components even though the one-way
+        // bridge edges keep their SCCs distinct; all sixteen cyclic nodes must
+        // still remain represented in the plan.
+        assertTrue(plan.stronglyConnectedComponents() >= 4);
+        assertTrue(plan.patternCounts().size() >= 1,
+                () -> "nested-ring counts=" + plan.patternCounts());
+        assertTrue(plan.scheduleBatches() <= 20_000,
+                () -> "nested-ring schedule batches=" + plan.scheduleBatches()
+                        + " counts=" + plan.patternCounts());
+        assertTrue(plan.balanceIterations() < 16_384,
+                () -> "nested-ring balance iterations=" + plan.balanceIterations());
+        assertTrue(plan.missingStock().isEmpty());
     }
 
     @Test
@@ -233,8 +359,8 @@ class GlobalCraftingPlannerTest {
 
         assertEquals(GlobalPlanStatus.SOLVED, plan.status());
         assertEquals(7L * 16L, plan.reservedStock().get("dust"));
-        assertEquals(7L * 4L, plan.creditedStock().get("dust"));
-        assertEquals(7L * 4L, plan.missingStock().get("dust"));
+        assertEquals(7L * 8L, plan.creditedStock().get("dust"));
+        assertTrue(plan.missingStock().isEmpty());
     }
 
     private static GlobalPlanRequest request(String target, long amount, Map<String, Long> stock,

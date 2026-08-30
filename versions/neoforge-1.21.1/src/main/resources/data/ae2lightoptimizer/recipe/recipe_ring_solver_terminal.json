@@ -2,23 +2,15 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "A": {
-      "item": "ae2:annihilation_core"
-    },
-    "C": {
-      "item": "ae2:calculation_processor"
-    },
-    "F": {
-      "item": "ae2:formation_core"
-    },
-    "U": {
-      "item": "ae2:crafting_unit"
-    }
+    "I": {"item":"minecraft:iron_ingot"},
+    "C": {"item":"ae2:calculation_processor"},
+    "L": {"item":"ae2:logic_processor"},
+    "R": {"item":"ae2lightoptimizer:loop_crystal"}
   },
   "pattern": [
-    "FCA",
-    "CUC",
-    "ACF"
+    "ICI",
+    "LRL",
+    "ICI"
   ],
   "result": {
     "count": 1,

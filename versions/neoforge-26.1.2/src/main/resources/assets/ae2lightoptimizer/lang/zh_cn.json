@@ -1,4 +1,9 @@
 {
+  "itemGroup.ae2lightoptimizer": "AE2LO - 应用能源 2 轻量优化",
   "block.ae2lightoptimizer.recipe_ring_solver_terminal": "配方环解算终端",
-  "block.ae2lightoptimizer.supercomputing_crafting_optimizer_interface": "超算合成优化接口"
+  "block.ae2lightoptimizer.supercomputing_crafting_optimizer_interface": "超算合成优化接口",
+  "item.ae2lightoptimizer.loop_crystal": "循环水晶",
+  "item.ae2lightoptimizer.loop_crystal_fragment": "循环水晶碎片",
+  "block.ae2lightoptimizer.loop_crystal_block": "循环水晶块",
+  "item.ae2lightoptimizer.loop_crystal_powder": "循环水晶粉"
 }

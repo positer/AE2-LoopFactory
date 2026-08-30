@@ -25,6 +25,8 @@ public final class ModBlocks {
                     .strength(3.5F)
                     .sound(SoundType.METAL));
 
+    public static final DeferredBlock<Block> LOOP_CRYSTAL_BLOCK = BLOCKS.registerBlock("loop_crystal_block", Block::new,
+            () -> BlockBehaviour.Properties.of().strength(1.5F).sound(SoundType.AMETHYST));
     private ModBlocks() {
     }
 }

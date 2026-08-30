@@ -1,0 +1,13 @@
+{
+  "neoforge:conditions": [
+    { "type": "neoforge:mod_loaded", "modid": "create" }
+  ],
+  "type": "create:milling",
+  "ingredients": [
+    { "tag": "c:gems/loop_crystal" }
+  ],
+  "processing_time": 250,
+  "results": [
+    { "id": "ae2lightoptimizer:loop_crystal_powder", "count": 1 }
+  ]
+}

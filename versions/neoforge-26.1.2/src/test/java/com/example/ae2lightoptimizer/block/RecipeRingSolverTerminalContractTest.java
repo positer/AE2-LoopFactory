@@ -57,13 +57,13 @@ class RecipeRingSolverTerminalContractTest {
                 .getAsJsonObject();
 
         assertEquals("minecraft:crafting_shaped", recipe.get("type").getAsString());
-        assertEquals("FCA", recipe.getAsJsonArray("pattern").get(0).getAsString());
-        assertEquals("CUC", recipe.getAsJsonArray("pattern").get(1).getAsString());
-        assertEquals("ACF", recipe.getAsJsonArray("pattern").get(2).getAsString());
-        assertEquals("ae2:formation_core", ingredient(recipe, "F"));
-        assertEquals("ae2:annihilation_core", ingredient(recipe, "A"));
+        assertEquals("ICI", recipe.getAsJsonArray("pattern").get(0).getAsString());
+        assertEquals("LRL", recipe.getAsJsonArray("pattern").get(1).getAsString());
+        assertEquals("ICI", recipe.getAsJsonArray("pattern").get(2).getAsString());
+        assertEquals("minecraft:iron_ingot", ingredient(recipe, "I"));
+        assertEquals("ae2:logic_processor", ingredient(recipe, "L"));
+        assertEquals("ae2lightoptimizer:loop_crystal", ingredient(recipe, "R"));
         assertEquals("ae2:calculation_processor", ingredient(recipe, "C"));
-        assertEquals("ae2:crafting_unit", ingredient(recipe, "U"));
         assertEquals("ae2lightoptimizer:recipe_ring_solver_terminal",
                 recipe.getAsJsonObject("result").get("id").getAsString());
     }

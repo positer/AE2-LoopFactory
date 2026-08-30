@@ -24,10 +24,10 @@ This block independently takes over reachable cyclic crafting graphs and solves 
 
 ## Material reserve
 
-Self-growth calculations preserve enough existing material for up to 16 additional cycles.
+The 16-cycle value is execution seed metadata; it never reduces the current order's usable inventory.
 
-- If existing stock cannot cover 16 cycles, all of it is reserved and none of it reduces the calculated demand.
-- If stock exceeds 16 cycles, the 16-cycle reserve remains untouched and only the surplus reduces demand.
+- Cyclic output seeds remain reserved by the executing CPU until dispatch completes.
+- External inputs are checked against the current order in full, so finite orders never report a fixed reserve as missing.
 - Checked 64-bit arithmetic is used. An overflow or unsupported recipe structure falls back to AE2's normal calculation.
 
 The live integration handles single-pattern growth and multi-pattern nested growth SCCs without expanding every application. Reachable cycles remain takeover candidates regardless of node, pattern, or edge count, and planning capacity scales with the discovered graph. Dead 1:1 rings, overflow, and graphs for which an executable schedule cannot be proven fall back safely.

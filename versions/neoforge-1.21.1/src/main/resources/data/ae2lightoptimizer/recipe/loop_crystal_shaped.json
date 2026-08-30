@@ -1,0 +1,1 @@
+{"type":"minecraft:crafting_shaped","category":"misc","pattern":["ABA","BCB","ABA"],"key":{"A":{"item":"ae2:certus_quartz_crystal"},"B":{"item":"ae2lightoptimizer:loop_crystal_fragment"},"C":{"item":"ae2:fluix_crystal"}},"result":{"id":"ae2lightoptimizer:loop_crystal","count":4}}
