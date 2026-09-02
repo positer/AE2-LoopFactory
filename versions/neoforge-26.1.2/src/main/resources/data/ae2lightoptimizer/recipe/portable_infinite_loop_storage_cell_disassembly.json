@@ -1,0 +1,18 @@
+{
+  "type": "ae2:storage_cell_disassembly",
+  "cell": "ae2lightoptimizer:portable_infinite_loop_storage_cell",
+  "cell_disassembly_items": [
+    {
+      "id": "ae2:me_chest",
+      "count": 1
+    },
+    {
+      "id": "ae2:energy_cell",
+      "count": 1
+    },
+    {
+      "id": "ae2lightoptimizer:infinite_loop_storage_cell",
+      "count": 1
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "ae2:me_chest",
+    "ae2:energy_cell",
+    "ae2lightoptimizer:loop_storage_cell_housing",
+    "ae2lightoptimizer:16k_loop_storage_core"
+  ],
+  "result": {
+    "id": "ae2lightoptimizer:portable_16k_loop_storage_cell",
+    "count": 1
+  }
+}

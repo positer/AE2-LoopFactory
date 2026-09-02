@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "ae2lightoptimizer:item/64m_loop_storage_core"
+  }
+}

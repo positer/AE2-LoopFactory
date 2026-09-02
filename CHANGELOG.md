@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.0.3
+
+### English
+
+- Added the complete Loop Storage Cell family: one housing, ten storage cores, ten finite universal cells, and one infinite cell.
+- Added 1k through 256k cells with AE2-equivalent capacities and 63-type limits; 1M through 256M cells use a shared DISK-style total equal to 63 times the original single-type ceiling, and the infinite cell uses an unlimited aggregate pool. M and infinite cells do not show a separate type count.
+- Added dynamic compatibility with every key type registered in AE2, including items, fluids, FE, mana, source, soul, and other addon keys. Optional storage addons are detected through AE2 only and are not dependencies.
+- Added multi-cell spillover so a full cell routes the same key into the next compatible Loop Storage Cell instead of blocking that key on one disk.
+- Added eleven portable cells covering every finite tier and the infinite tier. They reuse AE2's portable terminal, battery, charge rate, idle drain, powered insert or extract, and four upgrade slots with the same card set as AE2 portable cells: fuzzy, inverter, equal distribution, void, and energy card x2. Card hints, insertion validation, and card effects match AE2 portable behavior. Creative mode exposes empty and fully charged variants.
+- Added all ordered and shapeless acquisition routes plus eleven disassembly declarations, and the exact explosion transform of 64 256M cores plus one housing for the infinite cell.
+- Preserved the ten supplied core textures byte-for-byte and generated only the requested deterministic shell and cell recolors; portable layers follow each generation's native AE2 color contract.
+- Kept mounted cell contents durable across grid refreshes and remounts, and kept AE2 as the only mod prerequisite in both maintained generations.
+
+### 简体中文
+
+- 新增完整循环存储磁盘系列：一个磁盘外壳、十个存储核心、十个有限通用磁盘和一个无限磁盘。
+- 1k 至 256k 磁盘采用与 AE2 对应磁盘相同的容量和 63 种类型限制；1M 至 256M 磁盘使用总量为原单类上限 63 倍的深度磁盘式共享池，无限磁盘使用无限聚合池。M 级与无限级不单独显示种类数量。
+- 自动兼容所有注册到 AE2 的存储键类型，包括物品、流体、FE、魔力、魔源、灵魂涌动及其他附属键；可选存储附属仅通过 AE2 动态识别，不作为依赖。
+- 新增多磁盘溢写：同一种键在磁盘满后继续进入下一块兼容循环存储磁盘，不再被单块磁盘限制。
+- 新增十一档便携磁盘，覆盖全部有限档与无限档。它们复用 AE2 的便携终端、电池、充能速率、待机耗电、通电存取，以及 AE2 便携元件相同的四格升级卡槽：模糊、反转、均衡分配、虚空、能量卡 x2。卡牌提示、准入判断与卡牌效果与 AE2 便携元件一致。创造模式提供空电与满电两种物品。
+- 新增全部有序和无序获取配方、十一份拆解声明，以及精确消耗 64 个 256M 核心加一个外壳的无限磁盘爆炸转换配方。
+- 十张用户提供的核心材质逐字节原样复制，只对明确要求的外壳和磁盘部分执行确定性换色。
+- 便携磁盘各层遵循对应世代的 AE2 原生取色约定；磁盘内容在网格刷新与重新挂载后保持稳定。
+- 两个维护版本均只将 AE2 作为模组前置。
+
 ## 0.0.2
 
 ### English

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GPG",
+    "ICI",
+    "GPG"
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "P": {
+      "item": "ae2lightoptimizer:loop_crystal_powder"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "C": {
+      "item": "ae2lightoptimizer:4k_loop_storage_core"
+    }
+  },
+  "result": {
+    "id": "ae2lightoptimizer:4k_loop_storage_cell",
+    "count": 1
+  }
+}

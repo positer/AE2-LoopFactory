@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "NPN",
+    "PSP",
+    "NLN"
+  ],
+  "key": {
+    "N": {
+      "item": "minecraft:netherite_ingot"
+    },
+    "P": {
+      "item": "ae2lightoptimizer:64m_loop_storage_core"
+    },
+    "S": {
+      "item": "ae2:singularity"
+    },
+    "L": {
+      "item": "ae2lightoptimizer:loop_crystal"
+    }
+  },
+  "result": {
+    "id": "ae2lightoptimizer:256m_loop_storage_core",
+    "count": 1
+  }
+}

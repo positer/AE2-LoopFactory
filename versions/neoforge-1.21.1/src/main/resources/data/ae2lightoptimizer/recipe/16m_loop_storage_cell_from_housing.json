@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "ae2lightoptimizer:16m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:loop_storage_cell_housing"
+    }
+  ],
+  "result": {
+    "id": "ae2lightoptimizer:16m_loop_storage_cell",
+    "count": 1
+  }
+}

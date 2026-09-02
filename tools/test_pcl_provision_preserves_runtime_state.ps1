@@ -29,6 +29,8 @@ try {
                 'appliedenergistics2-19.2.17.jar'
                 'guideme-21.1.17.jar'
                 'jei-1.21.1-neoforge-19.37.0.363.jar'
+                'AppliedFlux-1.21-2.1.5-neoforge.jar'
+                'Glodium-1.21-2.2-neoforge.jar'
             )
         }
         @{
@@ -38,6 +40,8 @@ try {
                 'appliedenergistics2-26.1.10-beta.jar'
                 'guideme-26.1.12-beta.jar'
                 'jei-26.1.2-neoforge-29.21.0.68.jar'
+                'AppliedFlux-26.1-1.0.1-neoforge.jar'
+                'Glodium-26.1-1.2-neoforge.jar'
             )
         }
     )

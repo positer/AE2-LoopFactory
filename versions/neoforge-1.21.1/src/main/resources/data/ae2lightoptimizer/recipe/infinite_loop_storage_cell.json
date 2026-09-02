@@ -1,0 +1,207 @@
+{
+  "type": "ae2:transform",
+  "circumstance": {
+    "type": "explosion"
+  },
+  "ingredients": [
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:256m_loop_storage_core"
+    },
+    {
+      "item": "ae2lightoptimizer:loop_storage_cell_housing"
+    }
+  ],
+  "result": {
+    "id": "ae2lightoptimizer:infinite_loop_storage_cell",
+    "count": 1
+  }
+}
