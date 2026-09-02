@@ -9,7 +9,8 @@
     "ElapsedTimeTrackerAccessor",
     "CraftingPlanMixin",
     "ExecutingCraftingJobMixin",
-    "ExecutingCraftingJobPersistenceMixin"
+    "ExecutingCraftingJobPersistenceMixin",
+    "TransformRecipeDisplayMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -151,13 +151,16 @@ class LoopStorageCellContractTest {
     }
 
     @Test
-    void jeiCompressesInfiniteTransformToA64CoreStackAndHousingWithoutChangingTheRecipe() throws IOException {
-        String source = Files.readString(Path.of(
-                "src/main/java/com/example/ae2lightoptimizer/client/jei/InfiniteLoopStorageJeiPlugin.java"));
+    void transformDisplayCompressesInfiniteExplosionWithoutChangingTheRecipe() throws IOException {
+        String mixin = read("src/main/java/com/example/ae2lightoptimizer/mixin/TransformCategoryDisplayMixin.java");
+        String mixins = read("src/main/resources/ae2lightoptimizer.mixins.json");
 
-        assertTrue(source.contains("new ItemStack(ModItems.LOOP_STORAGE_CORE_256M.get(), 64)"));
-        assertTrue(source.contains("builder.addInputSlot(25, 10)"));
-        assertTrue(source.contains("hideRecipes(TransformCategory.RECIPE_TYPE, original)"));
+        assertTrue(mixin.contains("method = \"buildSlots\""));
+        assertTrue(mixin.contains("new ItemStack(ModItems.LOOP_STORAGE_CORE_256M.get(), 64)"));
+        assertTrue(mixin.contains("new ItemStack(ModItems.LOOP_STORAGE_CELL_HOUSING.get())"));
+        assertTrue(mixin.contains("RecipeIngredientRole.CRAFTING_STATION"));
+        assertTrue(mixins.contains("TransformCategoryDisplayMixin"));
+        assertFalse(mixin.contains("InfiniteLoopStorageJeiPlugin"));
     }
 
     @Test

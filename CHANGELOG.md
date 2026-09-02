@@ -12,6 +12,7 @@
 - Added all ordered and shapeless acquisition routes plus eleven disassembly declarations, and the exact explosion transform of 64 256M cores plus one housing for the infinite cell.
 - Preserved the ten supplied core textures byte-for-byte and generated only the requested deterministic shell and cell recolors; portable layers follow each generation's native AE2 color contract.
 - Kept mounted cell contents durable across grid refreshes and remounts, and kept AE2 as the only mod prerequisite in both maintained generations.
+- Integrated the infinite explosion transform into AE2's native world-interaction recipe category and aggregated the 64 256M cores into one slot.
 
 ### 简体中文
 
@@ -24,6 +25,7 @@
 - 十张用户提供的核心材质逐字节原样复制，只对明确要求的外壳和磁盘部分执行确定性换色。
 - 便携磁盘各层遵循对应世代的 AE2 原生取色约定；磁盘内容在网格刷新与重新挂载后保持稳定。
 - 两个维护版本均只将 AE2 作为模组前置。
+- 将无限磁盘爆炸转换整合进 AE2 原生世界交互合成分类，并将 64 个 256M 核心聚合为一格显示。
 
 ## 0.0.2
 

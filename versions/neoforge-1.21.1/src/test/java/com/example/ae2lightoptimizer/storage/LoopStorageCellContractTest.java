@@ -163,6 +163,18 @@ class LoopStorageCellContractTest {
         assertTrue(inventory.contains("voidUpgrade ? amount : inserted"));
     }
 
+    @Test
+    void transformDisplayCompressesInfiniteExplosionWithoutChangingTheRecipe() throws IOException {
+        String mixin = read(MAIN_JAVA.resolve("mixin/TransformRecipeDisplayMixin.java"));
+        String mixins = read(Path.of("src/main/resources/ae2lightoptimizer.mixins.json"));
+
+        assertTrue(mixin.contains("method = \"getIngredients\""));
+        assertTrue(mixin.contains("new ItemStack(ModItems.LOOP_STORAGE_CORE_256M.get(), 64)"));
+        assertTrue(mixin.contains("new ItemStack(ModItems.LOOP_STORAGE_CELL_HOUSING.get())"));
+        assertTrue(mixin.contains("ingredients.size() != 65"));
+        assertTrue(mixins.contains("TransformRecipeDisplayMixin"));
+    }
+
     private static List<String> tiers() {
         return List.of("1k", "4k", "16k", "64k", "256k", "1m", "4m", "16m", "64m", "256m");
     }
