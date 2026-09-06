@@ -6,13 +6,18 @@
   "mixins": [
     "CraftingCalculationMixin",
     "CraftingCpuLogicMixin",
+    "CraftingTaskProgressAccessor",
     "ElapsedTimeTrackerAccessor",
     "CraftingPlanMixin",
     "ExecutingCraftingJobMixin",
     "ExecutingCraftingJobPersistenceMixin",
-    "TransformRecipeDisplayMixin"
+    "TransformRecipeDisplayMixin",
+    "PatternProviderLogicInvoker"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "client": [
+    "WidgetContainerAccessor"
+  ]
 }

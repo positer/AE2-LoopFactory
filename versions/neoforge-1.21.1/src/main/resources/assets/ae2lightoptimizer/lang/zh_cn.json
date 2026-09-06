@@ -43,5 +43,7 @@
   "tooltip.ae2lightoptimizer.loop_storage_cell.types": "种类：%s / %s",
   "tooltip.ae2lightoptimizer.loop_storage_cell.types_unlimited": "种类：%s / 无限制",
   "tooltip.ae2lightoptimizer.loop_storage_cell.capacity_infinite": "存储：无限",
-  "tooltip.ae2lightoptimizer.loop_storage_cell.universal": "兼容所有已加载附属注册到 AE2 的存储键类型"
+  "tooltip.ae2lightoptimizer.loop_storage_cell.universal": "兼容所有已加载附属注册到 AE2 的存储键类型",
+  "block.ae2lightoptimizer.crafting_ripper": "合成撕裂者",
+  "item.ae2lightoptimizer.loop_card": "循环卡"
 }

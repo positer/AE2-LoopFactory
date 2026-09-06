@@ -65,6 +65,15 @@ public final class PortableLoopStorageCellItem extends AbstractPortableCell impl
         stack.set(AEComponents.STORAGE_CELL_FUZZY_MODE, mode);
     }
 
+    @Override
+    public void inventoryTick(ItemStack stack, net.minecraft.world.level.Level level,
+            net.minecraft.world.entity.Entity owner, int slot, boolean selected) {
+        super.inventoryTick(stack, level, owner, slot, selected);
+        if (!level.isClientSide()) {
+            PortableLoopEnergy.recharge(stack, this);
+        }
+    }
+
     public List<ItemStack> emptyAndFullStacks() {
         ItemStack empty = new ItemStack(this);
         ItemStack full = new ItemStack(this);

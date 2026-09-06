@@ -1,5 +1,6 @@
 package com.example.ae2lightoptimizer.item;
 
+import appeng.api.upgrades.Upgrades;
 import com.example.ae2lightoptimizer.Ae2LightOptimizer;
 import com.example.ae2lightoptimizer.block.ModBlocks;
 import com.example.ae2lightoptimizer.storage.LoopStorageCellItem;
@@ -25,6 +26,10 @@ public final class ModItems {
                     ModBlocks.SUPERCOMPUTING_CRAFTING_OPTIMIZER_INTERFACE.get(),
                     new Item.Properties()));
 
+    public static final DeferredItem<BlockItem> CRAFTING_RIPPER = ITEMS.register(
+            "crafting_ripper", () -> new BlockItem(ModBlocks.CRAFTING_RIPPER.get(), new Item.Properties()));
+    public static final DeferredItem<Item> LOOP_CARD = ITEMS.register(
+            "loop_card", () -> Upgrades.createUpgradeCardItem(new Item.Properties()));
     public static final DeferredItem<Item> LOOP_CRYSTAL = ITEMS.register("loop_crystal", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> LOOP_CRYSTAL_FRAGMENT = ITEMS.register("loop_crystal_fragment", () -> new Item(new Item.Properties()));
     public static final DeferredItem<BlockItem> LOOP_CRYSTAL_BLOCK = ITEMS.register("loop_crystal_block", () -> new BlockItem(ModBlocks.LOOP_CRYSTAL_BLOCK.get(), new Item.Properties()));

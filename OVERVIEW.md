@@ -3,19 +3,36 @@
 English name: Applied Energistics 2 Lightweight Optimization (AE2LO).  
 中文名称：应用能源 2 轻量优化（AE2LO）。
 
+Current release: **[0.0.4](https://github.com/positer/AE2-lightoptimizer/releases/tag/v0.0.4)**.
+
 ## Goal and status
 
-Provide a clean, dual-generation workspace for `AE2-lightoptimizer`, a UI-free AE2 addon whose universal Loop Storage cells share capacity across every dynamically registered AE2 key type and whose network blocks solve crafting cycles and accelerate eligible global crafting calculations. The workspace is isolated from ImmortalStorage and hard-separates incompatible Minecraft generations.
+Provide a clean, dual-generation workspace for `AE2-lightoptimizer`, an AE2 addon whose universal Loop Storage cells share capacity across every dynamically registered AE2 key type and whose network blocks solve crafting cycles, accelerate eligible global crafting calculations and execute validated crafting chains. The workspace is isolated from ImmortalStorage and hard-separates incompatible Minecraft generations.
 
 The canonical upstream is the standalone GitHub repository `https://github.com/positer/AE2-lightoptimizer`. Its Git root, history, branches, tags, and remote are independent from ImmortalStorage; no repository nesting, subtree, submodule, or shared worktree is used.
 
-Release 0.0.3 supports both maintained generations. It adds stationary and portable Loop Storage Cell families, dynamic compatibility with every AE2-registered storage key type, exact upgrade/explosion recipes, and immutable supplied core assets while retaining the 0.0.2 Loop Crystal and planner surface. Minecraft 1.20.1 is intentionally not maintained.
+Release 0.0.4 adds the Crafting Ripper and Loop Card in both maintained generations. The complete stationary and portable storage families, dynamic storage-key compatibility, recipes and existing solver services are retained. Minecraft 1.20.1 is intentionally not maintained.
 
 Optional compatibility data is additive: a NeoForge `mod_loaded(create)` conditional Create Milling recipe and a `mod_loaded(mekanism)` conditional Mekanism Crushing recipe both use the common `c:gems/loop_crystal` item tag. Each is ignored independently when its platform is absent; neither external mod is a dependency or class reference.
 
 Loop Storage Cells have only AE2 as a mod prerequisite. Version adapters enumerate `AEKeyTypes.getAll()` and use each key type's native `getAmountPerByte()`; optional storage addons are therefore compatibility inputs, never compile-time or metadata dependencies.
 
 ## Runtime flow
+
+### Crafting Ripper and Loop Card
+
+1. `CraftingRipperBlockEntity` reuses AE2's provider host contract and exposes a channel-requiring managed grid node with 5 AE/t drain.
+2. `CraftingRipperLogic` supplies 36 physical pattern slots, validates crafting/smithing/stonecutting patterns and prevents inserting into locked slots through either local menus or the pattern access terminal. Its pattern list is refreshed on card, inventory and recipe changes.
+3. `CraftingRipperMenu` and `CraftingRipperScreen` subclass the pinned AE2 provider implementations. The compact 176×210 interface contains only four pattern rows in its main area, with native player inventory and upgrade/control panels. Native return slots are disabled on both menu sides and hidden from the screen. A native upgrade slot holds one Loop Card; synchronized card state drives the grey slot overlay.
+4. `CraftingRipperPatterns` validates real recipe identity, selected input matching, assembled results and remainders. Automatic mode enumerates encodable concrete recipes; dynamic recipes without an enumerable representative are not advertised as fabricated static outputs.
+   `CraftingRipperCatalog` resolves real recipe inputs, native display/placement data and observed network component keys, with per-recipe coverage diagnostics. The server recipe manager and reload events control namespace-independent recipe additions, replacements, removals and tag changes. `CatalogCraftingPattern` preserves and validates all nine component candidate lists in the pinned 26.1.2 adapter; `CatalogSmithingPattern` provides a validated persistent definition for genuinely absent optional smithing slots.
+5. `CraftingRipperExecutor` preflights the entire selected CPU job before initial stock extraction, then validates again against private CPU stock before its single 50 AE commit. `InstantCraftingBatch` performs checked, compressed resource transitions; ring schedules and seed reserves retain their existing ownership.
+6. Completed products remain in the CPU for delivery and native finalization. Requester backpressure must never repeat material consumption or the 50 AE charge; reload/cancellation must preserve stock and completion state.
+   `RipperNativeCrafting` handles map expansion and AE2 quartz-cutting recipes requiring native random durability handling one operation per tick. Its CPU-job-local state persists real-output identity credits, remaining operations and the single 50 AE payment for the committed job. It never changes global key equality or writes a planned placeholder as a physical result.
+   `RipperMapSerialization` preserves vanilla's network-only map postprocessing marker beside normal native codecs for task definitions, final targets and private identity credits. Logical output credits can satisfy only the exact declared subsequent input, preventing fuzzy matching from consuming already completed maps. Quartz-cutting tool classification examines selected component keys before reading random remainders.
+7. Portable `inventoryTick` invokes `PortableLoopEnergy` to convert stored FE into AE charge only with a Loop Card, using AE2's conversion and native charge limits.
+8. `PortableLoopEnergy` registers version-local item energy capabilities: 1.21.1 uses the saturating legacy integer API, 26.1.2 uses transactional transfers and native long amount queries. Stored FE is available as a capacitor only while both FE and AE charge are positive.
+9. Portable inventory operations compare the current `STORAGE_CELL_INV` component to their cached snapshot and refresh after external FE changes, preventing stale terminal contents from restoring consumed energy.
 
 ### Crafting takeover
 
@@ -63,6 +80,18 @@ The no-service gate precedes pattern traversal and stock access. The graph-owner
 - `build-1.21.1.ps1`, `build-26.1.2.ps1`: isolated build launchers with separate Gradle homes.
 - `tools/provision_pcl_instances.ps1`: non-destructive, whitelist-only managed-file refresh for two independent PCL test instances, with save manifests checked before and after deployment.
 - `tools/test_pcl_provision_preserves_runtime_state.ps1`: temporary-instance regression proving saves, configs, screenshots, resource packs, logs, and options survive deployment byte-for-byte.
+- `tools/runtime-ripper-probe/`: separate, test-only real-client acceptance harness; none of its classes or metadata enter production JARs.
+  - `launch-pcl-probe.ps1`: launches the matching installed PCL client with a fixed offline test identity and a new uniquely named test world, recording installed hashes and launch arguments.
+  - `install-built-probe.ps1`: backs up both installed addon JARs and verifies the replacement production/helper hashes.
+  - `probe.init.gradle`: compiles and packages helper sources outside the production source sets.
+  - `1.21.1/` and `26.1.2/`: independent helper adapters. `RuntimeRipperProbe` builds a real ME network and submits native crafting jobs; `Core256MFixture` checks the exact 3000-core recipe and stock balance; `ClientBootstrap` creates the new world and captures the native framebuffer; `ProbeState` coordinates screenshots. `PlannerDiagnostic` and observer mixins record the actual planner request/result, bridge decision, native CPU tick and executor call without changing them. Each adapter's resources register only the helper mod and observers.
+    - `ExactComponentFixture`: two real 3000-item orders, missing precise input rejection, nested NBT values beyond double precision, and full component/material equality in manual and automatic modes.
+    - `PackRecipeReloadFixture`: actual server data-pack reload, recipe addition/replacement/removal, changed tags and typed component predicates; validates the provider's naturally refreshed published patterns.
+    - `NativeCatalogFixture`, `NativeContinuationAssertions`: three real map expansions, strict private-state round-trip and native CPU binary save/read after the first commit, followed by resumed completion with one total fee.
+    - `ToolComponentFixture`, `ToolRemainderObserver`: ordinary versus actual Unbreaking tools, native remainder callback observations and exact returned-tool balances without replacing the random generator.
+    - `CatalogAuditFixture`, `CatalogPatternPersistenceFixture` and `OptionalSmithingFixture`: live recipe witnesses, actual published candidates, card lifecycle and adapter-specific encoded pattern persistence and optional smithing slots.
+  - `ReplayPlannerCapture.java`: replays the captured real recipe graph with only the supercomputing service enabled and checks the exact materials for an acyclic order; this checks planning, not native CPU execution.
+  - `README.md`: reproducible launch commands, fixture boundaries, energy measurement and acceptance criteria.
 - `tools/generate_loop_storage_assets.ps1`, `tools/StrictPngRecolor.java`: hash-locked core copying, exact LUT recoloring, native AE2 drive-model copying, and cross-generation item/model generation.
 - `tools/generate_loop_storage_recipes.ps1`: deterministic generation of 53 acquisition recipes plus eleven AE2 portable disassembly declarations per adapter.
 - `.gitignore`: local Gradle, generated build/run, IDE, and inspection exclusions.
@@ -118,6 +147,15 @@ Each standalone project owns:
 - `block/ModBlocks.java`, `ModBlockEntities.java`: block and block-entity registration.
 - `block/RecipeRingSolverTerminalBlock.java` and `...BlockEntity.java`: 2 AE/t channel-required cyclic service, persistence, and active-state synchronization.
 - `block/SupercomputingCraftingOptimizerInterfaceBlock.java` and `...BlockEntity.java`: 8 AE/t channel-required acyclic service, persistence, and active-state synchronization.
+- `block/CraftingRipperBlock.java`, `CraftingRipperBlockEntity.java`, `CraftingRipperLogic.java`: network machine, provider host, card/pattern persistence and recipe advertisement.
+- `menu/CraftingRipperMenu.java`, `client/CraftingRipperScreen.java`: four-row native provider UI and synchronized grey locked-slot overlay.
+- `integration/CraftingRipperPatterns.java`, `CraftingRipperExecutor.java`: recipe catalogue, live legality checks and private whole-chain CPU replay/commit.
+- `integration/CraftingRipperCatalog.java`: native recipe witnesses, component candidates, namespace-independent automatic discovery and coverage diagnostics.
+- `integration/CatalogCraftingPattern.java`, `CatalogSmithingPattern.java` (26.1.2): validated persistent catalog definitions for all nine component choice lists and empty optional smithing slots.
+- `integration/RipperNativeCrafting.java`, `RipperMapSerialization.java`: original-CPU native continuation, physical output identities, one-time energy payment, strict logical-credit inputs and validated transient map-marker persistence.
+- `storage/PortableLoopEnergy.java`: generation-specific FE capability and stored-FE-to-AE charging; the portable inventory refresh boundary remains in `LoopStorageCellInventory`.
+- `mixin/CraftingTaskProgressAccessor.java`: required access to AE2 task counters for exact whole-chain completion and progress accounting.
+- `assets/ae2/screens/ae2lightoptimizer_crafting_ripper.json`: unique native ScreenStyle layout extending the provider controls to 36 pattern slots.
 - `item/ModItems.java`: service-block items, Loop Crystal materials, housing, ten cores, eleven cell items, and creative-tab placement without menus.
 - `storage/LoopStorageCellItem.java`, `LoopStorageCellHandler.java`, `LoopStorageCellInventory.java`: version-native item tooltip, AE2 handler registration, dynamic-key inventory, persistence, nested-cell guard, and shared-capacity enforcement.
 - `client/Ae2LightOptimizerClient.java`: `Dist.CLIENT`-isolated registration of eleven drive models; 1.21.1 also binds AE2 cell-state tinting through the item color handler while 26.1.2 uses its native item descriptor tint.
@@ -141,14 +179,15 @@ Each version contains block states keyed by `connected=false/true`, offline and 
 
 - `recipe_ring_solver_terminal`
 - `supercomputing_crafting_optimizer_interface`
+- `crafting_ripper`
 
 Each version also packages the same root-level `ae2lightoptimizer.png`: a transparent 64x64 isometric three-face render of the connected ring terminal, inset within a fully closed square PNG viewport frame. The four-layer frame uses dark steel, metal-grey, cyan signal, and a dark inner edge; all four outer image edges are pixel-opaque while the interior retains transparency. `META-INF/neoforge.mods.toml` binds it as the NeoForge `logoFile`.
 
-Each version contains 74 recipe JSON files: two service-block recipes, eight Loop Crystal recipes, and 64 Loop Storage recipes/declarations. The Loop Storage set contains the original 32 stationary recipes, two shapeless portable recipes for each of ten finite tiers, one cell-based infinite portable recipe, and eleven native disassembly declarations. The infinite portable tier intentionally has no housing-plus-core recipe because no infinite core exists. The 1.21.1 adapter uses object-form ingredients and `ae2:chest`, while 26.1.2 uses string-form ingredients and `ae2:me_chest`; structured tests lock both layouts and ingredient IDs.
+Each version contains 76 recipe JSON files: three machine recipes, the Loop Card recipe, eight Loop Crystal recipes, and 64 Loop Storage recipes/declarations. The Loop Storage set contains the original 32 stationary recipes, two shapeless portable recipes for each of ten finite tiers, one cell-based infinite portable recipe, and eleven native disassembly declarations. The infinite portable tier intentionally has no housing-plus-core recipe because no infinite core exists. The 1.21.1 adapter uses object-form ingredients and `ae2:chest`, while 26.1.2 uses string-form ingredients and `ae2:me_chest`; structured tests lock both layouts and ingredient IDs.
 
 Each version carries 36 Loop Storage texture files and 33 item models: the original ten byte-identical user cores, housing and stationary cells, plus three portable housing palettes and eleven portable side layers. Finite portable side layers are copied byte-for-byte from the matching native AE2 tier; portable housings use the approved k/M/infinite shell LUTs, and only the infinite side uses the approved light-purple core LUT. Native portable LED and screen layers remain external AE2 references. Dimensions, alpha, silhouette, coordinates, and unmapped pixels are unchanged. Eleven stationary drive models remain byte-identical native AE2 models. Minecraft 26.1.2 additionally carries 33 generation-native `assets/.../items/` descriptors.
 
-Neither version contains menus, screens, or local configuration UI. Each contributes the same GuideME tree to AE2's existing guide:
+The two solver service blocks remain UI-free. The Crafting Ripper subclasses the pinned AE2 provider menu/screen and extends its layout to four pattern rows. Each adapter contributes the same GuideME tree to AE2's existing guide:
 
 The optimizer face is an opaque 16x16 hash-grid core with identical offline/connected geometry. Connected rails and intersections use cyan-white illumination with eight amber endpoints; the offline state uses the same pixels in a dim palette. The generator enforces exact 90-degree rotational invariance. Ring-terminal textures remain unchanged.
 
@@ -167,6 +206,14 @@ assets/ae2lightoptimizer/ae2guide/
 English pages are canonical and Chinese pages mirror the same path under `_zh_cn`. `item_ids` enables AE2's native hold-`G` link. No standalone guide registration exists.
 
 ## Tools and generated state
+
+- `tools/audit_runtime_resources.py`: resolves addon model textures against both the local resource tree and the pinned AE2 JAR, avoiding false missing-texture reports for intentional dependency references.
+- `tools/verify_crafting_ripper_runtime.ps1`: isolated full builds and data-runtime startup, followed by freshness-checked transformed-bytecode validation for chain preflight, execution, paid persistence and native provider locks.
+- `tools/generate_crafting_ripper_resources.py`: generation-native machine and advanced-card recipes, models, blockstates, tags and names.
+- `tools/generate_crafting_ripper_textures.ps1`: native machine-frame extension with online/offline nine-cell cores and acceleration-card shell preservation.
+- `shared/src/main/.../crafting/InstantCraftingBatch.java`: API-free checked batch execution and maximum legal compressed repetition count.
+- `shared/src/main/.../storage/PortableEnergyMath.java`: API-free immutable FE debit and conversion arithmetic used by both adapters.
+- `shared/src/test/.../crafting/CraftingRipperResourceTest.java`: exact shaped/shapeless inputs, native-card shell/alpha preservation and two-state grid geometry.
 
 - `tools/generate_block_textures.ps1`: deterministic generator for both blocks' offline and connected textures plus the 64x64 isometric ring-terminal mod icon and its pixel-exact square viewport frame. The icon's three contiguous material faces have lighting only and no added cube outline or seam strokes. The generator also enforces strict 90-degree pixel-rotation symmetry for the optimizer faces.
 - `tools/generate_loop_storage_assets.ps1`: verifies the ten supplied core hashes, copies those PNG bytes unchanged into both adapters, performs only the requested strict RGB LUT substitutions against pinned AE2 cell PNGs, writes item resources, and copies the matching native AE2 drive models unchanged.
@@ -189,13 +236,27 @@ The optional PCL tool targets two addon-only instances when explicitly invoked:
 - `<PCL_ROOT>\.minecraft\versions\AE2-lightoptimizer-1.21.1`
 - `<PCL_ROOT>\.minecraft\versions\AE2-lightoptimizer-26.1.2`
 
-Its contract requires `VersionArgumentIndieV2:True`, exactly six managed mod JARs (AE2, GuideME, JEI, AE2LO, Applied Flux, and Glodium), no ImmortalStorage artifact, no filesystem link, and no copied mutable directories. Applied Flux and Glodium exist only in the test-instance whitelist to verify third-party FE key discovery; they are not release dependencies. PCL creates future instance state under the matching target directory. Existing ImmortalStorage PCL instances remain separate and unchanged. Release 0.0.3 and the compatibility-test pair were deployed to both matching isolated instances on 2026-09-01; the provisioning script verified that their save manifests were unchanged.
+Its contract requires `VersionArgumentIndieV2:True`, exactly six managed mod JARs (AE2, GuideME, JEI, AE2LO, Applied Flux, and Glodium), no ImmortalStorage artifact, no filesystem link, and no copied mutable directories. Applied Flux and Glodium exist only in the test-instance whitelist to verify third-party FE key discovery; they are not release dependencies. PCL creates future instance state under the matching target directory. Existing ImmortalStorage PCL instances remain separate and unchanged. Both instances now contain the matching 0.0.4 release artifact. After twelve passing runtime scenarios, the final installation audit removed the two temporary helpers and verified all 335 original non-production files unchanged.
 
 ## Isolation contract
 
 Neither version references the ImmortalStorage workspace, packages, artifacts, generated sources, caches, or run directories. No compiled class is shared between generations. Only API-free source under `shared/` is compiled into both builds; compatibility work is duplicated explicitly in each adapter.
 
-## Verification state
+## Current 0.0.4 verification
+
+Release 0.0.4 validation: both complete `build`; 1.21.1 passes 138 tests and 26.1.2 passes 136, with zero failures/errors/skips. Final JARs contain 116 and 122 AE2LO classes respectively and 76 recipes each, with no nested JAR, unrelated mod class or runtime-probe class. Both real installed PCL clients have been launched in new, isolated test worlds. A full automatic-catalog order for 3,000 256M cores passes with both the supercomputing interface and ring terminal online: 13 recipes, 188,681,000 applications, 38 compressed batches, exactly 769,888,153 required CPU bytes, one native CPU tick, one executor call and 50 AE total surcharge. Exact materials, preserved crystal seed, zero intermediate stock and empty reusable CPU all pass. The native UI shows four pattern rows and a single upgrade slot, with no return slots; optional JEI navigation uses the full sidebar bounds.
+
+The real catalog is also captured and replayed with the ring terminal offline to verify acyclic supercomputing ownership and exact materials independently. This replay does not submit a native CPU job. Requester backpressure and third-party portable equipment are outside the gameplay fixture. The 1.21.1 client intermittently stalled in native chunk-unload futures after a completed pre-save; its thread dump and verified test-process stop are retained. The 26.1.2 acceptance saved and exited normally. The preceding acceptance campaign's reports and failed-first-attempt evidence remain under `archive/2026-09-06-runtime-ripper-acceptance/`; final release-artifact evidence is in the catalog campaign below.
+
+The subsequent catalog and precise-component acceptance is archived under `archive/2026-09-06-loop-card-catalog/`. Both installed clients pass manual and Loop Card orders of 3000 exact book copies, rejecting wrong deep/partial custom data before material mutation; each completed order uses one native CPU call/tick and 50 AE. Both pass three real recipe/tag data-pack reloads, and ordinary versus actual Unbreaking tool execution with observed native remainder callbacks and exact inventory. Native map continuations produce three distinct scale-1 maps after a strict complete CPU binary write/read following the first operation, retaining one total 50 AE fee. This persistence test keeps the world live. Artifact and original-file auditing confirms 116/122 production classes, 76 recipes each and all 335 original non-production PCL files unchanged; temporary helpers are outside both the production JARs and the original-file baseline.
+
+All twelve final-hash runtime scenarios pass, including the final 3000-core and finite-catalog replays. The completed final installation audit removed exactly the two temporary helper JARs after every accepted client saved and exited. Each instance now contains six production/dependency JARs with installed/build hashes equal, and the same 335 original non-production files unchanged. Test worlds and both failed early-window catalog launch attempts remain archived; the successful 1.21.1 final directory is `catalog-verified-19-retry2`.
+
+See the [build isolation audit](archive/2026-09-06-loop-card-catalog/precise-final-build-audit.md), [completed installation audit](archive/2026-09-06-loop-card-catalog/final-install-audit.md) and [runtime acceptance summary](archive/2026-09-06-loop-card-catalog/SUMMARY.md) for artifact hashes, individual scenarios and verification boundaries.
+
+## Historical 0.0.3 verification baseline
+
+The following measurements are the independent 0.0.3 release snapshot. Its test counts, artifact hashes and installation statements describe that older release; the current 0.0.4 results and installed state are recorded above.
 
 - NeoForge 1.21.1 passes 102 tests and NeoForge 26.1.2 passes 101 tests, with zero failures, errors, or skips.
 - Both real AE2/GuideME/Mixin data environments start successfully.
@@ -204,7 +265,7 @@ Neither version references the ImmortalStorage workspace, packages, artifacts, g
 - The ten core textures in each adapter match the user-supplied SHA-256 values byte-for-byte. Every finite/infinite cell recolor passes exact pixel comparison, and every drive model matches the pinned AE2 source bytes.
 - Both packaged `neoforge.mods.toml` files decode as strict UTF-8, report version 0.0.3, and declare no optional storage addon as a dependency. Both Gradle adapters set `processResources.filteringCharset` to UTF-8 and expand only `META-INF/neoforge.mods.toml`; JSON, GuideME Markdown, PNG, and all other resources remain unfiltered.
 - Final release JAR SHA-256: 1.21.1 `8DC0C2854ADCE448B34BB99F77F3B30FB666F5876896C3DBCADE3BD94C531A8A`; 26.1.2 `6A9FC6A0A58F1B34DB3A3E54932DC4582F32F39049E5A814F88AAB4852061A93`.
-- Both PCL test instances contain exactly the expected six JARs with the matching 0.0.3 hash, no stale 0.0.2 addon, no filesystem reparse point, and independent mode enabled. The deployment preservation regression and the real-instance save-manifest checks passed.
+- At the 0.0.3 deployment, both PCL test instances contained exactly the expected six JARs with the matching 0.0.3 hash, no stale 0.0.2 addon, no filesystem reparse point, and independent mode enabled. The deployment preservation regression and the real-instance save-manifest checks passed.
 - The 1,000-template execution model delivers exactly 1,000 net templates and returns one locked seed; a 500-round three-node SCC delivers the same net growth without skipping an unavailable node.
 - Parallel ring and optimizer jobs retain separate cursor state, and optimizer-owned final outputs bypass the ring-only recycling branch.
 - The two global adapters are byte-identical; the two Mixin sources are byte-identical.
@@ -213,4 +274,4 @@ Neither version references the ImmortalStorage workspace, packages, artifacts, g
 - P-total-material stress covers 64 component types and 128 producer routes.
 - T-distinct diagnostics report the unavoidable `Omega(V + E)` traversal and minimum reference cost without imposing a live threshold.
 
-A persistent in-game network submission and hold-`G` rendering remain final release acceptance checks.
+This historical baseline did not include persistent in-game network submission or visual hold-`G` acceptance. Current network-submission evidence is listed in the 0.0.4 section; it does not extend to untested GuideME interactions.

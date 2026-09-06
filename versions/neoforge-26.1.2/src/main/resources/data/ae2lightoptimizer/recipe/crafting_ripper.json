@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ISI",
+    "FCD",
+    "ISI"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "S": "ae2:quantum_entangled_singularity",
+    "F": "ae2:formation_core",
+    "C": "ae2lightoptimizer:4m_loop_storage_core",
+    "D": "ae2:annihilation_core"
+  },
+  "result": {
+    "id": "ae2lightoptimizer:crafting_ripper",
+    "count": 1
+  }
+}

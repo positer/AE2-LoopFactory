@@ -2,7 +2,7 @@
   "schema_version": 1,
   "mod_id": "ae2lightoptimizer",
   "display_name": "AE2-lightoptimizer",
-  "mod_version": "0.0.3",
+  "mod_version": "0.0.4",
   "entries": [
     {
       "minecraft": "1.21.1",

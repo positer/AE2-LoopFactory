@@ -1,0 +1,6 @@
+{
+  "type": "minecraft:smithing_transform",
+  "template": "minecraft:paper",
+  "base": "minecraft:stick",
+  "result": {"id": "minecraft:echo_shard"}
+}

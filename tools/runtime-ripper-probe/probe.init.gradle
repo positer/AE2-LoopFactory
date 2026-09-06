@@ -1,0 +1,33 @@
+// External acceptance harness. Never included in the production source set or JAR.
+allprojects {
+    afterEvaluate { p ->
+        if (!p.plugins.hasPlugin('java')) return
+        def generation = p.property('minecraft_version')
+        def probeRoot = new File(p.rootDir, "../../tools/runtime-ripper-probe/${generation}")
+        def productionJar = p.tasks.named('jar').flatMap { it.archiveFile }
+        def compileProbe = p.tasks.register('compileRipperProbe', JavaCompile) {
+            dependsOn p.tasks.named('jar')
+            source fileTree(new File(probeRoot, 'src/main/java')) { include '**/*.java' }
+            classpath = p.sourceSets.main.compileClasspath + p.files(productionJar)
+            destinationDirectory = new File(probeRoot, 'build/classes')
+            javaCompiler = p.tasks.named('compileJava', JavaCompile).get().javaCompiler
+            options.encoding = 'UTF-8'
+        }
+        p.tasks.register('ripperProbeJar', Jar) {
+            dependsOn compileProbe
+            archiveBaseName = "ae2lo-runtime-probe-mc${generation}"
+            archiveVersion = '1'
+            destinationDirectory = new File(probeRoot, 'build/libs')
+            from compileProbe.map { it.destinationDirectory }
+            from new File(probeRoot, 'src/main/resources')
+        }
+        p.tasks.register('writeRipperProbeClasspath') {
+            doLast {
+                def output = new File(probeRoot, 'build/compile-classpath.txt')
+                output.parentFile.mkdirs()
+                output.text = p.sourceSets.main.compileClasspath.asPath
+                println "Probe compile classpath saved: ${output}"
+            }
+        }
+    }
+}

@@ -1,0 +1,33 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="All Rights Reserved"
+
+[[mods]]
+modId="ae2lo_runtime_probe"
+version="1"
+displayName="AE2LO Isolated Runtime Acceptance Probe"
+description='''Test-only acceptance mod. Builds a physical AE2 network in a new disposable world and observes unmodified production crafting. Never package this inside AE2LO.'''
+
+[[mixins]]
+config="ae2lo_runtime_probe.mixins.json"
+
+[[dependencies.ae2lo_runtime_probe]]
+modId="neoforge"
+type="required"
+versionRange="[26.1.2,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.ae2lo_runtime_probe]]
+modId="ae2"
+type="required"
+versionRange="[26.1.10-beta,26.2)"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.ae2lo_runtime_probe]]
+modId="ae2lightoptimizer"
+type="required"
+versionRange="[0.0.4,0.0.5)"
+ordering="AFTER"
+side="BOTH"

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "ae2:advanced_card",
+    "ae2lightoptimizer:loop_crystal"
+  ],
+  "result": {
+    "id": "ae2lightoptimizer:loop_card",
+    "count": 1
+  }
+}

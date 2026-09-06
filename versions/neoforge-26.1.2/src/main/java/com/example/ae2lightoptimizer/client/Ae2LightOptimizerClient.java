@@ -12,7 +12,14 @@ import net.neoforged.neoforge.client.event.InitializeClientRegistriesEvent;
 
 @Mod(value = Ae2LightOptimizer.MOD_ID, dist = Dist.CLIENT)
 public final class Ae2LightOptimizerClient {
+    private static void registerScreens(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent event) {
+        appeng.client.InitScreens.register(event,
+                com.example.ae2lightoptimizer.menu.CraftingRipperMenu.TYPE.get(),
+                CraftingRipperScreen::new, "/screens/ae2lightoptimizer_crafting_ripper.json");
+    }
+
     public Ae2LightOptimizerClient(IEventBus modEventBus) {
+        modEventBus.addListener(Ae2LightOptimizerClient::registerScreens);
         modEventBus.addListener(Ae2LightOptimizerClient::initializeClientRegistries);
     }
 

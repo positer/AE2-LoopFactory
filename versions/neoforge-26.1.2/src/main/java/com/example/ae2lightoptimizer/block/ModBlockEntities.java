@@ -24,6 +24,10 @@ public final class ModBlockEntities {
                             SupercomputingCraftingOptimizerInterfaceBlockEntity::new,
                             ModBlocks.SUPERCOMPUTING_CRAFTING_OPTIMIZER_INTERFACE.get()));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CraftingRipperBlockEntity>>
+            CRAFTING_RIPPER = BLOCK_ENTITIES.register("crafting_ripper",
+                    () -> new BlockEntityType<>(CraftingRipperBlockEntity::new, ModBlocks.CRAFTING_RIPPER.get()));
+
     private ModBlockEntities() {
     }
 }

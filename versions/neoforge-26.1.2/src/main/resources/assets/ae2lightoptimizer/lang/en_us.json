@@ -43,5 +43,7 @@
   "tooltip.ae2lightoptimizer.loop_storage_cell.types": "Types: %s / %s",
   "tooltip.ae2lightoptimizer.loop_storage_cell.types_unlimited": "Types: %s / unlimited",
   "tooltip.ae2lightoptimizer.loop_storage_cell.capacity_infinite": "Storage: unlimited",
-  "tooltip.ae2lightoptimizer.loop_storage_cell.universal": "Accepts every AE key type registered by loaded addons"
+  "tooltip.ae2lightoptimizer.loop_storage_cell.universal": "Accepts every AE key type registered by loaded addons",
+  "block.ae2lightoptimizer.crafting_ripper": "Crafting Ripper",
+  "item.ae2lightoptimizer.loop_card": "Loop Card"
 }

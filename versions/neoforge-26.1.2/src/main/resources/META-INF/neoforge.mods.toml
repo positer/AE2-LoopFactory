@@ -10,7 +10,7 @@ modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
 logoFile="ae2lightoptimizer.png"
-description='''UI-free network blocks that optimize Applied Energistics 2 crafting algorithms.'''
+description='''Network crafting optimization, atomic recipe-chain execution, and unified loop storage for Applied Energistics 2.'''
 
 [[dependencies.${mod_id}]]
 modId="neoforge"

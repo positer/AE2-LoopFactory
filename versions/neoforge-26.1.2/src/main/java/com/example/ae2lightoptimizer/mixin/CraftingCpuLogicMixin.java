@@ -12,10 +12,12 @@ import appeng.api.stacks.AEKey;
 import appeng.api.stacks.GenericStack;
 import appeng.crafting.execution.CraftingCpuLogic;
 import appeng.crafting.execution.ExecutingCraftingJob;
+import appeng.crafting.execution.CraftingSubmitResult;
 import appeng.crafting.inv.ListCraftingInventory;
 import appeng.me.cluster.implementations.CraftingCPUCluster;
 import appeng.me.service.CraftingService;
 import com.example.ae2lightoptimizer.integration.CraftingExecutionScheduleCodec;
+import com.example.ae2lightoptimizer.integration.CraftingRipperExecutor;
 import com.example.ae2lightoptimizer.integration.ScheduledCraftingJob;
 import com.example.ae2lightoptimizer.integration.ScheduledCraftingPlan;
 import com.example.ae2lightoptimizer.crafting.RingCompletionGate;
@@ -58,6 +60,59 @@ abstract class CraftingCpuLogicMixin {
     @Shadow
     protected abstract void finishJob(boolean success);
 
+    @Shadow
+    protected abstract void postChange(AEKey what);
+
+    @Inject(method = "trySubmitJob", at = @At(value = "INVOKE",
+            target = "Lappeng/crafting/execution/CraftingCpuHelper;tryExtractInitialItems(Lappeng/api/networking/crafting/ICraftingPlan;Lappeng/api/networking/IGrid;Lappeng/crafting/inv/ListCraftingInventory;Lappeng/api/networking/security/IActionSource;)Lappeng/api/stacks/GenericStack;"),
+            cancellable = true, require = 1, expect = 1)
+    private void ae2lightoptimizer$preflightRipperChain(
+            IGrid grid, ICraftingPlan plan, IActionSource source,
+            @Nullable ICraftingRequester requester,
+            CallbackInfoReturnable<ICraftingSubmitResult> callback) {
+        if (CraftingRipperExecutor.ownsAny(grid, plan.patternTimes())
+                && !CraftingRipperExecutor.acceptsPlan(plan, cluster.getLevel())) {
+            callback.setReturnValue(CraftingSubmitResult.INCOMPLETE_PLAN);
+        }
+    }
+
+    @Inject(method = "tickCraftingLogic", at = @At(value = "INVOKE",
+            target = "Lappeng/me/cluster/implementations/CraftingCPUCluster;getCoProcessors()I"),
+            cancellable = true, require = 1, expect = 1)
+    private void ae2lightoptimizer$executeRipperChain(
+            IEnergyService energyService, CraftingService craftingService, CallbackInfo callback) {
+        if (job == null) {
+            return;
+        }
+        var scheduledJob = (ScheduledCraftingJob) job;
+        if (!scheduledJob.ae2lightoptimizer$isRipped()
+                && !scheduledJob.ae2lightoptimizer$isRipperRequested()
+                && !scheduledJob.ae2lightoptimizer$isNativeRipperJob()
+                && !CraftingRipperExecutor.hasActiveRipper(cluster.getGrid())) {
+            return;
+        }
+        var beforeTasks = scheduledJob.ae2lightoptimizer$getRemainingTasks();
+        var result = CraftingRipperExecutor.execute(cluster.getGrid(), energyService,
+                inventory, scheduledJob, cluster.getLevel());
+        if (result != CraftingRipperExecutor.Result.NOT_HANDLED) {
+            cluster.markDirty();
+            if (scheduledJob.ae2lightoptimizer$isRipped()) {
+                beforeTasks.keySet().forEach(pattern -> pattern.getOutputs().forEach(
+                        output -> postChange(output.what())));
+            }
+        }
+        if (result == CraftingRipperExecutor.Result.COMPLETED || result == CraftingRipperExecutor.Result.INVALID) {
+            finishJob(result == CraftingRipperExecutor.Result.COMPLETED);
+            cluster.updateOutput(null);
+        } else if (scheduledJob.ae2lightoptimizer$isRipped()) {
+            cluster.updateOutput(new GenericStack(scheduledJob.ae2lightoptimizer$getFinalOutputKey(),
+                    scheduledJob.ae2lightoptimizer$getRemainingRequest()));
+        }
+        if (result != CraftingRipperExecutor.Result.NOT_HANDLED) {
+            callback.cancel();
+        }
+    }
+
     @Inject(method = "trySubmitJob", at = @At(value = "FIELD",
             target = "Lappeng/crafting/execution/CraftingCpuLogic;job:Lappeng/crafting/execution/ExecutingCraftingJob;",
             opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER), require = 1, expect = 1)
@@ -65,6 +120,13 @@ abstract class CraftingCpuLogicMixin {
             IGrid grid, ICraftingPlan plan, IActionSource source,
             @Nullable ICraftingRequester requester,
             CallbackInfoReturnable<ICraftingSubmitResult> callback) {
+        if (CraftingRipperExecutor.ownsAny(grid, plan.patternTimes())) {
+            if (CraftingRipperExecutor.requiresNativePlan(plan, cluster.getLevel())) {
+                ((ScheduledCraftingJob) job).ae2lightoptimizer$useNativeRipper();
+            } else {
+                ((ScheduledCraftingJob) job).ae2lightoptimizer$requestRipper();
+            }
+        }
         if (!(plan instanceof ScheduledCraftingPlan scheduledPlan)) {
             return;
         }
@@ -85,6 +147,18 @@ abstract class CraftingCpuLogicMixin {
             ((ScheduledCraftingJob) job).ae2lightoptimizer$configure(
                     restored.schedule(), restored.batchIndex(), restored.remainingInBatch());
         }
+        if (input.childOrEmpty("job").getBooleanOr("ae2loRipped", false)) {
+            ((ScheduledCraftingJob) job).ae2lightoptimizer$markRipped();
+        }
+        if (input.childOrEmpty("job").getBooleanOr("ae2loRipperRequested", false)) {
+            ((ScheduledCraftingJob) job).ae2lightoptimizer$requestRipper();
+        }
+        if (input.childOrEmpty("job").getBooleanOr("ae2loNativeRipper", false)) {
+            ((ScheduledCraftingJob) job).ae2lightoptimizer$useNativeRipper();
+        }
+        var nativeState = com.example.ae2lightoptimizer.integration.RipperNativeCrafting.read(
+                input.childOrEmpty("job"), cluster.getLevel());
+        if (nativeState != null) ((ScheduledCraftingJob) job).ae2lightoptimizer$setNativeState(nativeState);
     }
 
     @ModifyVariable(method = "executeCrafting", at = @At("HEAD"), argsOnly = true,

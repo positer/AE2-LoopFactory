@@ -12,6 +12,8 @@ import com.example.ae2lightoptimizer.crafting.CompressedBatchCursor;
 import com.example.ae2lightoptimizer.integration.CraftingExecutionSchedule;
 import com.example.ae2lightoptimizer.integration.ScheduledCraftingJob;
 import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Final;
@@ -22,6 +24,7 @@ import org.spongepowered.asm.mixin.Unique;
 abstract class ExecutingCraftingJobMixin implements ScheduledCraftingJob {
     @Shadow @Final private CraftingLink link;
     @Shadow @Final private ListCraftingInventory waitingFor;
+    @Shadow @Final private Map<IPatternDetails, ?> tasks;
     @Shadow @Final private ElapsedTimeTracker timeTracker;
     @Shadow private GenericStack finalOutput;
     @Shadow private long remainingAmount;
@@ -33,6 +36,83 @@ abstract class ExecutingCraftingJobMixin implements ScheduledCraftingJob {
     @Unique
     @Nullable
     private CompressedBatchCursor ae2lightoptimizer$cursor;
+
+    @Unique
+    private boolean ae2lightoptimizer$ripped;
+
+    @Unique
+    private boolean ae2lightoptimizer$ripperRequested;
+
+    @Unique
+    private boolean ae2lightoptimizer$nativeRipper;
+
+    @Unique
+    private com.example.ae2lightoptimizer.integration.RipperNativeCrafting.State ae2lightoptimizer$nativeState;
+
+    @Override
+    public com.example.ae2lightoptimizer.integration.RipperNativeCrafting.State ae2lightoptimizer$getNativeState() {
+        return ae2lightoptimizer$nativeState;
+    }
+
+    @Override
+    public void ae2lightoptimizer$setNativeState(com.example.ae2lightoptimizer.integration.RipperNativeCrafting.State state) {
+        ae2lightoptimizer$nativeState = state;
+        ae2lightoptimizer$nativeRipper = true;
+    }
+
+    @Override
+    public boolean ae2lightoptimizer$isNativeRipperJob() { return ae2lightoptimizer$nativeRipper; }
+
+    @Override
+    public void ae2lightoptimizer$useNativeRipper() { ae2lightoptimizer$nativeRipper = true; }
+
+    @Override
+    public boolean ae2lightoptimizer$isRipperRequested() {
+        return ae2lightoptimizer$ripperRequested;
+    }
+
+    @Override
+    public void ae2lightoptimizer$requestRipper() {
+        ae2lightoptimizer$ripperRequested = true;
+    }
+
+    @Override
+    public boolean ae2lightoptimizer$isRipped() {
+        return ae2lightoptimizer$ripped;
+    }
+
+    @Override
+    public void ae2lightoptimizer$markRipped() {
+        ae2lightoptimizer$ripperRequested = true;
+        ae2lightoptimizer$ripped = true;
+        tasks.clear();
+        if (ae2lightoptimizer$hasSchedule()) {
+            int count = ae2lightoptimizer$schedule.batches().size();
+            ae2lightoptimizer$configure(ae2lightoptimizer$schedule, count, 0);
+        }
+    }
+
+    @Override
+    public boolean ae2lightoptimizer$isStandalone() {
+        return link.isStandalone();
+    }
+
+    @Override
+    public Map<IPatternDetails, Long> ae2lightoptimizer$getRemainingTasks() {
+        Map<IPatternDetails, Long> result = new LinkedHashMap<>();
+        tasks.forEach((pattern, progress) -> {
+            long remaining = ((CraftingTaskProgressAccessor) progress).ae2lightoptimizer$getRemaining();
+            if (remaining > 0) {
+                result.put(pattern, remaining);
+            }
+        });
+        return result;
+    }
+
+    @Override
+    public boolean ae2lightoptimizer$hasWaitingItems() {
+        return !waitingFor.list.isEmpty();
+    }
 
     @Override
     public void ae2lightoptimizer$configure(

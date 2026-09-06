@@ -31,6 +31,8 @@ public final class CraftingExecutionScheduleCodec {
         for (var batch : job.ae2lightoptimizer$getSchedule().batches()) {
             var batchData = batches.addChild();
             batch.pattern().getDefinition().toTag(batchData);
+            var markers = RipperMapSerialization.markers(batch.pattern().getDefinition());
+            if (!markers.isEmpty()) batchData.store(RipperMapSerialization.TAG_NAME, net.minecraft.nbt.CompoundTag.CODEC, markers);
             batchData.putLong(TAG_REPETITIONS, batch.repetitions());
         }
     }
@@ -48,6 +50,9 @@ public final class CraftingExecutionScheduleCodec {
             for (var batchData : data.childrenListOrEmpty(TAG_BATCHES)) {
                 long repetitions = batchData.getLongOr(TAG_REPETITIONS, 0);
                 var definition = AEItemKey.fromTag(batchData);
+                definition = (AEItemKey) RipperMapSerialization.restoreKey(definition,
+                        batchData.read(RipperMapSerialization.TAG_NAME, net.minecraft.nbt.CompoundTag.CODEC)
+                                .orElseGet(net.minecraft.nbt.CompoundTag::new));
                 var pattern = PatternDetailsHelper.decodePattern(definition, level);
                 if (pattern == null) {
                     return null;

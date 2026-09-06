@@ -15,23 +15,27 @@ public final class GlobalCraftingPlanner {
     public GlobalCraftingPlan plan(GlobalPlanRequest request) {
         try {
             Graph graph = buildRelevantGraph(request.target(), request.patterns());
-            Components components = findComponents(graph);
-            boolean cyclic = !components.cyclicComponents().isEmpty();
-            if (cyclic && !request.ringTerminalOnline()) {
-                return failed(GlobalPlanStatus.CYCLE_TERMINAL_REQUIRED, cyclic, components.count(), 0, 0);
-            }
-
-            Map<String, Long> reserved = cyclic
-                    ? computeExternalCycleReserve(graph, components, request.reservedCycles())
-                    : Map.of();
             // The reserve is a runtime seed-retention policy, not a deduction from the
             // current order's inventory. Subtracting it here made every finite order
             // falsely report the fixed reserve as missing external inputs.
             Map<String, Long> usableStock = new LinkedHashMap<>(request.availableStock());
             BalanceResult balance = solveBalances(request, graph, usableStock);
             if (balance.status() != GlobalPlanStatus.SOLVED) {
-                return failed(balance.status(), cyclic, components.count(), balance.iterations(), 0);
+                return failed(balance.status(), false, 0, balance.iterations(), 0);
             }
+
+            // Ownership follows the recipes this order actually uses. Automatic
+            // catalogs contain unused reverse recipes even for ordinary DAG jobs.
+            Graph selected = selectedGraph(graph, balance.patternCounts());
+            Components components = findComponents(selected);
+            boolean cyclic = !components.cyclicComponents().isEmpty();
+            if (cyclic && !request.ringTerminalOnline()) {
+                return failed(GlobalPlanStatus.CYCLE_TERMINAL_REQUIRED, true,
+                        components.count(), balance.iterations(), 0);
+            }
+            Map<String, Long> reserved = cyclic
+                    ? computeExternalCycleReserve(selected, components, request.reservedCycles())
+                    : Map.of();
 
             ScheduleResult schedule = buildCompressedSchedule(
                     graph, balance.patternCounts(), request.target(),
@@ -75,6 +79,7 @@ public final class GlobalCraftingPlanner {
     private static BalanceResult solveBalances(GlobalPlanRequest request, Graph graph,
                                                 Map<String, Long> usableStock) {
         Map<String, Long> counts = new LinkedHashMap<>();
+        Map<String, Set<String>> neutralConversions = findNeutralConversions(graph);
         long targetFloor = Math.addExact(usableStock.getOrDefault(request.target(), 0L),
                 request.requestedAmount());
 
@@ -113,13 +118,16 @@ public final class GlobalCraftingPlanner {
 
             GlobalPattern producer = chooseProducer(
                     deficitResource, deficit, balance,
-                    graph.producers().get(deficitResource), graph.producers());
+                    graph.producers().get(deficitResource), graph.producers(),
+                    neutralConversions, request.target(), targetFloor);
             long output = producer.outputs().get(deficitResource);
             long selfInput = producer.inputs().getOrDefault(deficitResource, 0L);
             long directGain = output - selfInput;
             long divisor = directGain > 0 ? directGain : output;
             long increment = ceilDiv(deficit, divisor);
-            long stockSupported = stockSupportedIncrement(producer, balance, graph.producers());
+            long stockSupported = neutralConversions.containsKey(producer.id())
+                    ? conversionStockSupported(producer, balance, request.target(), targetFloor)
+                    : stockSupportedIncrement(producer, balance, graph.producers());
             if (stockSupported > 0 && stockSupported < increment) {
                 increment = stockSupported;
             }
@@ -132,17 +140,120 @@ public final class GlobalCraftingPlanner {
     private static GlobalPattern chooseProducer(String resource, long deficit,
                                                  Map<String, Long> balance,
                                                  List<GlobalPattern> candidates,
-                                                 Map<String, List<GlobalPattern>> producers) {
+                                                 Map<String, List<GlobalPattern>> producers,
+                                                 Map<String, Set<String>> neutralConversions,
+                                                 String target, long targetFloor) {
+        Map<String, ProducerPressure> pressure = new HashMap<>();
+        for (GlobalPattern pattern : candidates) {
+            pressure.put(pattern.id(), producerPressure(pattern, resource, deficit, balance,
+                    producers, neutralConversions, target, targetFloor, new HashSet<>()));
+        }
         return candidates.stream()
                 .min(Comparator
-                        .comparingLong((GlobalPattern pattern) -> rawPressure(
-                                pattern, resource, deficit, balance, producers))
-                        .thenComparingLong(pattern -> craftablePressure(
-                                pattern, resource, deficit, balance, producers))
+                        .comparing((GlobalPattern pattern) -> pressure.get(pattern.id()))
                         .thenComparing(Comparator.comparingLong(
                                 (GlobalPattern pattern) -> directGain(pattern, resource)).reversed())
                         .thenComparing(GlobalPattern::id))
                 .orElseThrow();
+    }
+
+    private static ProducerPressure producerPressure(
+            GlobalPattern pattern, String resource, long deficit, Map<String, Long> balance,
+            Map<String, List<GlobalPattern>> producers, Map<String, Set<String>> neutralConversions,
+            String target, long targetFloor, Set<String> visiting) {
+        if (directGain(pattern, resource) <= 0) {
+            return ProducerPressure.UNAVAILABLE;
+        }
+        Set<String> inverseIds = neutralConversions.get(pattern.id());
+        if (inverseIds == null) {
+            return new ProducerPressure(rawPressure(pattern, resource, deficit, balance, producers),
+                    craftablePressure(pattern, resource, deficit, balance, producers));
+        }
+        if (conversionStockSupported(pattern, balance, target, targetFloor) > 0) {
+            return new ProducerPressure(0, 0);
+        }
+        if (!visiting.add(pattern.id())) {
+            return ProducerPressure.UNAVAILABLE;
+        }
+        try {
+            var input = pattern.inputs().entrySet().iterator().next();
+            long required = Math.multiplyExact(input.getValue(), projectedIncrement(pattern, resource, deficit));
+            long available = conversionAvailable(input.getKey(), balance, target, targetFloor);
+            long shortage = required - Math.min(required, available);
+            ProducerPressure best = ProducerPressure.UNAVAILABLE;
+            // Packing then unpacking cannot supply missing material. Look through
+            // other sources, however: the carrier may be craftable from stocked
+            // raw inputs, or this same conversion may participate in a growth ring.
+            for (GlobalPattern upstream : producers.getOrDefault(input.getKey(), List.of())) {
+                if (inverseIds.contains(upstream.id())) {
+                    continue;
+                }
+                ProducerPressure candidate = producerPressure(upstream, input.getKey(), shortage,
+                        balance, producers, neutralConversions, target, targetFloor, visiting);
+                if (candidate.compareTo(best) < 0) {
+                    best = candidate;
+                }
+            }
+            return best;
+        } finally {
+            visiting.remove(pattern.id());
+        }
+    }
+
+    private static Map<String, Set<String>> findNeutralConversions(Graph graph) {
+        Map<String, Set<String>> neutral = new HashMap<>();
+        for (GlobalPattern pattern : graph.patterns()) {
+            if (pattern.inputs().size() != 1 || pattern.outputs().size() != 1) {
+                continue;
+            }
+            var input = pattern.inputs().entrySet().iterator().next();
+            var output = pattern.outputs().entrySet().iterator().next();
+            if (input.getKey().equals(output.getKey())) {
+                continue;
+            }
+            long divisor = gcd(input.getValue(), output.getValue());
+            for (GlobalPattern reverse : graph.producers().getOrDefault(input.getKey(), List.of())) {
+                if (reverse.inputs().size() != 1 || reverse.outputs().size() != 1
+                        || !reverse.inputs().containsKey(output.getKey())) {
+                    continue;
+                }
+                long reverseInput = reverse.inputs().get(output.getKey());
+                long reverseOutput = reverse.outputs().get(input.getKey());
+                long reverseDivisor = gcd(reverseInput, reverseOutput);
+                if (input.getValue() / divisor == reverseOutput / reverseDivisor
+                        && output.getValue() / divisor == reverseInput / reverseDivisor) {
+                    neutral.computeIfAbsent(pattern.id(), ignored -> new HashSet<>()).add(reverse.id());
+                }
+            }
+        }
+        return neutral;
+    }
+
+    private static long gcd(long left, long right) {
+        while (right != 0) {
+            long remainder = left % right;
+            left = right;
+            right = remainder;
+        }
+        return left;
+    }
+
+    private static long conversionStockSupported(GlobalPattern pattern, Map<String, Long> balance,
+                                                  String target, long targetFloor) {
+        var input = pattern.inputs().entrySet().iterator().next();
+        return conversionAvailable(input.getKey(), balance, target, targetFloor) / input.getValue();
+    }
+
+    private static long conversionAvailable(String resource, Map<String, Long> balance,
+                                             String target, long targetFloor) {
+        long available = balance.getOrDefault(resource, 0L);
+        if (resource.equals(target)) {
+            available = available > targetFloor ? available - targetFloor : 0L;
+        }
+        // A lossless conversion only moves existing material. Do not treat an
+        // absent compressed carrier as a cheap source and recursively recreate it
+        // from the very output we are missing. Partial stock remains usable.
+        return Math.max(0L, available);
     }
 
     private static long rawPressure(GlobalPattern pattern, String resource, long deficit,
@@ -209,7 +320,7 @@ public final class GlobalCraftingPlanner {
             GlobalPlanningBudget budget) {
         Map<String, GlobalPattern> byId = new LinkedHashMap<>();
         graph.patterns().forEach(pattern -> byId.put(pattern.id(), pattern));
-        Map<String, Long> remaining = new LinkedHashMap<>(patternCounts);
+        Map<String, Long> remaining = dependencyOrderedCounts(graph, patternCounts);
         Map<String, Long> stock = new LinkedHashMap<>();
         Map<String, Long> required = new LinkedHashMap<>();
         Map<String, Long> emitted = new LinkedHashMap<>();
@@ -273,6 +384,44 @@ public final class GlobalCraftingPlanner {
         }
 
         return new ScheduleResult(GlobalPlanStatus.SOLVED, schedule, required, emitted, schedule.size());
+    }
+
+    private static Map<String, Long> dependencyOrderedCounts(Graph graph, Map<String, Long> patternCounts) {
+        Graph selectedGraph = selectedGraph(graph, patternCounts);
+        List<GlobalPattern> selected = selectedGraph.patterns();
+        // Only selected recipes constrain this schedule. An unused reverse recipe
+        // must not merge a consumer with the growth component feeding it.
+        Components components = findComponents(selectedGraph);
+        Map<String, Integer> order = new HashMap<>();
+        for (GlobalPattern pattern : selected) {
+            // Tarjan visits output -> input edges, so dependency components finish
+            // first. Use the first output component: later byproducts cannot delay
+            // a recipe that supplies an earlier component's seed.
+            int component = pattern.outputs().keySet().stream()
+                    .mapToInt(output -> components.componentByResource().get(output))
+                    .min().orElseThrow();
+            order.put(pattern.id(), component);
+        }
+        Map<String, Long> result = new LinkedHashMap<>();
+        patternCounts.entrySet().stream()
+                .filter(entry -> entry.getValue() > 0)
+                .sorted(Comparator.comparingInt(entry -> order.get(entry.getKey())))
+                .forEach(entry -> result.put(entry.getKey(), entry.getValue()));
+        // The stable sort preserves the existing seed strategy inside each SCC,
+        // while preventing downstream consumers from repeatedly stealing its seed.
+        return result;
+    }
+
+    private static Graph selectedGraph(Graph graph, Map<String, Long> patternCounts) {
+        List<GlobalPattern> selected = graph.patterns().stream()
+                .filter(pattern -> patternCounts.getOrDefault(pattern.id(), 0L) > 0)
+                .toList();
+        Set<String> resources = new LinkedHashSet<>();
+        for (GlobalPattern pattern : selected) {
+            resources.addAll(pattern.inputs().keySet());
+            resources.addAll(pattern.outputs().keySet());
+        }
+        return new Graph(selected, Map.of(), resources.stream().sorted().toList());
     }
 
     private static void seedExternalInputs(
@@ -523,6 +672,16 @@ public final class GlobalCraftingPlanner {
     private record BalanceResult(GlobalPlanStatus status,
                                  Map<String, Long> patternCounts,
                                  int iterations) {}
+
+    private record ProducerPressure(long raw, long craftable) implements Comparable<ProducerPressure> {
+        private static final ProducerPressure UNAVAILABLE = new ProducerPressure(Long.MAX_VALUE, Long.MAX_VALUE);
+
+        @Override
+        public int compareTo(ProducerPressure other) {
+            int rawOrder = Long.compare(raw, other.raw);
+            return rawOrder != 0 ? rawOrder : Long.compare(craftable, other.craftable);
+        }
+    }
 
     private record ScheduleResult(GlobalPlanStatus status,
                                   List<PatternBatch> schedule,

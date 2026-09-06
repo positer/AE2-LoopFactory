@@ -1,5 +1,41 @@
 # Changelog
 
+## 0.0.4
+
+### English
+
+- Fixed automatic-catalog planning that repeatedly compressed and decompressed material without net growth. Existing compressed stock and legitimate upstream crafting routes remain usable.
+- Kept supercomputing acceleration compatible with automatic recipe discovery: unused reverse recipes no longer force ordinary crafting plans to require a ring terminal; ownership follows the recipes selected for the order.
+- Added the Crafting Ripper with a four-row AE2 Pattern Provider interface for crafting-table, smithing and stonecutting patterns, native provider controls and priority configuration.
+- The ripper's main area contains only its 36 pattern slots; the compact native interface keeps the player inventory and upgrade controls visible at normal GUI scales.
+- Fixed compressed schedules that consumed an intermediate cycle seed before running its upstream growth recipes, causing false missing-material results for complete layered jobs.
+- Added whole-chain recipe preflight and one-tick execution using checked 64-bit quantities, compressed ring-terminal schedules, exact remainders and the ring terminal's seed-reserve policy. The ripper uses 5 AE/t and an additional 50 AE for each committed whole-chain rip.
+- Added the Loop Card, crafted shapelessly from an Advanced Card and a Loop Crystal. Its native acceleration-card body is preserved with a circular repeat emblem.
+- Installing a Loop Card in the ripper advertises automatically discovered, encodable recipes and greys out all pattern slots. Existing patterns remain removable; removing the card restores normal pattern use.
+- Fixed automatic discovery skipping special and custom crafting recipes, including storage upgrades, dyeing, fireworks, books, banners and maps. Network component variants now refresh automatically; 26.1.2 also supports empty optional smithing slots and correct shapeless alternatives.
+- Added native continuations for map expansion and stochastic quartz-knife durability effects. Real output identities remain private to the original CPU job, with persistent progress and one 50 AE payment; these operations are exempt from instant execution.
+- Recipe discovery follows the live server recipe manager across modpack namespaces, data-pack replacements, tag changes and removal. Precise selection preserves complete components, nested NBT and numeric tag types; alternatives must assemble the exact requested result.
+- Classified quartz-knife durability effects from the actual selected knife, so a substitute with random durability effects cannot enter deterministic batch execution. Preserved map transformation markers across CPU persistence and prevented completed map identities from being reused as fuzzy input aliases.
+- Installing a Loop Card in a portable Loop Storage Cell enables charging its AE battery from stored FE using AE2's configured conversion and charge limits.
+- Portable cells with both stored FE and positive AE charge expose their energy through NeoForge's native item energy API. Portable inventory caches refresh after external energy changes to keep stored quantities consistent.
+
+### 简体中文
+
+- 修复自动配方目录中反复压缩、解压材料却没有净增长而耗尽规划预算的问题；已有压缩材料与合法的上游合成路线仍可使用。
+- 保持超算材料解算与自动配方发现兼容：未选中的逆向配方不再让普通合成计划强制要求环终端，按订单实际采用的配方确定服务归属。
+- 新增合成撕裂者，使用四排 AE2 样板供应器界面，接受工作台、锻造台和切石机样板，并复用供应器原生控件与优先级设置。
+- 撕裂者主体仅显示 36 个样板槽，紧凑界面在常用 GUI 缩放下完整保留玩家背包和升级控件。
+- 修复多层合成任务中，下游配方先消耗循环种子、上游增殖配方后执行导致的材料充足却误报缺料问题。
+- 新增整条合成链配方预检与一个 tick 内执行，使用带溢出检查的 64 位数量，兼容环解算终端压缩调度，精确结算返还物并遵循环终端种子保留策略。撕裂者消耗 5 AE/t，每次整链撕裂提交执行时额外消耗 50 AE。
+- 新增循环卡，由高级卡与循环水晶无序合成；保留原版加速卡卡体，仅将图案替换为循环箭头。
+- 为撕裂者安装循环卡后，自动发布可编码的真实配方并将全部样板槽变灰。原样板可取出，移除循环卡后恢复正常样板使用。
+- 修复自动发现跳过特殊及自定义工作台配方的问题，覆盖存储升级、染色、烟火、书籍、旗帜和地图；网络组件变体自动刷新，26.1.2 同时补齐可空锻造槽与无序合成替代输入。
+- 地图扩大及石英刀随机耐久效果使用原生逐步续作，真实产物身份仅关联原 CPU 任务，进度和一次 50 AE 收费共同保存；这类操作不受瞬间执行限制。
+- 配方发现跟随服务端实际配方管理器，响应整合包命名空间、数据包替换、标签变更及配方删除。精准选料保留完整组件、深层 NBT 和数值标签类型，替代材料必须合成完全一致的目标产物。
+- 按实际选中的石英刀识别耐久效果，避免带有随机耐久效果的替代刀具进入确定性批量执行；CPU 保存恢复保留地图变换标记，并防止已完成地图通过模糊输入别名被重复加工。
+- 为便携循环存储磁盘安装循环卡后，可按 AE2 的转换比例与充能速率，将已存储的 FE 转换成自身 AE 电量。
+- 同时存有 FE 与非零 AE 电量的便携磁盘通过 NeoForge 原生物品能量接口提供随身电容器能力；外部能量变化后刷新便携库存缓存，保持数量一致。
+
 ## 0.0.3
 
 ### English

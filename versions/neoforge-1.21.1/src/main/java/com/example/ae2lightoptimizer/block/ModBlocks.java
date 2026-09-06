@@ -23,6 +23,10 @@ public final class ModBlocks {
                     .strength(3.5F)
                     .sound(SoundType.METAL)));
 
+    public static final DeferredBlock<CraftingRipperBlock> CRAFTING_RIPPER = BLOCKS.register(
+            "crafting_ripper", () -> new CraftingRipperBlock(
+                    BlockBehaviour.Properties.of().strength(3.5F).sound(SoundType.METAL)));
+
     public static final DeferredBlock<Block> LOOP_CRYSTAL_BLOCK = BLOCKS.register("loop_crystal_block",
             () -> new Block(BlockBehaviour.Properties.of().strength(1.5F).sound(SoundType.GLASS).lightLevel(s -> 3)));
     private ModBlocks() {

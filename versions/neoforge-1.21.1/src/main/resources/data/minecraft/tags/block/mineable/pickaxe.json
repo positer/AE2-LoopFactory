@@ -3,6 +3,7 @@
   "values": [
     "ae2lightoptimizer:recipe_ring_solver_terminal",
     "ae2lightoptimizer:supercomputing_crafting_optimizer_interface",
-    "ae2lightoptimizer:loop_crystal_block"
+    "ae2lightoptimizer:loop_crystal_block",
+    "ae2lightoptimizer:crafting_ripper"
   ]
 }

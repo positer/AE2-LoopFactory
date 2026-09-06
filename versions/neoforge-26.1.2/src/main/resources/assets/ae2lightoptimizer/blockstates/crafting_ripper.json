@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "connected=false": {
+      "model": "ae2lightoptimizer:block/crafting_ripper"
+    },
+    "connected=true": {
+      "model": "ae2lightoptimizer:block/crafting_ripper_connected"
+    }
+  }
+}

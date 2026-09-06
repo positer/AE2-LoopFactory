@@ -194,6 +194,20 @@ public final class Ae2GlobalCraftingOptimizer {
     private static PatternConversion convertPattern(
             IGrid grid, NetworkCraftingSimulationState networkInventory, IPatternDetails details,
             Map<AEKey, String> resourceIds, Map<String, AEKey> resources) {
+        var level = grid.getPivot().getLevel();
+        if (CraftingRipperPatterns.requiresNativeExecution(details, level)) return null;
+        var knifeTemplates = quartzKnifeTemplates(details, level);
+        if (!knifeTemplates.isEmpty()) {
+            var actualKnives = new LinkedHashSet<AEKey>();
+            for (var template : knifeTemplates) {
+                for (var candidate : networkInventory.findFuzzyTemplates(template)) {
+                    if (networkInventory.extract(candidate, 1, Actionable.SIMULATE) > 0) actualKnives.add(candidate);
+                }
+            }
+            // Native selection can choose a component-bearing knife absent from getPossibleInputs().
+            // Decline before reading any remainder; the final submitted plan is classified from usedItems.
+            if (CraftingRipperPatterns.requiresNativeExecution(details, actualKnives, level)) return null;
+        }
         Map<String, Long> inputs = new LinkedHashMap<>();
         Map<String, Long> outputs = new LinkedHashMap<>();
         List<AEKey> inputKeys = new ArrayList<>();
@@ -203,7 +217,8 @@ public final class Ae2GlobalCraftingOptimizer {
             if (possible.length == 0 || input.getMultiplier() <= 0) {
                 return null;
             }
-            int selected = selectInput(grid, networkInventory, possible);
+            int selected = selectInput(grid, networkInventory, input, possible);
+            if (selected < 0) return null;
             var stack = possible[selected];
             if (stack.amount() <= 0) {
                 return null;
@@ -213,7 +228,12 @@ public final class Ae2GlobalCraftingOptimizer {
             inputs.merge(idFor(key, resourceIds, resources), amount, Math::addExact);
             inputKeys.add(key);
 
-            AEKey remaining = input.getRemainingKey(key);
+        }
+        if (!knifeTemplates.isEmpty()
+                && CraftingRipperPatterns.requiresNativeExecution(details, inputKeys, level)) return null;
+        for (int index = 0; index < inputKeys.size(); index++) {
+            var input = details.getInputs()[index];
+            AEKey remaining = input.getRemainingKey(inputKeys.get(index));
             if (remaining != null) {
                 outputs.merge(idFor(remaining, resourceIds, resources), input.getMultiplier(), Math::addExact);
             }
@@ -227,12 +247,28 @@ public final class Ae2GlobalCraftingOptimizer {
         return outputs.isEmpty() ? null : new PatternConversion(inputs, outputs, inputKeys);
     }
 
+    private static List<AEKey> quartzKnifeTemplates(IPatternDetails pattern, net.minecraft.world.level.Level level) {
+        var encoded = pattern.getDefinition().get(appeng.api.ids.AEComponents.ENCODED_CRAFTING_PATTERN);
+        if (encoded == null) return List.of();
+        var holder = level.getRecipeManager().byKey(encoded.recipeId()).orElse(null);
+        if (holder == null || !(holder.value() instanceof appeng.recipes.quartzcutting.QuartzCuttingRecipe)) {
+            return List.of();
+        }
+        var templates = new ArrayList<AEKey>();
+        for (var input : encoded.inputs()) {
+            if (input.is(appeng.datagen.providers.tags.ConventionTags.QUARTZ_KNIFE)) templates.add(appeng.api.stacks.AEItemKey.of(input));
+        }
+        return templates;
+    }
+
     private static int selectInput(IGrid grid, NetworkCraftingSimulationState inventory,
+                                   IPatternDetails.IInput input,
                                    appeng.api.stacks.GenericStack[] possible) {
-        int best = 0;
+        int best = -1;
         long bestCoverage = -1;
         for (int i = 0; i < possible.length; i++) {
-            if (possible[i].amount() <= 0) {
+            if (possible[i].amount() <= 0
+                    || !input.isValid(possible[i].what(), grid.getPivot().getLevel())) {
                 continue;
             }
             long stored = inventory.extract(possible[i].what(), Long.MAX_VALUE, Actionable.SIMULATE);

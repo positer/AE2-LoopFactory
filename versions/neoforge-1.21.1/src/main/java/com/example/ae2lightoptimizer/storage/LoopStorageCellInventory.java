@@ -44,6 +44,7 @@ public final class LoopStorageCellInventory implements StorageCell {
     private final boolean voidUpgrade;
     private final long equalDistributionSlots;
     private boolean dirty;
+    private List<GenericStack> loadedContents;
 
     public LoopStorageCellInventory(ItemStack cellStack, @Nullable ISaveProvider host) {
         this.cellStack = Objects.requireNonNull(cellStack, "cellStack");
@@ -61,20 +62,33 @@ public final class LoopStorageCellInventory implements StorageCell {
         load();
     }
 
+    private void refreshPortableContents() {
+        // Portable menu hosts cache this inventory by ItemStack identity. The FE
+        // capability and loop card replace its immutable component independently.
+        if (cellStack.getItem() instanceof PortableLoopStorageCellItem
+                && loadedContents != cellStack.getOrDefault(AEComponents.STORAGE_CELL_INV, List.of())) {
+            load();
+        }
+    }
+
     public LoopStorageTier tier() {
         return tier;
     }
 
     public long storedTypeCount() {
+        refreshPortableContents();
         return storedAmounts.size();
     }
 
     public long usedBytes() {
+        refreshPortableContents();
         return currentUsage().map(LoopStorageUsage::usedBytes).orElse(tier.capacityBytes());
     }
 
     private void load() {
         List<GenericStack> storedStacks = cellStack.getOrDefault(AEComponents.STORAGE_CELL_INV, List.of());
+        loadedContents = storedStacks;
+        storedAmounts.clear();
         for (GenericStack stack : storedStacks) {
             if (stack.amount() <= 0 || !isRegisteredKeyType(stack.what().getType())) {
                 continue;
@@ -85,6 +99,7 @@ public final class LoopStorageCellInventory implements StorageCell {
 
     @Override
     public long insert(AEKey what, long amount, Actionable mode, IActionSource source) {
+        refreshPortableContents();
         appeng.api.storage.MEStorage.checkPreconditions(what, amount, mode, source);
         if (amount == 0 || !isRegisteredKeyType(what.getType())) {
             return 0;
@@ -177,6 +192,7 @@ public final class LoopStorageCellInventory implements StorageCell {
 
     @Override
     public long extract(AEKey what, long amount, Actionable mode, IActionSource source) {
+        refreshPortableContents();
         appeng.api.storage.MEStorage.checkPreconditions(what, amount, mode, source);
         long currentAmount = storedAmounts.getLong(what);
         long extracted = Math.min(amount, currentAmount);
@@ -194,6 +210,7 @@ public final class LoopStorageCellInventory implements StorageCell {
 
     @Override
     public void getAvailableStacks(KeyCounter out) {
+        refreshPortableContents();
         for (var entry : Object2LongMaps.fastIterable(storedAmounts)) {
             out.add(entry.getKey(), entry.getLongValue());
         }
@@ -206,6 +223,7 @@ public final class LoopStorageCellInventory implements StorageCell {
 
     @Override
     public CellState getStatus() {
+        refreshPortableContents();
         if (storedAmounts.isEmpty()) {
             return CellState.EMPTY;
         }
@@ -234,6 +252,7 @@ public final class LoopStorageCellInventory implements StorageCell {
 
     @Override
     public boolean canFitInsideCell() {
+        refreshPortableContents();
         return storedAmounts.isEmpty();
     }
 
@@ -255,6 +274,7 @@ public final class LoopStorageCellInventory implements StorageCell {
         } else {
             cellStack.set(AEComponents.STORAGE_CELL_INV, List.copyOf(storedStacks));
         }
+        loadedContents = cellStack.getOrDefault(AEComponents.STORAGE_CELL_INV, List.of());
         dirty = false;
     }
 

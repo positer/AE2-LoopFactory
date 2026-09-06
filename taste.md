@@ -1,5 +1,15 @@
 # Project Taste
 
+- Resolve pack recipes from the active server recipe manager and refresh on recipe/tag reload. Never use a namespace whitelist or advertised result alone as proof of a craftable recipe.
+- Preserve complete AE item keys, nested custom data and numeric tag types. Compare actual selected inputs and assembled output through native recipe rules; classify random tool effects before evaluating remainders.
+- Keep native world-output identity credits private to one CPU job and match them only to exact declared inputs. Explicitly persist network-only map markers without changing global item equality.
+
+- A Crafting Ripper accepts an entire job: validate the whole chain before extracting initial stock, then execute all selected recipe layers synchronously and charge 50 AE once per job. One pattern per tick does not satisfy this contract.
+- Order compressed batches by dependencies among the selected recipe SCCs. Downstream consumers must not steal the seed before an upstream growth cycle runs; replay regression schedules against actual credited stock, including cycles feeding acyclic outputs.
+- Assign the ring terminal and supercomputing interface ownership from recipes actually selected for the order. Unused reversible recipes in the automatic catalog must not make an otherwise acyclic plan require the ring terminal.
+- Treat reversible compression/decompression as conversion of existing material, not a source of net growth. Recognize conservation from exact recipe ratios without item-ID exceptions, and preserve mixed plans that consume available compressed stock before crafting the remaining demand.
+- Keep gameplay acceptance helpers outside production source sets and JARs. Launch new isolated PCL worlds, verify exact inputs/outputs and real native CPU calls, capture the framebuffer, and preserve existing saves. Cached network power estimates are not an exact per-call energy meter.
+
 - Prefer small, explicit version adapters over conditional branches scattered through feature code.
 - Keep registry names stable, lowercase, and namespaced under the final mod ID.
 - Treat server state as authoritative; client code renders and requests actions.
@@ -13,7 +23,7 @@
 - Bound graph algorithms by both depth and explored states, and never report budget exhaustion as proof that no solution exists.
 - Keep material quantities and compressed plan counts in `long`; state-count limits remain `int` because they bound allocated search memory.
 - Version adapters may expose shared solver entry points, but AE2 inventory discovery, security, and crafting-job submission stay server-authoritative and version-local.
-- All optimization blocks are UI-free AE2 network service nodes. Do not add menus, screens, or local configuration interactions; behavior activates from grid connection and server-authoritative network state.
+- The ring terminal and supercomputing interface remain UI-free AE2 network service nodes. The Crafting Ripper explicitly reuses AE2's pattern-provider menu/screen and configuration controls with 36 pattern slots; no separate visual language or duplicated priority workflow is introduced.
 - Build reverse producer indexes before relevance traversal; never rescan the full recipe list for each newly required resource.
 - Compile graph recipes as sparse touched-resource transitions. Dense per-recipe vectors require benchmark evidence before introduction.
 - Preserve breadth-first minimum-application semantics and explicit budgets when optimizing; performance claims must name their bounded input and avoid claiming mathematical optimality for Pareto-frontier search.
@@ -24,6 +34,8 @@
 - Drive connected textures from `IGridNode.isActive()` through the node listener so visual state matches channel and power availability.
 - Prefer eliminating work through graph aggregation and compressed arithmetic before considering JNI, handwritten machine code, or other platform-specific execution paths.
 - Every internal AE2 fast path must preflight semantics and return control without mutation when qualification fails or checked arithmetic overflows.
+- Discover recipes by live recipe type and demonstrated inputs, never by recipe-book visibility or a shaped/shapeless class whitelist. Keep component witnesses local to the supplying grid, coalesce storage refreshes, and preserve witnesses while CPU stock is reserved.
+- Keep world-dependent crafting on a CPU-job-local native continuation. Persist actual-output identity credits with physical stock and payment; never alter global AE key matching, advertise fabricated fixed world data, or replay completed steps through AE2 after the provider disappears.
 - Force required internal Mixin targets to transform during mod startup and verify exported target bytecode in the release gate; packaging or source-text checks alone do not prove takeover.
 - Distinguish quantity scale from distinct-graph scale without turning that distinction into a fixed admission ceiling. P-level counts stay compressed in `long`; distinct keys and nodes retain their unavoidable `Omega(V + E)` traversal cost, but every graph AE2 can enumerate remains eligible and planning capacity scales with the discovered graph.
 - Publish block documentation into AE2's existing cross-namespace `ae2guide` resource tree. Use `item_ids` for the native hold-`G` item link, mirror translations under `_zh_cn` at the same page path, and never create a standalone GuideME guide, guide item, screen, or key handler for these UI-free service blocks.
@@ -61,3 +73,8 @@
 - Treat `README.md` as the authoritative current-version public contract. Every release update must keep its bilingual identity, supported-version matrix, complete feature/recipe/integration surface, installation guidance, verification status, release links, and isolation boundaries accurate and internally consistent.
 - Structure `CHANGELOG.md` by version group: each version contains only its own changes, with that version's complete English subsection immediately followed by its complete Simplified Chinese subsection. Never group all English versions separately from all Chinese versions, and never copy later-version changes into an earlier version.
 - Mod isolation is a release-blocking invariant: source, build outputs, packaged JARs, PCL instances, and GitHub assets must contain only the generation-matched AE2LO artifact and explicitly pinned runtime dependencies. Optional Create/Mekanism compatibility remains conditional data-only integration; never bundle their classes, JARs, configs, saves, or directories, and never copy or reference ImmortalStorage state.
+- Crafting Ripper execution preflights the complete selected chain against live recipe semantics and detached CPU stock before committing. Keep all repeated quantities in checked signed 64-bit arithmetic and consume compressed ring schedules without expanding repetitions; preserve remainders, cyclic seeds, cancellation and requester backpressure.
+- Charge Crafting Ripper idle and active work at 5 AE/t, plus exactly 50 AE per committed whole-chain rip. Retrying delivery must not charge or calculate again.
+- Loop Card insertion locks only pattern insertion: retain installed patterns, permit removal, show disabled grey slots and publish live recipe-backed automatic patterns. Card removal restores the physical patterns. Never advertise fabricated static outputs for input-dependent recipes.
+- Loop Card uses the pinned native AE2 acceleration-card PNG as the immutable shell. Change only the central emblem; preserve dimensions, alpha, cyan side contacts and red status pixels exactly. Its recipe uses the user-confirmed advanced card, not the basic card.
+- Portable FE-to-AE charging uses AE2's configured unit conversion and native charge limits. FE capability simulations are read-only; the 26.1.2 transactional adapter must commit both energy amounts and inventory components atomically. Refresh cached portable inventories after external component changes to prevent stale FE resurrection.

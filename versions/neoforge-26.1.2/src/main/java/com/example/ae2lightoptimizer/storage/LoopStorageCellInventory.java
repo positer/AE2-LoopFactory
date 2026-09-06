@@ -41,6 +41,7 @@ public final class LoopStorageCellInventory implements StorageCell {
     private final boolean voidUpgrade;
     private final long equalDistributionSlots;
     private boolean dirty;
+    private List<GenericStack> loadedContents;
 
     LoopStorageCellInventory(ItemStack cellStack, @Nullable ISaveProvider saveProvider) {
         this.cellStack = Objects.requireNonNull(cellStack, "cellStack");
@@ -55,10 +56,26 @@ public final class LoopStorageCellInventory implements StorageCell {
         this.voidUpgrade = isInstalled(cellStack, AEItems.VOID_CARD);
         this.equalDistributionSlots = isInstalled(cellStack, AEItems.EQUAL_DISTRIBUTION_CARD)
                 ? configTypeSlots(cellStack) : 0;
-        for (var stored : cellStack.getOrDefault(AEComponents.STORAGE_CELL_INV, List.<GenericStack>of())) {
+        load();
+    }
+
+    private void load() {
+        loadedContents = cellStack.getOrDefault(AEComponents.STORAGE_CELL_INV, List.of());
+        amounts.clear();
+        for (var stored : loadedContents) {
+
             if (stored != null && stored.amount() > 0 && isRegisteredKeyType(stored.what().getType())) {
                 amounts.merge(stored.what(), stored.amount(), LoopStorageCellInventory::saturatingAdd);
             }
+        }
+    }
+
+    private void refreshPortableContents() {
+        // Portable menu hosts cache this inventory by ItemStack identity. The FE
+        // capability and loop card replace its immutable component independently.
+        if (cellStack.getItem() instanceof PortableLoopStorageCellItem
+                && loadedContents != cellStack.getOrDefault(AEComponents.STORAGE_CELL_INV, List.of())) {
+            load();
         }
     }
 
@@ -67,15 +84,18 @@ public final class LoopStorageCellInventory implements StorageCell {
     }
 
     public long storedTypeCount() {
+        refreshPortableContents();
         return amounts.size();
     }
 
     public long usedBytes() {
+        refreshPortableContents();
         return usage(amounts).map(LoopStorageUsage::usedBytes).orElse(tier.capacityBytes());
     }
 
     @Override
     public CellState getStatus() {
+        refreshPortableContents();
         if (amounts.isEmpty()) {
             return CellState.EMPTY;
         }
@@ -103,6 +123,7 @@ public final class LoopStorageCellInventory implements StorageCell {
 
     @Override
     public boolean canFitInsideCell() {
+        refreshPortableContents();
         return amounts.isEmpty();
     }
 
@@ -122,11 +143,13 @@ public final class LoopStorageCellInventory implements StorageCell {
             });
             cellStack.set(AEComponents.STORAGE_CELL_INV, List.copyOf(stored));
         }
+        loadedContents = cellStack.getOrDefault(AEComponents.STORAGE_CELL_INV, List.of());
         dirty = false;
     }
 
     @Override
     public long insert(AEKey what, long amount, Actionable mode, IActionSource source) {
+        refreshPortableContents();
         MEStorage.checkPreconditions(what, amount, mode, source);
         if (amount == 0 || !isRegisteredKeyType(what.getType())) {
             return 0;
@@ -194,6 +217,7 @@ public final class LoopStorageCellInventory implements StorageCell {
 
     @Override
     public long extract(AEKey what, long amount, Actionable mode, IActionSource source) {
+        refreshPortableContents();
         MEStorage.checkPreconditions(what, amount, mode, source);
         long current = amounts.getOrDefault(what, 0L);
         long extracted = Math.min(current, amount);
@@ -211,6 +235,7 @@ public final class LoopStorageCellInventory implements StorageCell {
 
     @Override
     public void getAvailableStacks(KeyCounter out) {
+        refreshPortableContents();
         amounts.forEach(out::add);
     }
 

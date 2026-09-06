@@ -24,13 +24,18 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 public final class Ae2LightOptimizer {
     public static final String MOD_ID = "ae2lightoptimizer";
     public static final DeferredRegister<CreativeModeTab> CREATIVE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
-    public static final net.neoforged.neoforge.registries.DeferredHolder<CreativeModeTab, CreativeModeTab> AE2_LIGHTOPTIMIZER_TAB = CREATIVE_TABS.register("ae2_lightoptimizer", () -> CreativeModeTab.builder().title(net.minecraft.network.chat.Component.translatable("itemGroup.ae2lightoptimizer")).icon(() -> ModItems.LOOP_CRYSTAL.get().getDefaultInstance()).displayItems((p, o) -> { o.accept(ModItems.RECIPE_RING_SOLVER_TERMINAL.get()); o.accept(ModItems.SUPERCOMPUTING_CRAFTING_OPTIMIZER_INTERFACE.get()); o.accept(ModItems.LOOP_CRYSTAL.get()); o.accept(ModItems.LOOP_CRYSTAL_FRAGMENT.get()); o.accept(ModItems.LOOP_CRYSTAL_BLOCK.get()); o.accept(ModItems.LOOP_CRYSTAL_POWDER.get()); ModItems.LOOP_STORAGE_CONTENT.forEach(item -> o.accept(item.get())); ModItems.PORTABLE_LOOP_STORAGE_CELLS.forEach(item -> item.get().emptyAndFullStacks().forEach(o::accept)); }).build());
+    public static final net.neoforged.neoforge.registries.DeferredHolder<CreativeModeTab, CreativeModeTab> AE2_LIGHTOPTIMIZER_TAB = CREATIVE_TABS.register("ae2_lightoptimizer", () -> CreativeModeTab.builder().title(net.minecraft.network.chat.Component.translatable("itemGroup.ae2lightoptimizer")).icon(() -> ModItems.LOOP_CRYSTAL.get().getDefaultInstance()).displayItems((p, o) -> { o.accept(ModItems.CRAFTING_RIPPER.get()); o.accept(ModItems.LOOP_CARD.get()); o.accept(ModItems.RECIPE_RING_SOLVER_TERMINAL.get()); o.accept(ModItems.SUPERCOMPUTING_CRAFTING_OPTIMIZER_INTERFACE.get()); o.accept(ModItems.LOOP_CRYSTAL.get()); o.accept(ModItems.LOOP_CRYSTAL_FRAGMENT.get()); o.accept(ModItems.LOOP_CRYSTAL_BLOCK.get()); o.accept(ModItems.LOOP_CRYSTAL_POWDER.get()); ModItems.LOOP_STORAGE_CONTENT.forEach(item -> o.accept(item.get())); ModItems.PORTABLE_LOOP_STORAGE_CELLS.forEach(item -> item.get().emptyAndFullStacks().forEach(o::accept)); }).build());
 
     public Ae2LightOptimizer(IEventBus modEventBus) {
         verifyTakeoverTargetLoads();
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+                com.example.ae2lightoptimizer.block.CraftingRipperLogic::onDatapackSync);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+                com.example.ae2lightoptimizer.block.CraftingRipperLogic::onServerTick);
         ModBlocks.BLOCKS.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
         CREATIVE_TABS.register(modEventBus);
+        com.example.ae2lightoptimizer.menu.CraftingRipperMenu.MENUS.register(modEventBus);
         ModBlockEntities.BLOCK_ENTITIES.register(modEventBus);
         modEventBus.addListener(Ae2LightOptimizer::registerCapabilities);
         modEventBus.addListener(Ae2LightOptimizer::addCreativeTabContents);
@@ -42,8 +47,10 @@ public final class Ae2LightOptimizer {
             // Forces all required calculation and execution targets to transform at startup.
             var loader = Ae2LightOptimizer.class.getClassLoader();
             Class.forName("appeng.crafting.CraftingCalculation", false, loader);
+            Class.forName("appeng.helpers.patternprovider.PatternProviderLogic", false, loader);
             Class.forName("appeng.crafting.CraftingPlan", false, loader);
             Class.forName("appeng.crafting.execution.ExecutingCraftingJob", false, loader);
+            Class.forName("appeng.crafting.execution.ExecutingCraftingJob$TaskProgress", false, loader);
             Class.forName("appeng.crafting.execution.CraftingCpuLogic", false, loader);
             Class.forName("appeng.crafting.execution.ElapsedTimeTracker", false, loader);
         } catch (ClassNotFoundException missingAe2Internals) {
@@ -52,6 +59,9 @@ public final class Ae2LightOptimizer {
     }
 
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
+        com.example.ae2lightoptimizer.storage.PortableLoopEnergy.registerCapabilities(event);
+        event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST,
+                ModBlockEntities.CRAFTING_RIPPER.get(), (ripper, side) -> ripper);
         event.registerBlockEntity(
                 AECapabilities.IN_WORLD_GRID_NODE_HOST,
                 ModBlockEntities.RECIPE_RING_SOLVER_TERMINAL.get(),
@@ -64,6 +74,8 @@ public final class Ae2LightOptimizer {
 
     private static void addCreativeTabContents(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
+            event.accept(ModItems.CRAFTING_RIPPER.get());
+            event.accept(ModItems.LOOP_CARD.get());
             event.accept(ModItems.RECIPE_RING_SOLVER_TERMINAL.get());
             event.accept(ModItems.SUPERCOMPUTING_CRAFTING_OPTIMIZER_INTERFACE.get());
             event.accept(ModItems.LOOP_CRYSTAL.get());
@@ -80,9 +92,14 @@ public final class Ae2LightOptimizer {
         // AE2 installs its own handlers during enqueued setup work. Our mod orders after AE2,
         // so this registration observes the completed AE key-type and storage registries.
         event.enqueueWork(() -> {
+            ModBlocks.CRAFTING_RIPPER.get().setBlockEntity(
+                    com.example.ae2lightoptimizer.block.CraftingRipperBlockEntity.class,
+                    ModBlockEntities.CRAFTING_RIPPER.get(), null, null);
+            Upgrades.add(ModItems.LOOP_CARD.get(), ModBlocks.CRAFTING_RIPPER.get(), 1);
             StorageCells.addCellHandler(LoopStorageCellHandler.INSTANCE);
             for (var cell : ModItems.PORTABLE_LOOP_STORAGE_CELLS) {
                 var item = cell.get();
+                Upgrades.add(ModItems.LOOP_CARD.get(), item, 1);
                 Upgrades.add(AEItems.FUZZY_CARD, item, 1);
                 Upgrades.add(AEItems.INVERTER_CARD, item, 1);
                 Upgrades.add(AEItems.EQUAL_DISTRIBUTION_CARD, item, 1);

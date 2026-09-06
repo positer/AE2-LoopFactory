@@ -33,6 +33,8 @@ public final class CraftingExecutionScheduleCodec {
         var batches = new ListTag();
         for (var batch : job.ae2lightoptimizer$getSchedule().batches()) {
             var batchData = batch.pattern().getDefinition().toTag(registries);
+            var markers = RipperMapSerialization.markers(batch.pattern().getDefinition());
+            if (!markers.isEmpty()) batchData.put(RipperMapSerialization.TAG_NAME, markers);
             batchData.putLong(TAG_REPETITIONS, batch.repetitions());
             batches.add(batchData);
         }
@@ -54,6 +56,8 @@ public final class CraftingExecutionScheduleCodec {
                 var batchData = batchList.getCompound(i);
                 long repetitions = batchData.getLong(TAG_REPETITIONS);
                 var definition = AEItemKey.fromTag(registries, batchData);
+                definition = (AEItemKey) RipperMapSerialization.restoreKey(definition,
+                        batchData.getCompound(RipperMapSerialization.TAG_NAME));
                 var pattern = PatternDetailsHelper.decodePattern(definition, level);
                 if (pattern == null) {
                     return null;
