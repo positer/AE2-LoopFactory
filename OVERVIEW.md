@@ -1,15 +1,15 @@
-# AE2LO — AE2-lightoptimizer Project Overview
+# AE2-LoopFactory (AE2LF) Project Overview
 
-English name: Applied Energistics 2 Lightweight Optimization (AE2LO).  
-中文名称：应用能源 2 轻量优化（AE2LO）。
+English name: AE2-LoopFactory (AE2LF).
+中文名称：应用能源 2 循环工厂（AE2LF）。
 
-Current release: **[0.0.4](https://github.com/positer/AE2-lightoptimizer/releases/tag/v0.0.4)**.
+Current release: **[0.0.4](https://github.com/positer/AE2-LoopFactory/releases/tag/v0.0.4)**.
 
 ## Goal and status
 
-Provide a clean, dual-generation workspace for `AE2-lightoptimizer`, an AE2 addon whose universal Loop Storage cells share capacity across every dynamically registered AE2 key type and whose network blocks solve crafting cycles, accelerate eligible global crafting calculations and execute validated crafting chains. The workspace is isolated from ImmortalStorage and hard-separates incompatible Minecraft generations.
+Provide a clean, dual-generation workspace for `AE2-LoopFactory`, an AE2 addon whose universal Loop Storage cells share capacity across every dynamically registered AE2 key type and whose network blocks solve crafting cycles, accelerate eligible global crafting calculations and execute validated crafting chains. The workspace is isolated from ImmortalStorage and hard-separates incompatible Minecraft generations.
 
-The canonical upstream is the standalone GitHub repository `https://github.com/positer/AE2-lightoptimizer`. Its Git root, history, branches, tags, and remote are independent from ImmortalStorage; no repository nesting, subtree, submodule, or shared worktree is used.
+The canonical upstream is the standalone GitHub repository `https://github.com/positer/AE2-LoopFactory`. Its Git root, history, branches, tags, and remote are independent from ImmortalStorage; no repository nesting, subtree, submodule, or shared worktree is used.
 
 Release 0.0.4 adds the Crafting Ripper and Loop Card in both maintained generations. The complete stationary and portable storage families, dynamic storage-key compatibility, recipes and existing solver services are retained. Minecraft 1.20.1 is intentionally not maintained.
 
@@ -236,7 +236,7 @@ The optional PCL tool targets two addon-only instances when explicitly invoked:
 - `<PCL_ROOT>\.minecraft\versions\AE2-lightoptimizer-1.21.1`
 - `<PCL_ROOT>\.minecraft\versions\AE2-lightoptimizer-26.1.2`
 
-Its contract requires `VersionArgumentIndieV2:True`, exactly six managed mod JARs (AE2, GuideME, JEI, AE2LO, Applied Flux, and Glodium), no ImmortalStorage artifact, no filesystem link, and no copied mutable directories. Applied Flux and Glodium exist only in the test-instance whitelist to verify third-party FE key discovery; they are not release dependencies. PCL creates future instance state under the matching target directory. Existing ImmortalStorage PCL instances remain separate and unchanged. Both instances now contain the matching 0.0.4 release artifact. After twelve passing runtime scenarios, the final installation audit removed the two temporary helpers and verified all 335 original non-production files unchanged.
+Its contract requires `VersionArgumentIndieV2:True`, exactly six managed mod JARs (AE2, GuideME, JEI, AE2LF, Applied Flux, and Glodium), no ImmortalStorage artifact, no filesystem link, and no copied mutable directories. Applied Flux and Glodium exist only in the test-instance whitelist to verify third-party FE key discovery; they are not release dependencies. PCL creates future instance state under the matching target directory. Existing ImmortalStorage PCL instances remain separate and unchanged. Both instances now contain the matching 0.0.4 release artifact. After twelve passing runtime scenarios, the final installation audit removed the two temporary helpers and verified all 335 original non-production files unchanged.
 
 ## Isolation contract
 
@@ -244,7 +244,7 @@ Neither version references the ImmortalStorage workspace, packages, artifacts, g
 
 ## Current 0.0.4 verification
 
-Release 0.0.4 validation: both complete `build`; 1.21.1 passes 138 tests and 26.1.2 passes 136, with zero failures/errors/skips. Final JARs contain 116 and 122 AE2LO classes respectively and 76 recipes each, with no nested JAR, unrelated mod class or runtime-probe class. Both real installed PCL clients have been launched in new, isolated test worlds. A full automatic-catalog order for 3,000 256M cores passes with both the supercomputing interface and ring terminal online: 13 recipes, 188,681,000 applications, 38 compressed batches, exactly 769,888,153 required CPU bytes, one native CPU tick, one executor call and 50 AE total surcharge. Exact materials, preserved crystal seed, zero intermediate stock and empty reusable CPU all pass. The native UI shows four pattern rows and a single upgrade slot, with no return slots; optional JEI navigation uses the full sidebar bounds.
+Release 0.0.4 validation: both complete `build`; 1.21.1 passes 138 tests and 26.1.2 passes 136, with zero failures/errors/skips. Final JARs contain 116 and 122 AE2LF classes respectively and 76 recipes each, with no nested JAR, unrelated mod class or runtime-probe class. Both real installed PCL clients have been launched in new, isolated test worlds. A full automatic-catalog order for 3,000 256M cores passes with both the supercomputing interface and ring terminal online: 13 recipes, 188,681,000 applications, 38 compressed batches, exactly 769,888,153 required CPU bytes, one native CPU tick, one executor call and 50 AE total surcharge. Exact materials, preserved crystal seed, zero intermediate stock and empty reusable CPU all pass. The native UI shows four pattern rows and a single upgrade slot, with no return slots; optional JEI navigation uses the full sidebar bounds.
 
 The real catalog is also captured and replayed with the ring terminal offline to verify acyclic supercomputing ownership and exact materials independently. This replay does not submit a native CPU job. Requester backpressure and third-party portable equipment are outside the gameplay fixture. The 1.21.1 client intermittently stalled in native chunk-unload futures after a completed pre-save; its thread dump and verified test-process stop are retained. The 26.1.2 acceptance saved and exited normally. The preceding acceptance campaign's reports and failed-first-attempt evidence remain under `archive/2026-09-06-runtime-ripper-acceptance/`; final release-artifact evidence is in the catalog campaign below.
 
@@ -261,7 +261,7 @@ The following measurements are the independent 0.0.3 release snapshot. Its test 
 - NeoForge 1.21.1 passes 102 tests and NeoForge 26.1.2 passes 101 tests, with zero failures, errors, or skips.
 - Both real AE2/GuideME/Mixin data environments start successfully.
 - Calculation, plan, executing-job, CPU-logic, and elapsed-time classes pass transformed-bytecode takeover verification in both generations.
-- Each adapter packages exactly 64 Loop Storage recipe JSON files and 74 AE2LO recipe JSON files in total, two localized Loop Storage GuideME pages, 33 Loop Storage items, 36 Loop Storage textures, 33 item models, and eleven native drive models.
+- Each adapter packages exactly 64 Loop Storage recipe JSON files and 74 AE2LF recipe JSON files in total, two localized Loop Storage GuideME pages, 33 Loop Storage items, 36 Loop Storage textures, 33 item models, and eleven native drive models.
 - The ten core textures in each adapter match the user-supplied SHA-256 values byte-for-byte. Every finite/infinite cell recolor passes exact pixel comparison, and every drive model matches the pinned AE2 source bytes.
 - Both packaged `neoforge.mods.toml` files decode as strict UTF-8, report version 0.0.3, and declare no optional storage addon as a dependency. Both Gradle adapters set `processResources.filteringCharset` to UTF-8 and expand only `META-INF/neoforge.mods.toml`; JSON, GuideME Markdown, PNG, and all other resources remain unfiltered.
 - Final release JAR SHA-256: 1.21.1 `8DC0C2854ADCE448B34BB99F77F3B30FB666F5876896C3DBCADE3BD94C531A8A`; 26.1.2 `6A9FC6A0A58F1B34DB3A3E54932DC4582F32F39049E5A814F88AAB4852061A93`.
@@ -275,3 +275,7 @@ The following measurements are the independent 0.0.3 release snapshot. Its test 
 - T-distinct diagnostics report the unavoidable `Omega(V + E)` traversal and minimum reference cost without imposing a live threshold.
 
 This historical baseline did not include persistent in-game network submission or visual hold-`G` acceptance. Current network-submission evidence is listed in the 0.0.4 section; it does not extend to untested GuideME interactions.
+
+## Branding update — 2026-09-08
+
+Public name: AE2-LoopFactory; abbreviation: AE2LF; repository: https://github.com/positer/AE2-LoopFactory. Both version adapters update mod display metadata, creative-tab translations and GuideME references. Internal IDs, package paths, artifact names and existing PCL instance paths remain stable. No project directories were moved. Historical release tags and assets remain intact.

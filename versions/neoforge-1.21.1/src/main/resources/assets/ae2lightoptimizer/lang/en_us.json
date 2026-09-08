@@ -1,5 +1,5 @@
 {
-  "itemGroup.ae2lightoptimizer": "AE2LO - Applied Energistics 2 Lightweight Optimization",
+  "itemGroup.ae2lightoptimizer": "AE2LF - AE2-LoopFactory",
   "block.ae2lightoptimizer.recipe_ring_solver_terminal": "Recipe Ring Solver Terminal",
   "block.ae2lightoptimizer.supercomputing_crafting_optimizer_interface": "Supercomputing Crafting Optimizer Interface",
   "item.ae2lightoptimizer.loop_crystal": "Loop Crystal",

@@ -1,12 +1,12 @@
-# AE2LO — AE2-lightoptimizer
+# AE2-LoopFactory (AE2LF)
 
-Official source repository: <https://github.com/positer/AE2-lightoptimizer>
+Official source repository: <https://github.com/positer/AE2-LoopFactory>
 
-Current release: **[0.0.4](https://github.com/positer/AE2-lightoptimizer/releases/tag/v0.0.4)**.
+Current release: **[0.0.4](https://github.com/positer/AE2-LoopFactory/releases/tag/v0.0.4)**.
 
 ## Description
 
-Applied Energistics 2 Lightweight Optimization (AE2LO) is a NeoForge addon for Applied Energistics 2. It adds universal Loop Storage Cells that share one byte budget across every AE2-registered key type, two network services that split cycle solving from acyclic plan acceleration, and a Crafting Ripper that validates and executes supported crafting chains in one server tick.
+AE2-LoopFactory (AE2LF) is a NeoForge addon for Applied Energistics 2. It adds universal Loop Storage Cells that share one byte budget across every AE2-registered key type, two network services that split cycle solving from acyclic plan acceleration, and a Crafting Ripper that validates and executes supported crafting chains in one server tick.
 
 Loop Storage Cells require only AE2. The family covers a housing, ten cores, ten finite cells, and one infinite cell. The 1k-256k tiers keep AE2-equivalent capacity and the 63-type limit; the 1M-256M tiers use one aggregate pool equal to 63 times the original single-type ceiling; the infinite tier removes both amount and type limits. Every cell accepts items, fluids, FE, mana, source, soul, and any other registered AE2 addon key, charging the native amount-per-byte each key defines. Eleven portable cells reuse AE2's terminal, battery, four AE2-compatible upgrade slots, charge rate, idle drain, and powered insert or extract. Fifty-three acquisition recipes and eleven disassembly declarations cover all tiers through ordered and shapeless routes; the infinite cell requires the explosion transform of 64 256M cores plus one housing.
 
@@ -14,7 +14,7 @@ The Crafting Ripper provides four rows of AE2 pattern-provider slots for craftin
 
 ## 简介
 
-应用能源 2 轻量优化（AE2LO）是一个面向应用能源 2（Applied Energistics 2）的 NeoForge 附属模组。它新增通用循环存储磁盘——所有注册到 AE2 的存储键类型共享同一字节预算——并提供两个独立负责循环图解算与无环计划加速的网络服务，以及在一个服务端 tick 内验证并执行受支持合成链的合成撕裂者。
+应用能源 2 循环工厂（AE2LF）是一个面向应用能源 2（Applied Energistics 2）的 NeoForge 附属模组。它新增通用循环存储磁盘——所有注册到 AE2 的存储键类型共享同一字节预算——并提供两个独立负责循环图解算与无环计划加速的网络服务，以及在一个服务端 tick 内验证并执行受支持合成链的合成撕裂者。
 
 循环存储磁盘只依赖 AE2。系列包含一个外壳、十个核心、十个有限磁盘和一个无限磁盘。1k 至 256k 档沿用 AE2 容量和 63 类限制；1M 至 256M 档使用等于原单类上限 63 倍的聚合池；无限档取消数量与种类限制。磁盘可存储物品、流体、FE、魔力、魔源、灵魂涌动及其他已注册附属键，并按各键类型自身的每字节占用计费。十一档便携磁盘复用 AE2 终端、电池、与 AE2 一致的四格升级卡插槽、充能速率、待机耗电和通电存取。共 53 个获取配方与 11 个拆解声明覆盖全部档位及有序、无序路线；无限磁盘必须通过 64 个 256M 核心加一个外壳的爆炸转换获得。
 
@@ -31,7 +31,7 @@ Both maintained generations are independent Gradle projects and are fully isolat
 
 ## Current release contents
 
-AE2LO 0.0.4 retains the complete 0.0.3 surface and adds:
+AE2LF 0.0.4 retains the complete 0.0.3 surface and adds:
 
 - Crafting Ripper: 36 pattern slots, AE2's native pattern-provider controls and priority page, whole-chain recipe validation, checked 64-bit batch execution, and Recipe Ring Solver Terminal compatibility. Idle and working drain is 5 AE/t; each committed whole-chain rip costs an additional 50 AE.
 - Loop Card: one advanced card plus one Loop Crystal, shapeless. On the ripper it disables pattern insertion while retaining removable installed patterns and automatically advertises encodable crafting, smithing and stonecutting recipes; removing it restores the physical patterns. On a portable cell it enables stored-FE-to-AE charging.
@@ -146,7 +146,7 @@ The addon contributes pages to AE2's `ae2guide` resource tree through GuideME's 
 
 ## Scale and verification
 
-The 0.0.4 release builds pass **138 tests on 1.21.1** and **136 tests on 26.1.2**, with no failures, errors or skips. Each JAR contains 76 recipes, with 116 AE2LO classes on 1.21.1 and 122 on 26.1.2, and no bundled mod JARs or gameplay-test helper classes. Real AE2 startup and transformed-bytecode checks cover whole-chain preflight, atomic execution, paid-state persistence, 64-bit task counters and native provider-lock callbacks. The same artifacts are installed in the two independent AE2LO PCL instances.
+The 0.0.4 release builds pass **138 tests on 1.21.1** and **136 tests on 26.1.2**, with no failures, errors or skips. Each JAR contains 76 recipes, with 116 AE2LF classes on 1.21.1 and 122 on 26.1.2, and no bundled mod JARs or gameplay-test helper classes. Real AE2 startup and transformed-bytecode checks cover whole-chain preflight, atomic execution, paid-state persistence, 64-bit task counters and native provider-lock callbacks. The same artifacts are installed in the two independent AE2LF PCL instances.
 
 Both actual clients completed an order for **3,000 256M Loop Storage Cores** with the Loop Card, supercomputing interface and ring terminal online. The 13 selected recipes represent **188,681,000 applications**, compressed into 38 batches. The entire native CPU job completed through one Ripper call in one server tick, consumed exactly **50 AE** beyond its **5 AE/t** base draw, preserved one crystal seed and matched every raw-material and intermediate balance. No lower core, fragment or netherite ingot was preloaded; powders, singularities and other materials made by unsupported machines were explicit external inputs. A separate replay of the captured in-game catalog verifies optimizer-only acyclic material planning with the ring terminal offline. The [isolated acceptance harness](tools/runtime-ripper-probe/README.md) documents these boundaries and reproduction steps.
 
@@ -182,3 +182,9 @@ From the repository root:
 Each launcher uses `.gradle-user-home/<version>` so dependency caches and daemons do not leak into ImmortalStorage. Set `AE2LIGHTOPTIMIZER_JAVA_HOME` to override the Gradle runtime JDK 21 and `AE2LIGHTOPTIMIZER_JAVA25_HOME` to expose an installed JDK 25 toolchain. Otherwise the launchers discover the current user's Gradle JDK cache and then use `JAVA_HOME`; Foojay remains the final toolchain-download fallback. Both adapters force UTF-8 resource handling and expand templates only in `META-INF/neoforge.mods.toml`; JSON, GuideME Markdown, PNG, and every other resource pass through without filtering. Implement loader-independent algorithms in `shared/`; keep Minecraft, NeoForge, AE2, Mixin, resources, and persistence code inside the exact version directory.
 
 Release history is recorded in [`CHANGELOG.md`](CHANGELOG.md). GitHub release assets are generation-qualified; install exactly one JAR matching the target Minecraft version.
+
+## Project name
+
+The project is named **AE2-LoopFactory**, abbreviated **AE2LF**. The internal mod ID, registry namespace and artifact prefix remain `ae2lightoptimizer` for existing-world compatibility. Existing published JARs retain their original metadata until a new release.
+
+项目全名为 **AE2-LoopFactory**，简称 **AE2LF**。为兼容已有存档，内部模组 ID、注册命名空间及制品前缀继续使用 `ae2lightoptimizer`；已发布 JAR 的原有元数据将在后续发行时更新。

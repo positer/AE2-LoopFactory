@@ -110,7 +110,7 @@ converted into its AE battery using AE2's configured unit conversion and native
 charge limit. It can recharge an empty AE battery. No stored FE is created, and
 charging stops when the battery is full or the card is removed.
 
-An AE2 energy-storage addon must provide the FE storage key. AE2LO does not add
+An AE2 energy-storage addon must provide the FE storage key. AE2LF does not add
 a new required mod. For example, store FE in a portable cell, install a Loop Card
 and carry it: the card consumes the stored FE as the terminal battery recharges.
 
@@ -145,7 +145,7 @@ amount remains 64-bit; the newer energy interface reports long amounts directly.
 与原生充能上限转成自身 AE 电量，也可以从空 AE 电池开始充电。
 不会凭空产生 FE；电池充满或卡被取出后停止转换。
 
-需要由 AE2 能量存储附属提供 FE 存储键，AE2LO 不新增硬前置。
+需要由 AE2 能量存储附属提供 FE 存储键，AE2LF 不新增硬前置。
 例如先在便携磁盘中存入 FE，再安装循环卡并随身携带，卡会消耗内部 FE 为终端电池补电。
 
 ## 随身电容器

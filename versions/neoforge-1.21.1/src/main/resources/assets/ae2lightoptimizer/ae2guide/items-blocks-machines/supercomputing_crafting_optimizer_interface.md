@@ -18,7 +18,7 @@ item_ids:
 
 <RecipeFor id="ae2lightoptimizer:supercomputing_crafting_optimizer_interface" />
 
-The Supercomputing Crafting Optimizer Interface is the execution and acceleration service of AE2-lightoptimizer. Attach it to an ME Network with an available channel and power. Its compute lanes light blue and amber when the managed grid node is active.
+The Supercomputing Crafting Optimizer Interface is the execution and acceleration service of AE2-LoopFactory. Attach it to an ME Network with an available channel and power. Its compute lanes light blue and amber when the managed grid node is active.
 
 For non-cyclic crafting graphs, the interface takes over AE2's network-wide calculation entry, aggregates shared dependencies globally, and keeps pattern counts compressed instead of expanding every application. Tera- and peta-scale repetition counts therefore remain 64-bit counters rather than trillions of tree operations.
 
