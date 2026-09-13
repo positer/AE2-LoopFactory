@@ -28,6 +28,8 @@ public final class ModItems {
 
     public static final DeferredItem<BlockItem> CRAFTING_RIPPER = ITEMS.register(
             "crafting_ripper", () -> new BlockItem(ModBlocks.CRAFTING_RIPPER.get(), new Item.Properties()));
+    public static final DeferredItem<com.example.ae2lightoptimizer.factory.FactoryPatternItem> LOOP_FACTORY_PATTERN = ITEMS.register("loop_factory_pattern", () -> new com.example.ae2lightoptimizer.factory.FactoryPatternItem(new Item.Properties()));
+
     public static final DeferredItem<Item> LOOP_CARD = ITEMS.register(
             "loop_card", () -> Upgrades.createUpgradeCardItem(new Item.Properties()));
     public static final DeferredItem<Item> LOOP_CRYSTAL = ITEMS.register("loop_crystal", () -> new Item(new Item.Properties()));

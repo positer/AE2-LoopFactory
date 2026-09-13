@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "ae2:quartz_fiber"
+    },
+    {
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "item": "ae2lightoptimizer:loop_crystal_powder"
+    },
+    {
+      "item": "ae2lightoptimizer:loop_crystal_powder"
+    }
+  ],
+  "result": {
+    "id": "ae2lightoptimizer:loop_factory_interface_cable",
+    "count": 8
+  }
+}

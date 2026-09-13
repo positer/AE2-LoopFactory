@@ -1,0 +1,9 @@
+{
+  "parent": "ae2:item/display_base",
+  "textures": {
+    "front": "ae2:part/pattern_encoding_terminal",
+    "front_bright": "ae2lightoptimizer:part/loop_factory_pattern_encoding_panel_bright",
+    "front_medium": "ae2lightoptimizer:part/loop_factory_pattern_encoding_panel_medium",
+    "front_dark": "ae2lightoptimizer:part/loop_factory_pattern_encoding_panel_dark"
+  }
+}

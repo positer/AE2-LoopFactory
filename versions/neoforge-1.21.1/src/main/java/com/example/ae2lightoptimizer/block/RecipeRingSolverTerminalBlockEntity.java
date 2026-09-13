@@ -61,12 +61,13 @@ public final class RecipeRingSolverTerminalBlockEntity extends BlockEntity
         super.onLoad();
         if (level != null && !level.isClientSide) {
             GridHelper.onFirstTick(this, terminal ->
-                    terminal.mainNode.create(terminal.getLevel(), terminal.getBlockPos()));
+                    { terminal.mainNode.create(terminal.getLevel(), terminal.getBlockPos()); com.example.ae2lightoptimizer.factory.UniqueNetworkServices.add(terminal, terminal.mainNode, com.example.ae2lightoptimizer.factory.UniqueNetworkServices.Kind.RING, false); });
         }
     }
 
     @Override
     public void setRemoved() {
+        com.example.ae2lightoptimizer.factory.UniqueNetworkServices.remove(this);
         mainNode.destroy();
         super.setRemoved();
     }

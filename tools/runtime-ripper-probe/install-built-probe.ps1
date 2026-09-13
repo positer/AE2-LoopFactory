@@ -7,7 +7,7 @@ $versionsRoot = Join-Path $env:USERPROFILE 'Desktop/Files/Minecraft/PCL/.minecra
 $evidencePath = [IO.Path]::GetFullPath($EvidenceDir)
 $targets = foreach ($generation in @('1.21.1','26.1.2')) {
     $instance = Join-Path $versionsRoot "AE2-lightoptimizer-$generation"
-    $productionName = "ae2lightoptimizer-neoforge-mc$generation-0.0.4.jar"
+    $productionName = "ae2lf-neoforge-mc$generation-0.0.5.jar"
     $probeName = "ae2lo-runtime-probe-mc$generation-1.jar"
     [pscustomobject]@{
         Generation=$generation; Instance=$instance

@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.0.5
+
+### English
+
+- Added the Loop Factory language's lexical `channel` scopes, including function inheritance and channel-local GET quotas.
+- Added terminal execution refresh on installed-code changes, pattern replacement/removal, and redstone rising edges, while preserving ordinary reload continuation.
+- Added persistent recovery for buffered resources when an execution is refreshed or cancelled.
+- Added recipe-aware `P1`/`P2` and `O1`/`O2` references for factory patterns, with normal AE2 recipe target previews retained when factory code is absent or invalid.
+- Added complete syntax highlighting for factory and supported SFM code, including strings, resources, functions, operators, faces, recipe references, and `//` end-of-line comments; quoted slash text and existing comment forms remain supported.
+- Added code-area ID insertion from the carried GUI item: ordinary items use their own ID, and containers can insert their own ID or their visible contents.
+- Added optional JEI and EMI item/fluid drag insertion into the code editor.
+- Improved caret, selection, wrapping, and scrolling behavior so the visible editor range matches the actual source range.
+- Improved unloaded-chunk handling with resumable waits and explicit capability errors.
+- Improved large logistics with compressed batches, checked signed-64-bit quantities, independent job backpressure, and recoverable partial transfers.
+- Improved crafting services with persistent cyclic schedules, recipe-aware acyclic planning, container returns, byproducts, and safe fallback when a plan cannot be proven.
+- Added the complete Loop Storage Cell and portable-cell families with AE2-compatible upgrades and optional Create/Mekanism recipe integrations.
+
+### 简体中文
+
+- 新增循环工厂语言的词法 `channel` 作用域，支持函数继承和通道内 GET 额度隔离。
+- 新增已安装代码变化、样板替换/移除以及红石上升沿触发的终端执行刷新，并保留普通重载后的执行续点。
+- 新增执行刷新或取消时的实际缓存资源持久化回收。
+- 为工厂样板新增配方感知的 `P1`/`P2` 与 `O1`/`O2` 引用；工厂代码缺失或非法时仍保留普通 AE2 配方目标预览。
+- 补全工厂语言和已支持 SFM 语法的代码高亮，覆盖字符串、注释、资源、函数、运算符、方向、配方引用和 `//` 行尾注释；双引号中的斜线文本及原有注释形式继续保留。
+- 新增从 GUI 鼠标拿起物品向代码区填入 ID：普通物品填入本体 ID，容器可填入本体 ID 或其中可见内容。
+- 新增可选 JEI 与 EMI 物品/流体拖入代码区功能。
+- 修正光标、选区、自动折行和滚动，使编辑器显示范围与实际源码范围一致。
+- 改进未加载区块处理，支持可恢复等待并报告明确的能力错误。
+- 改进大宗物流，使用压缩批次、带检查的有符号 64 位数量、独立任务背压和可恢复的部分转运。
+- 改进合成服务，支持持久化循环调度、配方感知无环规划、容器返还、副产物，以及无法证明计划时安全交回 AE2。
+- 完善循环存储磁盘和便携磁盘系列，兼容 AE2 升级卡，并提供可选 Create/Mekanism 配方联动。
+
 ## 0.0.4
 
 ### English

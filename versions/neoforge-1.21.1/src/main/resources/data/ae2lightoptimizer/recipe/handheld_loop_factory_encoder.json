@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "ae2:quartz_glass"
+    },
+    {
+      "item": "ae2:calculation_processor"
+    },
+    {
+      "item": "ae2lightoptimizer:loop_crystal"
+    },
+    {
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "item": "minecraft:redstone"
+    }
+  ],
+  "result": {
+    "id": "ae2lightoptimizer:handheld_loop_factory_encoder",
+    "count": 1
+  }
+}

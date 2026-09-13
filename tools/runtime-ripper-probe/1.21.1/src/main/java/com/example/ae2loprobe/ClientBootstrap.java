@@ -34,23 +34,41 @@ public final class ClientBootstrap {
     private static final String UI_SCREENSHOT = "ae2lo-ripper-ui.png";
     private static boolean uiRequested;
     private static int uiDelay = 20;
-    private static final long SHUTDOWN_SETTLE_NANOS = java.util.concurrent.TimeUnit.SECONDS.toNanos(25);
-    private static boolean shutdownPreparationStarted;
+    private static final long SHUTDOWN_READY_TIMEOUT_NANOS = java.util.concurrent.TimeUnit.MINUTES.toNanos(3);
+    private static volatile boolean shutdownPreparationStarted;
+    private static volatile boolean shutdownPreparationFailed;
+    private static volatile boolean serverHaltRequested;
     private static boolean stopRequested;
-    private static volatile long savedAtNanos;
-    private static volatile int savedAtServerTick;
+    private static volatile net.minecraft.client.server.IntegratedServer shutdownServer;
+    private static String readinessPhase = "before_ticket_release";
+    private static long readinessPhaseStarted;
+    private static int consecutiveReadyTicks;
+    private static int lastReadinessSampleTick = -100;
     private static boolean oldPauseOnLostFocus;
+    private static long hiddenClientTicks;
+    private static long visibleObservations;
+    private static int lastWindowVisible = -1;
+    private static boolean hiddenNormalStopObserved;
     private static int oldRenderDistance;
     private static int oldSimulationDistance;
     private static net.minecraft.client.tutorial.TutorialSteps oldTutorialStep;
 
     public ClientBootstrap() {
         NeoForge.EVENT_BUS.addListener(ClientBootstrap::onClientTick);
+        NeoForge.EVENT_BUS.addListener(ClientBootstrap::onServerTick);
+        NeoForge.EVENT_BUS.addListener(ClientBootstrap::onServerStopping);
         LOG.info("AE2LO client probe bootstrap armed; only a brand-new {} world can be created", WORLD_PREFIX);
     }
 
     private static void onClientTick(ClientTickEvent.Post event) {
         var minecraft = Minecraft.getInstance();
+        verifyHiddenWindow(minecraft);
+        // The normal disconnect may clear the client level before the next tick. Keep observing
+        // the exact server we halted instead of losing shutdown progress behind the world guard.
+        if (shutdownPreparationStarted) {
+            advanceNormalShutdown(minecraft);
+            return;
+        }
         if (!attempted && Boolean.getBoolean("ae2lo.probe")
                 && minecraft.level == null && minecraft.getSingleplayerServer() == null
                 && minecraft.getOverlay() == null && (minecraft.screen instanceof TitleScreen
@@ -95,51 +113,145 @@ public final class ClientBootstrap {
         }
     }
 
-    /** Timing experiment for vanilla chunk unload shutdown; the server keeps ticking throughout. */
+    /** Observe every real client tick; the launcher agent, not this observer, hides the window. */
+    private static void verifyHiddenWindow(Minecraft minecraft) {
+        if (!Boolean.getBoolean("ae2lo.probe") || !Boolean.getBoolean("ae2lo.probe.background")) return;
+        hiddenClientTicks++;
+        lastWindowVisible = org.lwjgl.glfw.GLFW.glfwGetWindowAttrib(
+                minecraft.getWindow().getWindow(), org.lwjgl.glfw.GLFW.GLFW_VISIBLE);
+        if (lastWindowVisible != 0) visibleObservations++;
+        if (hiddenClientTicks == 1 || hiddenClientTicks % 100 == 0 || lastWindowVisible != 0) {
+            writeHiddenWindowState(minecraft);
+        }
+        if (lastWindowVisible != 0) {
+            throw new IllegalStateException("Background ripper probe window became visible at client tick " + hiddenClientTicks);
+        }
+    }
+
+    private static void writeHiddenWindowState(Minecraft minecraft) {
+        if (!Boolean.getBoolean("ae2lo.probe.background")) return;
+        var state = new java.util.LinkedHashMap<String, Object>();
+        state.put("observedAt", java.time.Instant.now().toString());
+        state.put("clientTicksChecked", hiddenClientTicks);
+        state.put("visibleObservations", visibleObservations);
+        state.put("lastWindowVisible", lastWindowVisible);
+        state.put("normalStopObserved", hiddenNormalStopObserved);
+        state.put("phase", ProbeState.phase);
+        state.put("shutdownBudgetHookApplied", java.util.Arrays.stream(net.minecraft.server.MinecraftServer.class.getDeclaredMethods())
+                .anyMatch(method -> method.getName().contains("advanceShutdownChunks")));
+        state.put("world", minecraft.getSingleplayerServer() == null ? "" :
+                minecraft.getSingleplayerServer().getWorldData().getLevelName());
+        state.put("productionCodeSource", String.valueOf(
+                com.example.ae2lightoptimizer.block.CraftingRipperBlockEntity.class
+                        .getProtectionDomain().getCodeSource().getLocation()));
+        state.put("probeCodeSource", String.valueOf(ClientBootstrap.class.getProtectionDomain().getCodeSource().getLocation()));
+        try {
+            Files.writeString(evidenceDirectory(minecraft).resolve("hidden-window-state.json"),
+                    new com.google.gson.GsonBuilder().setPrettyPrinting().create().toJson(state));
+        } catch (java.io.IOException error) {
+            throw new IllegalStateException("Cannot persist hidden-window evidence", error);
+        }
+    }
+
+    /** The server thread owns preparation; the client only observes the exact server's completion. */
     private static void advanceNormalShutdown(Minecraft minecraft) {
-        var server = minecraft.getSingleplayerServer();
-        if (server == null || stopRequested) return;
-        if (!shutdownPreparationStarted) {
-            shutdownPreparationStarted = true;
-            shutdownEvent(minecraft, "prepare_requested", "world=" + server.getWorldData().getLevelName());
-            server.execute(() -> {
-                if (!server.getWorldData().getLevelName().startsWith(WORLD_PREFIX)) {
-                    shutdownEvent(minecraft, "prepare_refused", "Integrated world changed; auto-exit remains disabled");
-                    return;
-                }
-                try {
-                    var level = server.overworld();
-                    // These are exactly the nine temporary tickets installed by RuntimeRipperProbe.start.
-                    for (int x = -1; x <= 1; x++) for (int z = -1; z <= 1; z++) {
-                        boolean removed = level.setChunkForced(x, z, false);
-                        shutdownEvent(minecraft, "ticket_released", "chunk=" + x + "," + z + " removed=" + removed);
-                    }
-                    shutdownEvent(minecraft, "save_begin", "serverTick=" + server.getTickCount());
-                    long began = System.nanoTime();
-                    boolean saved = server.saveEverything(false, true, true);
-                    shutdownEvent(minecraft, "save_complete", "saved=" + saved + " elapsedMillis="
-                            + (System.nanoTime() - began) / 1_000_000 + " serverTick=" + server.getTickCount());
-                    savedAtServerTick = server.getTickCount();
-                    savedAtNanos = System.nanoTime();
-                    shutdownEvent(minecraft, "settling", "Keep normal client/server ticking for 25 seconds after pre-save");
-                } catch (Throwable error) {
-                    LOG.error("AE2LO probe pre-save failed; leaving client open without forced exit", error);
-                    shutdownEvent(minecraft, "prepare_failed", error.toString());
-                }
-            });
+        if (stopRequested) return;
+        if (shutdownServer != null) {
+            completeNormalShutdown(minecraft);
             return;
         }
-        long completedAt = savedAtNanos;
-        if (completedAt == 0 || System.nanoTime() - completedAt < SHUTDOWN_SETTLE_NANOS) return;
+        var server = minecraft.getSingleplayerServer();
+        if (server == null) return;
+        if (!shutdownPreparationStarted) {
+            shutdownServer = server;
+            shutdownPreparationStarted = true;
+            shutdownEvent(minecraft, "prepare_requested", "world=" + server.getWorldData().getLevelName());
+        }
+    }
+
+    private static void onServerTick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) {
+        var server = shutdownServer;
+        if (!shutdownPreparationStarted || shutdownPreparationFailed || serverHaltRequested
+                || server == null || event.getServer() != server) return;
+        var minecraft = Minecraft.getInstance();
+        try {
+            if (!server.getWorldData().getLevelName().startsWith(WORLD_PREFIX)) {
+                throw new IllegalStateException("Integrated world changed during shutdown preparation");
+            }
+            if (readinessPhaseStarted == 0) readinessPhaseStarted = System.nanoTime();
+            var observation = ShutdownReadiness.capture(server, readinessPhase);
+            if (observation.tick() - lastReadinessSampleTick >= 20) {
+                observation.write(evidenceDirectory(minecraft), "chunk-readiness-latest.json");
+                lastReadinessSampleTick = observation.tick();
+            }
+            if (!observation.ready()) {
+                consecutiveReadyTicks = 0;
+                if (System.nanoTime() - readinessPhaseStarted > SHUTDOWN_READY_TIMEOUT_NANOS) {
+                    observation.write(evidenceDirectory(minecraft), "chunk-readiness-timeout.json");
+                    throw new IllegalStateException("Native chunk readiness did not settle within 180 seconds in " + readinessPhase);
+                }
+                return;
+            }
+            if (++consecutiveReadyTicks < 2) return;
+            observation.write(evidenceDirectory(minecraft), "chunk-readiness-" + readinessPhase + ".json");
+            shutdownEvent(minecraft, "chunk_readiness_passed", "phase=" + readinessPhase
+                    + " consecutiveServerTicks=" + consecutiveReadyTicks + " serverTick=" + observation.tick());
+            if (readinessPhase.equals("before_ticket_release")) {
+                // Release only this fixture's nine tickets, after their generation claims settled.
+                for (int x = -1; x <= 1; x++) for (int z = -1; z <= 1; z++) {
+                    boolean removed = server.overworld().setChunkForced(x, z, false);
+                    shutdownEvent(minecraft, "ticket_released", "chunk=" + x + "," + z + " removed=" + removed);
+                }
+                readinessPhase = "after_ticket_release";
+            } else if (readinessPhase.equals("after_ticket_release")) {
+                shutdownEvent(minecraft, "save_begin", "serverTick=" + server.getTickCount());
+                long began = System.nanoTime();
+                boolean saved = server.saveEverything(false, true, true);
+                shutdownEvent(minecraft, "save_complete", "saved=" + saved + " elapsedMillis="
+                        + (System.nanoTime() - began) / 1_000_000 + " serverTick=" + server.getTickCount());
+                if (!saved) throw new IllegalStateException("Native pre-save did not report success");
+                readinessPhase = "after_pre_save";
+            } else {
+                // The final predicate and native halt occur in the same server-thread callback.
+                // Do not enter Minecraft.disconnect while the native server is still running.
+                serverHaltRequested = true;
+                shutdownEvent(minecraft, "server_halt_requested", "All native holders ready and lifecycle queues drained on server thread");
+                server.halt(false);
+            }
+            consecutiveReadyTicks = 0;
+            readinessPhaseStarted = System.nanoTime();
+            lastReadinessSampleTick = -100;
+        } catch (Throwable error) {
+            shutdownPreparationFailed = true;
+            LOG.error("AE2LO native shutdown preparation failed; leaving client open without forced exit", error);
+            shutdownEvent(minecraft, "prepare_failed", error.toString());
+        }
+    }
+
+    private static void onServerStopping(net.neoforged.neoforge.event.server.ServerStoppingEvent event) {
+        if (event.getServer() != shutdownServer || !serverHaltRequested) return;
+        try {
+            ShutdownReadiness.capture(event.getServer(), "native_stopping_event")
+                    .write(evidenceDirectory(Minecraft.getInstance()), "chunk-readiness-native-stopping.json");
+        } catch (Throwable error) {
+            shutdownPreparationFailed = true;
+            shutdownEvent(Minecraft.getInstance(), "prepare_failed", "Cannot record native stopping state: " + error);
+        }
+    }
+
+    private static void completeNormalShutdown(Minecraft minecraft) {
+        var server = shutdownServer;
+        if (server == null || !serverHaltRequested || shutdownPreparationFailed || !server.isShutdown()) return;
+        var currentServer = minecraft.getSingleplayerServer();
+        if (currentServer != null && currentServer != server) {
+            throw new IllegalStateException("Refusing to disconnect a different integrated server during probe shutdown");
+        }
         stopRequested = true;
-        shutdownEvent(minecraft, "settled", "elapsedMillis=" + (System.nanoTime() - completedAt) / 1_000_000
-                + " serverTicks=" + (server.getTickCount() - savedAtServerTick));
+        shutdownEvent(minecraft, "server_shutdown_observed", "serverShutdown=true; native server finished before explicit client teardown");
         shutdownEvent(minecraft, "disconnect_begin", "Keep renderDistance=" + minecraft.options.renderDistance().get()
                 + " simulationDistance=" + minecraft.options.simulationDistance().get()
-                + "; native disconnect waits for integrated server shutdown");
-        // Match PauseScreen: close the local connection before disconnect waits for the server.
-        minecraft.level.disconnect();
-        minecraft.disconnect(new TitleScreen(), false);
+                + "; integrated server already stopped");
+        if (currentServer != null) minecraft.disconnect(new TitleScreen(), false);
         shutdownEvent(minecraft, "disconnect_complete", "serverShutdown=" + server.isShutdown()
                 + " integratedServerPresent=" + (minecraft.getSingleplayerServer() != null));
         if (!server.isShutdown() || minecraft.getSingleplayerServer() != null) {
@@ -156,6 +268,8 @@ public final class ClientBootstrap {
                 + " simulationDistance=" + oldSimulationDistance + " pauseOnLostFocus=" + oldPauseOnLostFocus
                 + "; helper does not call Options.save");
         shutdownEvent(minecraft, "normal_stop_requested", "Calling Minecraft.stop after native integrated-server disconnect completed");
+        hiddenNormalStopObserved = true;
+        writeHiddenWindowState(minecraft);
         minecraft.stop();
     }
 
@@ -232,6 +346,7 @@ public final class ClientBootstrap {
         var path = evidenceDirectory(minecraft).resolve("screenshots").resolve(fileName);
         if (Files.isRegularFile(path)) {
             CAPTURED.add(fileName);
+            writeHiddenWindowState(minecraft);
             if (!UI_SCREENSHOT.equals(fileName)) ProbeState.screenshotCompleted = fileName;
             LOG.info("AE2LO native frame saved {}: {}", path.toAbsolutePath(), message.getString());
         } else {

@@ -1,0 +1,135 @@
+{
+  "tool": "Blockbench 5.1.6",
+  "generated": "2026-09-08T11:59:53.575Z",
+  "assets": [
+    {
+      "gen": "1.21.1",
+      "id": "loop_factory_pattern_provider",
+      "shape": "block",
+      "textures": [
+        "loop_factory_provider_front",
+        "loop_factory_provider_side",
+        "loop_factory_provider_back"
+      ],
+      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/1.21.1/loop_factory_pattern_provider.bbmodel"
+    },
+    {
+      "gen": "1.21.1",
+      "id": "loop_factory_network_terminal",
+      "shape": "block",
+      "textures": [
+        "loop_factory_terminal",
+        "loop_factory_terminal_top"
+      ],
+      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/1.21.1/loop_factory_network_terminal.bbmodel"
+    },
+    {
+      "gen": "1.21.1",
+      "id": "loop_factory_interface_cable",
+      "shape": "block",
+      "textures": [
+        "loop_factory_cable"
+      ],
+      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/1.21.1/loop_factory_interface_cable.bbmodel"
+    },
+    {
+      "gen": "1.21.1",
+      "id": "loop_factory_pattern",
+      "shape": "item",
+      "textures": [
+        "loop_factory_pattern"
+      ],
+      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/1.21.1/loop_factory_pattern.bbmodel"
+    },
+    {
+      "gen": "1.21.1",
+      "id": "handheld_loop_factory_encoder",
+      "shape": "item",
+      "textures": [
+        "handheld_loop_factory_encoder"
+      ],
+      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/1.21.1/handheld_loop_factory_encoder.bbmodel"
+    },
+    {
+      "gen": "1.21.1",
+      "id": "loop_factory_pattern_encoding_panel",
+      "shape": "panel",
+      "textures": [
+        "loop_factory_pattern_encoding_panel_bright",
+        "loop_factory_pattern_encoding_panel_medium",
+        "loop_factory_pattern_encoding_panel_dark"
+      ],
+      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/1.21.1/loop_factory_pattern_encoding_panel.bbmodel"
+    },
+    {
+      "gen": "26.1.2",
+      "id": "loop_factory_pattern_provider",
+      "shape": "block",
+      "textures": [
+        "loop_factory_provider_front",
+        "loop_factory_provider_side",
+        "loop_factory_provider_back"
+      ],
+      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/26.1.2/loop_factory_pattern_provider.bbmodel"
+    },
+    {
+      "gen": "26.1.2",
+      "id": "loop_factory_network_terminal",
+      "shape": "block",
+      "textures": [
+        "loop_factory_terminal",
+        "loop_factory_terminal_top"
+      ],
+      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/26.1.2/loop_factory_network_terminal.bbmodel"
+    },
+    {
+      "gen": "26.1.2",
+      "id": "loop_factory_interface_cable",
+      "shape": "block",
+      "textures": [
+        "loop_factory_cable"
+      ],
+      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/26.1.2/loop_factory_interface_cable.bbmodel"
+    },
+    {
+      "gen": "26.1.2",
+      "id": "loop_factory_pattern",
+      "shape": "item",
+      "textures": [
+        "loop_factory_pattern"
+      ],
+      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/26.1.2/loop_factory_pattern.bbmodel"
+    },
+    {
+      "gen": "26.1.2",
+      "id": "handheld_loop_factory_encoder",
+      "shape": "item",
+      "textures": [
+        "handheld_loop_factory_encoder"
+      ],
+      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/26.1.2/handheld_loop_factory_encoder.bbmodel"
+    },
+    {
+      "gen": "26.1.2",
+      "id": "loop_factory_pattern_encoding_panel",
+      "shape": "panel",
+      "textures": [
+        "loop_factory_pattern_encoding_panel_bright",
+        "loop_factory_pattern_encoding_panel_medium",
+        "loop_factory_pattern_encoding_panel_dark"
+      ],
+      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/26.1.2/loop_factory_pattern_encoding_panel.bbmodel"
+    }
+  ],
+  "projectRevision": {
+    "date": "2026-09-09",
+    "method": "Editable project/export data synchronization during invisible QA",
+    "changes": [
+      "up-facing provider base and four lateral arrows",
+      "six native AE2 direction rotations",
+      "independent native back recolored to neutral grey",
+      "pattern panel uses native display_base with three transparent Recipe Ring core-shape dye masks",
+      "panel item model is the native pattern-terminal display_base model with only the three core-shape masks substituted"
+    ]
+  }
+}

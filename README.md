@@ -1,190 +1,325 @@
 # AE2-LoopFactory (AE2LF)
 
-Official source repository: <https://github.com/positer/AE2-LoopFactory>
+AE2-LoopFactory is a NeoForge addon for Applied Energistics 2. It adds a programmable logistics layer, high-capacity universal storage, cyclic and acyclic crafting services, and a recipe-aware crafting provider. The project is maintained as two isolated Minecraft generations and keeps all optional integrations conditional: AE2LF never bundles another mod and never requires Create, Mekanism, Applied Flux, JEI, or EMI.
 
-Current release: **[0.0.4](https://github.com/positer/AE2-LoopFactory/releases/tag/v0.0.4)**.
+项目地址：<https://github.com/positer/AE2-LoopFactory>
 
-## Description
+当前公开发行版为 **[0.0.5](https://github.com/positer/AE2-LoopFactory/releases/tag/v0.0.5)**。完整验证与部署记录见 [2026-09-13 终端刷新报告](archive/2026-09-13-channel-face/REPORT.md)。
 
-AE2-LoopFactory (AE2LF) is a NeoForge addon for Applied Energistics 2. It adds universal Loop Storage Cells that share one byte budget across every AE2-registered key type, two network services that split cycle solving from acyclic plan acceleration, and a Crafting Ripper that validates and executes supported crafting chains in one server tick.
+## What It Adds
 
-Loop Storage Cells require only AE2. The family covers a housing, ten cores, ten finite cells, and one infinite cell. The 1k-256k tiers keep AE2-equivalent capacity and the 63-type limit; the 1M-256M tiers use one aggregate pool equal to 63 times the original single-type ceiling; the infinite tier removes both amount and type limits. Every cell accepts items, fluids, FE, mana, source, soul, and any other registered AE2 addon key, charging the native amount-per-byte each key defines. Eleven portable cells reuse AE2's terminal, battery, four AE2-compatible upgrade slots, charge rate, idle drain, and powered insert or extract. Fifty-three acquisition recipes and eleven disassembly declarations cover all tiers through ordered and shapeless routes; the infinite cell requires the explosion transform of 64 256M cores plus one housing.
+### Loop Factory logistics
 
-The Crafting Ripper provides four rows of AE2 pattern-provider slots for crafting-table, smithing and stonecutting patterns. A Loop Card switches it to automatic recipe discovery; the same card lets portable cells convert their stored FE into AE charge. A portable cell with both stored FE and positive AE charge also exposes its FE through the generation's native energy capability. Create milling and Mekanism crushing recipes are additive through the common `c:gems/loop_crystal` tag and never become dependencies. Two isolated NeoForge generations are maintained: 1.21.1 on Java 21 and 26.1.2 on Java 25. Minecraft 1.20.1 is not supported.
+The Loop Factory consists of a Pattern, Pattern Provider, Handheld Encoder, Pattern Encoding Panel, Network Terminal, and Interface Cable.
 
-## 简介
+- The recipe-free Network Terminal runs the indentation-based Loop Factory language.
+- The Pattern Encoding Panel edits code and recipe data for ordinary AE2 patterns.
+- The Handheld Encoder binds to a factory network and edits code without replacing the native AE2 editor workflow.
+- The Interface Cable connects factory machines and AE2 networks without consuming an AE2 channel.
+- A provider creates an isolated factory subnet in the direction of its arrows. Only AE power crosses the provider boundary automatically; storage, tags, and factory execution remain separate.
 
-应用能源 2 循环工厂（AE2LF）是一个面向应用能源 2（Applied Energistics 2）的 NeoForge 附属模组。它新增通用循环存储磁盘——所有注册到 AE2 的存储键类型共享同一字节预算——并提供两个独立负责循环图解算与无环计划加速的网络服务，以及在一个服务端 tick 内验证并执行受支持合成链的合成撕裂者。
+The terminal and provider use a real server-side execution state. Every job owns its VM continuation, source declarations, quotas, waits, function stack, and buffered output. Jobs are saved and restored with the block entity and use signed 64-bit quantities with checked arithmetic.
 
-循环存储磁盘只依赖 AE2。系列包含一个外壳、十个核心、十个有限磁盘和一个无限磁盘。1k 至 256k 档沿用 AE2 容量和 63 类限制；1M 至 256M 档使用等于原单类上限 63 倍的聚合池；无限档取消数量与种类限制。磁盘可存储物品、流体、FE、魔力、魔源、灵魂涌动及其他已注册附属键，并按各键类型自身的每字节占用计费。十一档便携磁盘复用 AE2 终端、电池、与 AE2 一致的四格升级卡插槽、充能速率、待机耗电和通电存取。共 53 个获取配方与 11 个拆解声明覆盖全部档位及有序、无序路线；无限磁盘必须通过 64 个 256M 核心加一个外壳的爆炸转换获得。
+### Terminal execution rules
 
-合成撕裂者提供四排 AE2 样板供应器风格的样板槽，接受工作台、锻造台与切石机样板。循环卡使其切换为自动配方发现，也能让便携磁盘把已存储的 FE 转换成自身 AE 电量。磁盘内同时有 FE 和非零 AE 电量时，还会通过对应世代原生能量能力作为随身电容器提供电量查询与提取。机械动力磨粉和 Mekanism 粉碎通过通用 `c:gems/loop_crystal` 标签按模组加载条件生效，均不是前置。维护两个隔离的 NeoForge 世代：1.21.1（Java 21）与 26.1.2（Java 25），不支持 Minecraft 1.20.1。
+For a recipe-free terminal:
 
-## Supported versions
+- Saving a different installed program, replacing the pattern, or removing the pattern cancels the old execution and starts the current program from its first instruction on the next eligible owner tick.
+- A redstone **rising edge** performs the same refresh. A held signal does not restart the program every tick.
+- Saving identical code and editing only an unsaved draft preserve the current continuation.
+- Old WAIT and MUST debt, source declarations, function returns, error state, and pending output pulses are cleared during refresh.
+- Physical input/output buffers and opaque native rollback records are moved to the persistent recovery queue before cancellation. Expected output debt is never treated as physical cargo, and already delivered resources are never rolled back.
+- `FactoryTerminalRestartPending` is saved in NBT, so a refresh requested before an unload is not lost. Loading a pattern from NBT establishes the comparison baseline and is not treated as a code edit.
+
+Recipe-provider jobs retain their independent lifecycle and are not reset by terminal-only rules.
+
+### The code language
+
+The indentation language uses four spaces. It supports:
+
+- `import`, `get`, `put`, `has`, `if`, `else`, `while`, `wait`, `redstone`, `func`, `done`, `break`, and `channel`;
+- item, fluid, FE, chemical, mana, source, soul, and other registered resource identities;
+- wildcard and tag selectors, explicit machine faces, exclusions, boolean conditions, and comparisons;
+- nested functions and saved continuations, with a 64-frame recursion limit;
+- recipe references `P1`, `P2`, `O1`, `O2`, and aggregate `P`/`O` references when a pattern carries a recipe;
+- `//` comments through the end of the physical line. A quoted `//` remains text. Existing `#` and SFM `--` comments remain supported.
+
+`channel` is a lexical logistics scope. GET declarations and their remaining quotas belong to one channel; PUT can consume only declarations in that channel. Ordinary function statements inherit the caller's channel, including nested calls and saved MUST waits. An explicitly nested `channel` block keeps its own lexical scope. Channels do not create separate inventories or parallel threads: two channels that name the same physical container still compete for that container's real contents. See [channel semantics](docs/loop-factory-channels.md).
+
+Normal transfers advance after partial or zero acceptance. `must` transfers retain the unfinished quantity in the owning job until the complete amount is settled. A wait or blocked MUST pauses that job only; independent jobs continue.
+
+### Bulk logistics and stability
+
+Large orders use compressed batches and checked signed 64-bit quantities instead of expanding into one instruction per item. Each job advances by its exact accepted amount, keeps its own backpressure and recovery state, and yields while another job can make progress. This supports high-volume item, fluid, and FE routes across ticks, including real capability backpressure and destination saturation. Verified campaigns include 4,096-round storage exchanges, 2,304 Mekanism batches, and signed-long boundary transfers; these are measured regression workloads, not a promise of unlimited TPS or arbitrary third-party machine behavior.
+
+The native editor highlights keywords, strings, quantities, comments, labels, functions, operators, resources, recipe references, SFM triggers, and soft-wrapped text. The viewport and caret use the native `MultiLineEditBox` coordinate system, so shortening or scrolling code does not create phantom rows. See [highlighting and comments](docs/loop-factory-highlighting.md).
+
+### Crafting and network services
+
+**Crafting Ripper**
+
+The Crafting Ripper is an AE2 Pattern Provider with 36 slots arranged in four rows. It accepts crafting-table, smithing-table, and stonecutting patterns. Before extraction it validates the complete selected recipe chain, rechecks live recipes, executes against private CPU inventory using checked `long` balances, and commits the result once. Recipe outputs, container returns, component data, byproducts, and cyclic seeds remain tied to the originating CPU job.
+
+**Loop Card**
+
+The Loop Card is made from an AE2 Advanced Card and one Loop Crystal. On the Ripper it enables automatic discovery of encodable crafting, smithing, and stonecutting recipes while installed patterns remain removable. In a portable cell it converts stored FE to AE charge. A portable cell with positive AE charge and stored FE also exposes its FE through the generation's native energy capability.
+
+**Recipe Ring Solver Terminal**
+
+This UI-free service solves cyclic crafting graphs. It condenses strongly connected components, keeps cyclic seeds reserved in the selected CPU, and submits compressed batches in strict order. A blocked batch cannot be skipped. Cursor position, remaining repetition counts, seed reserves, and final output ownership survive world reloads.
+
+**Supercomputing Crafting Optimizer Interface**
+
+This independent UI-free service accelerates ordinary acyclic graphs. It discovers reachable producers, combines routes, models byproducts and container remainders, and writes a compressed AE2 crafting plan. It declines before mutation when overflow or a valid integer schedule cannot be proven, allowing AE2 to retain control.
+
+### Loop Storage Cells
+
+Loop Storage Cells share one byte budget across AE2-registered key types. The family contains a housing, 1k/4k/16k/64k/256k tiers, 1M/4M/16M/64M/256M tiers, and an infinite tier.
+
+- K tiers keep AE2-equivalent capacity and the 63-type limit.
+- M tiers use an aggregate pool equal to 63 times the original single-type ceiling.
+- The infinite tier removes amount and type limits.
+- Items, fluids, FE, mana, source, soul, and other registered addon keys use the native amount-per-byte contract of their key type.
+- Eleven portable cells reuse AE2's portable terminal, battery, four upgrade slots, charge rate, idle drain, and powered insertion/extraction.
+- Portable-cell upgrades follow AE2 behavior for fuzzy, inverter, equal distribution, void, and energy cards.
+- There are 53 acquisition recipes and 11 AE2-native disassembly declarations. Optional Create milling and Mekanism crushing recipes use `c:gems/loop_crystal` and are added only when those mods are loaded.
+
+## Supported Versions
 
 | Minecraft | NeoForge | AE2 | Java |
 | --- | --- | --- | --- |
 | 1.21.1 | 21.1.235 | 19.2.17 | 21 |
 | 26.1.2 | 26.1.2.94 | 26.1.10-beta | 25 |
 
-Both maintained generations are independent Gradle projects and are fully isolated from ImmortalStorage. This repository has its own Git history and GitHub remote; it does not use the ImmortalStorage repository as an upstream, subtree, or submodule.
+Minecraft 1.20.1 is not supported. The two generations are separate Gradle projects with separate adapters, caches, artifacts, and runtime validation. ImmortalStorage is a different project and is not an upstream, dependency, bundled class set, or submodule.
 
-## Current release contents
+## Installation
 
-AE2LF 0.0.4 retains the complete 0.0.3 surface and adds:
+Use the JAR matching the Minecraft generation:
 
-- Crafting Ripper: 36 pattern slots, AE2's native pattern-provider controls and priority page, whole-chain recipe validation, checked 64-bit batch execution, and Recipe Ring Solver Terminal compatibility. Idle and working drain is 5 AE/t; each committed whole-chain rip costs an additional 50 AE.
-- Loop Card: one advanced card plus one Loop Crystal, shapeless. On the ripper it disables pattern insertion while retaining removable installed patterns and automatically advertises encodable crafting, smithing and stonecutting recipes; removing it restores the physical patterns. On a portable cell it enables stored-FE-to-AE charging.
-- Portable capacitor capability: stored FE is visible and extractable through NeoForge's native energy API while both FE and AE charge are positive. The 1.21.1 adapter saturates the legacy integer query at its API limit; the 26.1.2 adapter uses transactional transfers and native long amount queries.
-
-The retained features include:
-
-- Two UI-free AE2 network services: the Recipe Ring Solver Terminal for cyclic graphs and the Supercomputing Crafting Optimizer Interface for acyclic graphs.
-- Four registered Loop Crystal materials with bilingual names, models, textures, common `c:` tags, creative-tab exposure, conversion recipes, and Mysterious Cube bonus drop.
-- Ordered Loop Crystal growth, fragment recombination, direct decomposition, block compression/decompression, and powder conversion recipes.
-- Generic SCC planning for self-growth, multi-recipe, nested, and 16-node ring graphs with compressed executable schedules.
-- Additive optional Create Milling and Mekanism Crushing compatibility; each uses `c:gems/loop_crystal`, activates only when its own mod is loaded, and adds no external dependency.
-- Complete Loop Storage Cell family: housing, 1k/4k/16k/64k/256k and 1M/4M/16M/64M/256M cores and cells, plus the infinite cell. Cells accept every AE2-registered key type; k tiers retain AE2-equivalent capacity and 63 types, M tiers use one DISK-style pool equal to 63 times their original single-type ceiling, and the infinite tier uses the same aggregate model without amount or type limits. M and infinite cells do not display a separate type counter.
-- Loop Storage Cells advertise acceptance from their current per-key capacity. When one cell is full, the same item, fluid, FE, mana, source, soul, or addon key continues into the next compatible Loop Storage Cell instead of being limited to one disk.
-- Eleven Portable Loop Storage Cells cover every finite tier and the infinite tier. They inherit AE2's portable terminal, battery, four upgrade slots, energy-card capacity multiplier, charge rate, idle drain, and powered insertion/extraction. Creative mode exposes both empty and fully charged AE-power variants.
-- Portable-cell tinting follows each generation's native AE2 color contract; the 1.21.1 adapter explicitly restores opaque alpha so its layered housing, screen, LED, and side textures cannot render transparent.
-- Portable Loop Storage Cell upgrade slots expose the same cards as AE2 portable item/fluid cells: fuzzy, inverter, equal distribution, void, and energy card x2. The cells register these through AE2's `Upgrades` API, so the slot hover hint and insertion validation match AE2, and the loop cell inventory applies partition filtering, inverter mode, void overflow, equal distribution, and the energy-card charge multiplier.
-- Exactly 53 Loop Storage acquisition recipes per generation: the original 32 housing/core/cell recipes plus 20 finite portable-cell shapeless recipes and one infinite portable recipe. Every finite portable tier accepts either `ME Chest + Energy Cell + matching Loop Storage Cell` or `ME Chest + Energy Cell + housing + matching core`; because no infinite core exists, the infinite portable tier has only `ME Chest + Energy Cell + Infinite Loop Storage Cell`. Eleven AE2-native disassembly declarations additionally let empty portable cells return their construction parts and transfer remaining AE power back into the Energy Cell.
-- Version-separated NeoForge 1.21.1 and 26.1.2 artifacts, bilingual AE2 GuideME pages, Mixin takeover validation, and non-destructive provisioning tooling.
-
-## Network blocks
-
-### Crafting Ripper
-
-`ae2lightoptimizer:crafting_ripper` (`合成撕裂者`) opens an AE2 Pattern Provider interface whose main area contains only four rows of nine pattern slots, with the player inventory below and native upgrade/control panels beside it. Install encoded crafting-table, smithing-table or stonecutter patterns; other processing patterns are rejected. It requires an active powered AE2 channel. The original provider's priority, blocking, visibility and configuration workflows are reused.
-
-Submit a crafting job through AE2 as usual. Before initial material extraction, the ripper validates the complete selected chain. Execution rechecks live recipes and replays the chain against private CPU inventory using checked `long` balances, then commits the result within one server tick. Repeated operations remain compressed, including ring-terminal schedules; container returns follow the selected recipes and cyclic seeds follow the ring terminal's seed-reserve policy. Calculation and delivery are distinct: a requester that cannot accept output can delay delivery without charging another 50 AE or rerunning the recipes.
-
-Its shaped recipe is:
-
-| Iron Ingot | Quantum Entangled Singularity | Iron Ingot |
-| --- | --- | --- |
-| Formation Core | 4M Loop Storage Core | Annihilation Core |
-| Iron Ingot | Quantum Entangled Singularity | Iron Ingot |
-
-A Loop Card switches the provider to automatically discovered, recipe-backed patterns. All 36 installed pattern slots turn grey and reject new insertions, including through the Pattern Access Terminal; existing patterns remain removable. Removing the card restores normal pattern insertion and advertising. Automatic discovery only publishes a concrete pattern when a real recipe and valid assembled output can be demonstrated; it does not invent fixed outputs for recipes with no encodable representative input.
-
-Discovery covers the three recipe types independently of recipe-book visibility or concrete recipe class, including AE2 and addon storage upgrades, dyeing, fireworks, books, banners and maps. Exact component variants are derived from real network inputs and refreshed when new keys arrive. Arbitrary text and every possible dye mixture are not globally pre-generated. The 26.1.2 adapter also preserves genuinely empty optional smithing slots.
-
-The active server recipe manager is authoritative for modpacks: custom namespaces, data-pack overrides, tag changes and recipe removal are reflected after reload. Native ingredient predicates and complete item components remain authoritative during selection and execution, including nested custom data and its numeric tag types. Component alternatives cannot substitute a different assembled result. AE2 quartz-cutting recipes are classified from the actual selected tool's components before batch execution, including Unbreaking durability effects.
-
-Map expansion and AE2 quartz-cutting recipes requiring native random durability handling use a separate native continuation, one recipe operation per tick. It runs the normal crafting callbacks and keeps real products and their changing identities inside the originating CPU job; no external assembler is required. This explicit exception to instant ripping preserves world data and native tool behavior. The continuation retains 5 AE/t device drain and charges 50 AE once for the committed job, with progress, payment and output identity saved together.
-
-### Loop Card and portable energy
-
-`ae2lightoptimizer:loop_card` (`循环卡`) is crafted shapelessly from an AE2 **Advanced Card** and a Loop Crystal. Its texture retains the native acceleration-card shell, contacts and status pixels, replacing only the central emblem with circular arrows.
-
-Install one in a portable Loop Storage Cell's existing upgrade slots to charge its AE battery from stored FE, using AE2's configured FE/AE conversion and native charging limit. The FE storage key comes from an installed AE2 energy-storage addon; the card does not introduce a new hard dependency. Charging can restart an empty AE battery when the card and stored FE are present.
-
-With stored FE and positive AE charge, the portable cell exposes FE to other mods through NeoForge's item energy capability. This capacitor behavior does not require a Loop Card. Zero AE charge hides the capacitor until it is recharged. Simulated queries do not consume energy, and portable terminal caches refresh after external FE changes so stale contents cannot restore already-consumed energy.
-
-### Recipe Ring Solver Terminal
-
-`ae2lightoptimizer:recipe_ring_solver_terminal` (`配方环解算终端`) handles cyclic crafting-tree analysis only. It requires an AE2 channel, consumes 2 AE/t, exposes its grid node on every side, and has no UI.
-
-For self-growth rings, the 16-cycle value is execution seed metadata; it does not reduce the current order's usable inventory:
-
-- Cyclic output seeds remain reserved by the executing CPU until dispatch completes.
-- External inputs are checked against the current order in full, so finite orders never report a fixed reserve as missing.
-- The resulting demand is the exact net material balance for the requested order.
-- All arithmetic uses checked `long`; overflow makes the fast path decline the request and AE2 retains control.
-
-The live AE2 bridge now collects the reachable network pattern graph and hands cyclic strongly connected components to the terminal. It supports single-pattern growth and multi-pattern nested growth without expanding every application. A terminal can operate independently for cyclic jobs and deliberately leaves acyclic jobs to AE2 or an optimizer interface.
-
-Solved cyclic plans retain their ordered compressed batch schedule through AE2 job submission. The ring terminal owns a strict CPU dispatch cursor: only the current batch can be sent, a blocked batch cannot be skipped, and the cursor advances only by patterns AE2 actually pushed. The cursor and its remaining `long` repetition count persist with the crafting CPU across world reloads.
-
-Ring-owned jobs also lock cyclic final-output seeds inside the selected crafting CPU. Provider outputs enter CPU inventory first and cannot be consumed by another network job. While any scheduled ring operation remains, none of that final-output carrier is delivered to the requester. Once dispatch is complete, the CPU releases only stock above the persisted initial seed reserve and flushes surplus accumulated before the last batch. Completion requires the compressed cursor to be finished, requested net output to reach zero, and in-flight final output to return; unrelated waiting keys cannot deadlock completion. Standalone crafting-terminal submissions have no AE2 requester, so returned net output satisfies `remainingAmount` independently of direct `CraftingLink` routing; AE2's normal finalization then returns that output, the retained seed, and other CPU inventory to network storage before the CPU becomes reusable.
-
-### Supercomputing Crafting Optimizer Interface
-
-`ae2lightoptimizer:supercomputing_crafting_optimizer_interface` (`超算合成优化接口`) independently accelerates ordinary acyclic plans. It requires an AE2 channel, consumes 8 AE/t, exposes its grid node on every side, and has no UI.
-
-The Mixin hook intercepts AE2's network-wide `CraftingCalculation.runCraftAttempt` entry. It collects all reachable producers, selects listed substitutes against the inventory snapshot, models byproducts and container remainders, condenses SCCs, combines multiple producer routes, and writes compressed `usedItems`, `missingItems`, `emittedItems`, and `patternTimes` back into AE2's native `CraftingPlan`.
-
-The adapter declines before mutation when checked arithmetic overflows or an executable integer schedule cannot be proven; AE2 then retains control. Multiple producers are split according to available raw stock instead of being treated as ambiguous. Live graph discovery has no fixed resource, pattern, or edge admission ceiling: every graph AE2 can enumerate remains eligible, and the planner's safety budget grows with the reachable graph. The project does not claim a universal mathematical optimum for every modded recipe semantic.
-
-Accepted acyclic plans also retain the planner's compressed execution batches. The optimizer interface drives AE2's CPU directly from the current batch instead of rescanning the entire unordered task map on every dispatch attempt. AE2 still performs provider availability, input extraction, energy, waiting-output, cancellation, security, and completion handling.
-
-## Independent takeover contract
-
-The two blocks are independently gated by AE2's active-machine index and each graph class has one owner:
-
-| Ring terminal | Optimizer interface | Acyclic graph | Cyclic graph |
-| --- | --- | --- | --- |
-| Offline | Offline | Original AE2 | Original AE2 |
-| Online | Offline | Original AE2 | Ring terminal |
-| Offline | Online | Optimizer interface | Original AE2 |
-| Online | Online | Optimizer interface | Ring terminal |
-
-When neither block is active, the hook returns before reachable-graph discovery, inventory extraction, child simulation state creation, missing/emitted item writes, pattern-count writes, schedule attachment, or callback cancellation. When one block is active but the discovered graph belongs to the other module, ownership is declined before the same AE2 state-mutation boundary. Unmarked jobs execute through AE2's original unordered task dispatch without a cursor, so a disconnected installation retains both original calculation and execution behavior.
-
-When both blocks are online, ownership and execution state remain per job: optimizer-owned acyclic jobs never enter the ring output-lock branch, while ring-owned cyclic jobs retain their own schedule, cursor, and seed reserve on their selected crafting CPU. Parallel jobs do not share mutable cursor or recycling state.
-
-## Visual state
-
-The two original service blocks have distinct offline and active-network 16x16 textures derived from an AE2 crafting-CPU visual language. The retained ring terminal uses a cyan closed-loop mark. The optimizer uses a hash-grid compute core whose face is pixel-identical after every 90-degree rotation; its connected state lights cyan-white double rails, four white compute intersections, and eight amber endpoints while the offline state keeps the same geometry dim. Block state changes follow the managed AE2 node's active state, so a disconnected or inactive node never renders as connected.
-
-The NeoForge mod icon is a transparent 64x64 isometric render of the connected recipe-ring terminal. Three contiguous faces use the real block texture and only necessary face lighting; the cube itself has no added silhouette border, seam stroke, or cyan outline. It sits inside a separate complete square viewport frame made from dark steel, metal-grey, cyan signal, and dark inner-edge layers. Every pixel along all four outer PNG edges is opaque while the framed interior remains transparent. Both generations package the same pixel-identical icon through `logoFile="ae2lightoptimizer.png"`.
-
-The Crafting Ripper shares the existing metal frame and uses a nine-cell crafting grid. Its active state lights the same grid cyan; the offline state dims it without moving any pixels.
-
-## AE2 GuideME documentation
-
-All three network blocks, the Loop Card and the complete Loop Storage family are documented inside AE2's existing GuideME guide in English and Simplified Chinese. Hover any indexed item and hold AE2's guide key (`G` by default) to open its page directly; the pages also appear under AE2's **Items, Blocks and Machines** section.
-
-- **Recipe Ring Solver Terminal** explains independent cycle-only responsibility, SCC solving, the 16-cycle material reserve rule, network/channel requirements, and the safe runtime boundary.
-- **Supercomputing Crafting Optimizer Interface** explains acyclic-plan acceleration, compressed tera/peta-scale calculation, ring-terminal cooperation, network requirements, and safe fallback to AE2.
-- **Crafting Ripper / Loop Card** explain the four-row provider interface, card locking, recipe-backed automatic mode, energy costs, portable charging and capacitor capability.
-- **Loop Storage Cells** indexes the housing, ten cores, eleven stationary cells, and eleven portable cells; documents k-tier limits, M-tier 63× aggregate capacity, the unlimited aggregate infinite tier, dynamic AE2 key-type compatibility, 53 acquisition recipes, native portable power/disassembly behavior, and the exact 64-core TNT transform.
-
-The addon contributes pages to AE2's `ae2guide` resource tree through GuideME's cross-namespace loading. It does not register a separate guide, guide item, screen, or client key handler.
-
-## Scale and verification
-
-The 0.0.4 release builds pass **138 tests on 1.21.1** and **136 tests on 26.1.2**, with no failures, errors or skips. Each JAR contains 76 recipes, with 116 AE2LF classes on 1.21.1 and 122 on 26.1.2, and no bundled mod JARs or gameplay-test helper classes. Real AE2 startup and transformed-bytecode checks cover whole-chain preflight, atomic execution, paid-state persistence, 64-bit task counters and native provider-lock callbacks. The same artifacts are installed in the two independent AE2LF PCL instances.
-
-Both actual clients completed an order for **3,000 256M Loop Storage Cores** with the Loop Card, supercomputing interface and ring terminal online. The 13 selected recipes represent **188,681,000 applications**, compressed into 38 batches. The entire native CPU job completed through one Ripper call in one server tick, consumed exactly **50 AE** beyond its **5 AE/t** base draw, preserved one crystal seed and matched every raw-material and intermediate balance. No lower core, fragment or netherite ingot was preloaded; powders, singularities and other materials made by unsupported machines were explicit external inputs. A separate replay of the captured in-game catalog verifies optimizer-only acyclic material planning with the ring terminal offline. The [isolated acceptance harness](tools/runtime-ripper-probe/README.md) documents these boundaries and reproduction steps.
-
-双版本已实机完成 **3000 个 256M 循环存储核心**的整单验收：循环卡、超算和环终端同时在线，十级核心及水晶循环共 **188,681,000 次配方操作**在一个 tick、一次撕裂调用内完成，整单额外消耗 **50 AE**，基础耗电 **5 AE/t**。未预放下级核心、碎片或下界合金锭；机器加工的基础材料按明确边界供应。另用实机捕获的配方图验证了无环任务由超算独立进行材料解算。界面已实机检查四排样板、单升级槽、灰色锁定及无返回槽。
-
-Both installed clients also pass two precise-component orders of 3,000 book copies, one with manual patterns and one with a Loop Card. Deep custom-data mismatches remain unconsumed, missing precise input rejects before execution, and each completed order uses one CPU tick/call and 50 AE. Three actual data-pack reloads per client verify recipe/tag replacement, removal and restoration. Native map continuations survive a complete CPU binary save/read after their first operation and produce three independent real map IDs with one total 50 AE fee; this is a live-world CPU persistence test, not a full server restart.
-
-双版本精准 NBT 实测分别通过手动样板、循环卡两笔 3000 件订单：深层数据错误的同类材料不被消耗，缺少正确材料时在执行前拒绝；每笔仍为一个 tick、一次调用、50 AE。每个客户端另完成三次真实数据包重载，验证配方和标签变更、删除与恢复。地图续作在首步后完成整个 CPU 的二进制保存恢复，最终产生三张独立新地图且整单只收费一次。
-
-The final twelve installed-client scenarios pass on the deployed artifacts. Temporary test mods are removed; both instances retain their six production/dependency mod JARs, and all 335 original non-production baseline files remain unchanged. Evidence and precise test boundaries are retained in `archive/2026-09-06-loop-card-catalog/`.
-
-This gameplay fixture does not cover requester backpressure or third-party portable equipment. A 1.21.1 test client intermittently stalled in native chunk unloading after a completed pre-save; the evidence retains its thread dump and narrowly scoped process stop, without attributing the stall to a JDK or mod cause. The corresponding 26.1.2 acceptance completed normal saving and exit.
-
-Automated coverage also includes solver and global-planner stress, compressed schedules, takeover policy, recipe/resource contracts, portable power delegation, grouped storage-capacity accounting, asset hashes and dynamic key registration. Historical release measurements are kept separately in [OVERVIEW.md](OVERVIEW.md#historical-003-verification-baseline).
-
-Stress coverage includes complex irreducible SCCs, dead 1:1 rings, multiple producer routes, shared acyclic dependencies, and peta-scale total material. The peta-scale three-pattern SCC represents `1.5×10^15` applications using 94 balance iterations and 96 compressed schedule batches, a measured work ratio of about `7.89×10^12`. A 64-component/128-route fixture plans a total of `10^15` raw items without false missing stock. Tests enforce explicit work-ratio bounds and a two-second planning deadline.
-
-A separate scale envelope represents `10^12` distinct material types, `10^12` irreducible nodes, `3×10^12` edges, and `10^15` total material without allocating that object graph in a unit test. It reports an `Ω(V+E)` lower bound of `5×10^12` visits and a conservative minimum of 80 TB for 16-byte references alone, but does not gate live takeover. Exact planning cannot be constant-time at that distinct-node scale because AE2's result itself requires one `patternTimes` entry per selected pattern; repeated quantities on the graph are compressed into `long` counters.
-
-Mixin takeover is fail-fast rather than optional: mod initialization forces AE2's calculation, plan, executing-job, CPU-logic, and elapsed-time targets to load, and required injections use `require = 1, expect = 1`. `tools/verify_global_takeover.ps1` launches both generations and checks transformed bytecode for calculation cancellation, schedule attachment, current-batch selection, operation limiting, successful-push advancement, cyclic output locking, CPU inventory recycling, elapsed-time accounting, and schedule persistence.
-
-## Build
-
-From the repository root:
-
-```powershell
-.\build-1.21.1.ps1
-.\build-26.1.2.ps1
-.\tools\verify_global_takeover.ps1
-.\tools\verify_crafting_ripper_runtime.ps1
+```text
+ae2lf-neoforge-mc1.21.1-0.0.5.jar
+ae2lf-neoforge-mc26.1.2-0.0.5.jar
 ```
 
-Each launcher uses `.gradle-user-home/<version>` so dependency caches and daemons do not leak into ImmortalStorage. Set `AE2LIGHTOPTIMIZER_JAVA_HOME` to override the Gradle runtime JDK 21 and `AE2LIGHTOPTIMIZER_JAVA25_HOME` to expose an installed JDK 25 toolchain. Otherwise the launchers discover the current user's Gradle JDK cache and then use `JAVA_HOME`; Foojay remains the final toolchain-download fallback. Both adapters force UTF-8 resource handling and expand templates only in `META-INF/neoforge.mods.toml`; JSON, GuideME Markdown, PNG, and every other resource pass through without filtering. Implement loader-independent algorithms in `shared/`; keep Minecraft, NeoForge, AE2, Mixin, resources, and persistence code inside the exact version directory.
+Copy the file into the instance's `mods/` directory together with the matching AE2 and NeoForge versions. Create, Mekanism, Applied Flux, JEI, and EMI remain optional. Do not install both generation-specific AE2LF JARs into one instance.
 
-Release history is recorded in [`CHANGELOG.md`](CHANGELOG.md). GitHub release assets are generation-qualified; install exactly one JAR matching the target Minecraft version.
+The verified local instances are:
 
-## Project name
+```text
+C:/Users/12252/Desktop/Files/Minecraft/PCL/.minecraft/versions/AE2-lightoptimizer-1.21.1
+C:/Users/12252/Desktop/Files/Minecraft/PCL/.minecraft/versions/AE2-lightoptimizer-26.1.2
+```
 
-The project is named **AE2-LoopFactory**, abbreviated **AE2LF**. The internal mod ID, registry namespace and artifact prefix remain `ae2lightoptimizer` for existing-world compatibility. Existing published JARs retain their original metadata until a new release.
+The 0.0.5 release JARs are deployed there. Deployment replaced only the matching AE2LF JAR; save files, configuration, dependencies, and other instance files were byte- and timestamp-checked.
 
-项目全名为 **AE2-LoopFactory**，简称 **AE2LF**。为兼容已有存档，内部模组 ID、注册命名空间及制品前缀继续使用 `ae2lightoptimizer`；已发布 JAR 的原有元数据将在后续发行时更新。
+## Building and Testing
+
+Run the generation-specific wrapper from the repository root:
+
+```powershell
+powershell -NoProfile -File .\build-1.21.1.ps1 --offline --no-daemon build
+powershell -NoProfile -File .\build-26.1.2.ps1 --offline --no-daemon build
+```
+
+The accepted 0.0.5 release artifacts were checked against their compiled classes and resources, with no embedded JARs, probe classes, or unrelated mod namespaces.
+
+Latest evidence:
+
+| Check | 1.21.1 | 26.1.2 |
+| --- | ---: | ---: |
+| Unit tests | 262 passed | 260 passed |
+| Failures / errors / skipped | 0 / 0 / 0 | 0 / 0 / 0 |
+| Native terminal-refresh assertions | 67 | 67 |
+| Repeated redstone rising-edge checks | 32 | 32 |
+| Persisted old jobs replaced in one refresh | 18 | 18 |
+| Native syntax pages checked by framebuffer pixels | 11 | 11 |
+| Native editor scroll/caret cases checked by pixels | 10 | 10 |
+
+The terminal lifecycle tests use a real hidden Minecraft client and integrated server with real chests, redstone blocks, AE2 grids, binary NBT round trips, and production `FactoryJob` instances. Some cargo cases intentionally inject saved buffers to test ownership and serialization. They do not claim a physical mouse/keyboard session, arbitrary third-party capability coverage, or a new long-duration stress campaign. Full evidence is indexed in [archive/2026-09-13-channel-face/REPORT.md](archive/2026-09-13-channel-face/REPORT.md).
+
+## Compatibility and Boundaries
+
+- Machine transport resolves exact faces through the generation's native item, fluid, FE, and supported chemical capabilities. An explicit face never silently falls back to another face.
+- Unloaded target chunks cause a recoverable pause or explicit error; the implementation does not fabricate inventories for unloaded areas.
+- Recipe execution uses the active server recipe manager, complete item components, live tags, and checked 64-bit arithmetic.
+- Advanced SFM clauses such as `RETAIN`, `EACH`, `WITH`, `WITHOUT`, slot ranges, polling, and relative-face syntax remain outside the supported language unless listed in the current guide.
+- A physical machine may belong to more than one tag. Tags and channels are different concepts: channel isolation protects declarations and quotas, while an overlapping tag still names the same physical inventory.
+- In the inspected user save, the output chest at `(2,-60,8)` was also included in `Furnance`, and 18 old terminal jobs were still persisted. The current JAR clears those old jobs on a code change or redstone rising edge, but the accidental `Furnance` binding must still be removed in-game while retaining `out`.
+
+## Repository Layout
+
+```text
+shared/                         Loader-independent factory, storage, compiler and tests
+versions/neoforge-1.21.1/       NeoForge 21.1.235 adapter and artifact
+versions/neoforge-26.1.2/       NeoForge 26.1.2.94 adapter and artifact
+docs/                            Channel, native-capability and editor behavior references
+tools/                           Build, provisioning, native probe and verification scripts
+archive/                         Immutable test evidence, deployment records and cold data
+OVERVIEW.md                      Full file-tree and module responsibilities
+taste.md                         Cross-version implementation and evidence contracts
+```
+
+## Project Status
+
+The public release is 0.0.5. Source changes, artifacts, PCL deployment, save preservation, and known limitations are recorded in dated archive reports so that later reviews can distinguish implemented behavior from candidate or unverified compatibility.
+
+AE2LF is distributed as a standalone project under its repository's own history and remote. Contributions should preserve the hard split between `shared`, the two NeoForge adapters, optional integrations, and test-only probe code.
+
+## 中文简介
+
+AE2-LoopFactory（AE2LF）是面向 Applied Energistics 2 的 NeoForge 附属模组，提供可编程物流、高容量通用存储、循环与无环合成服务，以及配方感知的合成供应器。项目维护两个完全隔离的 Minecraft 世代；Create、Mekanism、Applied Flux、JEI 与 EMI 都是可选兼容，AE2LF 不打包其他模组，也不把它们列为硬依赖。
+
+当前公开发行版为 **0.0.5**。完整的终端刷新、存档排查、构建和部署证据见 [2026-09-13 报告](archive/2026-09-13-channel-face/REPORT.md)。
+
+## 新增内容与核心逻辑
+
+### 循环工厂物流
+
+循环工厂由样板、样板供应器、手持编码器、样板编码面板、网络终端和网络接口线缆组成。
+
+- 无配方网络终端运行四空格缩进的循环工厂语言。
+- 样板编码面板同时处理普通 AE2 样板的配方页和代码页。
+- 手持编码器绑定工厂网络并编辑代码，沿用 AE2 原生编辑工作流。
+- 网络接口线缆连接工厂机器与 AE2 网络，但不占用 AE2 频道。
+- 供应器箭头指向独立工厂子网；边界只自动传递 AE 电力，存储、标签与工厂执行状态保持隔离。
+
+终端与供应器使用服务端真实执行状态。每个任务分别拥有虚拟机续点、来源声明、数量额度、等待、函数栈和输出缓存；任务随方块实体保存，所有数量使用带溢出检查的有符号 64 位整数。
+
+### 终端执行刷新
+
+无配方终端遵循以下规则：
+
+- 保存不同的已安装代码、更换样板或移除样板时，取消旧执行，并在下一次有效归属 tick 从当前代码第一条指令重新运行。
+- 工厂网络收到红石**上升沿**时执行同样的刷新；持续高电平不会每 tick 重启。
+- 保存相同代码或只修改未保存草稿时，保留当前续点。
+- 刷新会清除旧 WAIT、MUST 欠额、来源声明、函数返回、错误状态和待处理输出脉冲。
+- 实际输入/输出缓存和不透明的原生回滚记录会先转入持久化回收区；预期输出欠额不会伪装成实物资源，已经送达的资源不会回滚。
+- `FactoryTerminalRestartPending` 随 NBT 保存，区块卸载不会丢失待刷新请求；从 NBT 读取样板只建立比较基线，不会误判为代码编辑。
+
+带配方的供应器任务保持自身生命周期，不套用终端专属刷新规则。
+
+### 代码语言与编辑器
+
+缩进语言使用四个空格，支持：
+
+- `import`、`get`、`put`、`has`、`if`、`else`、`while`、`wait`、`redstone`、`func`、`done`、`break`、`channel`；
+- 物品、流体、FE、化学品、魔力、魔源、灵魂及其他已注册资源身份；
+- 通配符、资源标签、指定机器面、反选、布尔条件和比较；
+- 嵌套函数与保存后的续点，递归深度上限 64 层；
+- 带配方样板中的 `P1`、`P2`、`O1`、`O2` 与聚合 `P`/`O` 引用；
+- `//` 注释本行后续内容。双引号内的 `//` 保留为字符串，原有 `#` 与 SFM `--` 注释继续支持。
+
+`channel` 是词法物流作用域。GET 来源声明及其剩余额度属于单独通道，PUT 只能消费同一通道的声明。函数普通语句继承调用方通道，嵌套调用和保存后的 MUST 等待也保留归属；函数内部显式书写的 `channel` 块使用自己的词法作用域。通道不创建独立物理库存，也不启动并行线程；两个通道若指定同一个真实容器，仍会竞争该容器的实际内容。详见[通道语义](docs/loop-factory-channels.md)。
+
+普通物流在部分接受或零接受后继续执行；`must` 物流把未完成数量保留在所属任务，直到足量结清。等待或阻塞的 MUST 只暂停当前任务，其他任务继续。
+
+### 大宗物流与稳定性
+
+大宗订单使用压缩批次和带检查的有符号 64 位数量，不会为每件物品展开一条指令。每个任务按实际接受量推进，独立保存背压与回收状态；一个任务等待时，其他可执行任务仍能继续。该机制覆盖跨 tick 的高数量物品、流体和 FE 物流，也处理真实能力背压与目的地饱和。已验证场景包括 4,096 轮存储往返、2,304 批 Mekanism 订单和 signed-long 边界转运；这些是回归压力负载，不代表无限 TPS 或任意第三方机器行为。
+
+原生编辑器为关键字、字符串、数量、注释、标签、函数、运算符、资源、配方引用、SFM 触发器和自动折行文本着色。视口与光标使用原生 `MultiLineEditBox` 坐标体系，缩短或滚动代码不会产生虚假行。详见[代码高亮与注释](docs/loop-factory-highlighting.md)。
+
+### 合成与网络服务
+
+**合成撕裂者**：AE2 样板供应器界面，四排共 36 个槽位，接受工作台、锻造台和切石机样板。取料前验证完整配方链，执行前重新检查实时配方，以私有 CPU 库存和带检查的 `long` 数量一次提交结果。产物、容器返还、组件数据、副产物和循环种子都归属于原 CPU 任务。
+
+**循环卡**：由 AE2 高级卡和一个循环晶体无序合成。在合成撕裂者上启用可编码的工作台、锻造台和切石机配方自动发现，已安装样板仍可移除；安装到便携磁盘后，可把存储 FE 转换为 AE 电量。便携磁盘同时有正 AE 电量和 FE 时，通过对应世代原生能量能力提供 FE。
+
+**配方环解算终端**：无界面循环图服务，压缩强连通分量，锁定 CPU 内循环种子，严格按顺序提交批次；阻塞批次不能跳过，游标、剩余重复次数、种子储备和最终产物归属跨存档保留。
+
+**超算合成优化接口**：独立的无界面无环图加速服务，发现可达供应器、合并物流路线、建模副产物与容器返还，并写入压缩的 AE2 合成计划。若溢出或整数计划无法证明，则在修改前放弃，让 AE2 接管。
+
+### 循环存储磁盘
+
+循环存储磁盘让所有注册到 AE2 的存储键共享一个字节预算，包含外壳、1k/4k/16k/64k/256k、1M/4M/16M/64M/256M 和无限档。
+
+- K 档保留 AE2 等价容量和 63 类限制。
+- M 档使用相当于原单类上限 63 倍的聚合池。
+- 无限档取消数量和种类限制。
+- 物品、流体、FE、魔力、魔源、灵魂及其他注册附属键按自身原生每字节数量计费。
+- 十一个便携档复用 AE2 便携终端、电池、四个升级槽、充能速率、待机耗电和通电存取。
+- 模糊、反向、平均分配、虚空和能量卡遵循 AE2 便携存储行为。
+- 每代有 53 个获取配方和 11 个 AE2 原生拆解声明；Create 磨粉与 Mekanism 粉碎只在对应模组加载时通过 `c:gems/loop_crystal` 增加。
+
+## 支持版本
+
+| Minecraft | NeoForge | AE2 | Java |
+| --- | --- | --- | --- |
+| 1.21.1 | 21.1.235 | 19.2.17 | 21 |
+| 26.1.2 | 26.1.2.94 | 26.1.10-beta | 25 |
+
+不支持 Minecraft 1.20.1。两个世代使用独立 Gradle 工程、适配器、缓存、产物和运行验证。ImmortalStorage 是另一个项目，不是 AE2LF 的上游、依赖、打包类集合或子模块。
+
+## 安装
+
+按 Minecraft 世代选择对应文件：
+
+```text
+ae2lf-neoforge-mc1.21.1-0.0.5.jar
+ae2lf-neoforge-mc26.1.2-0.0.5.jar
+```
+
+将文件放入对应实例的 `mods/`，同时安装匹配的 AE2 和 NeoForge。Create、Mekanism、Applied Flux、JEI、EMI 均为可选。一个实例不要同时安装两个世代的 AE2LF JAR。
+
+已验证的 PCL 实例：
+
+```text
+C:/Users/12252/Desktop/Files/Minecraft/PCL/.minecraft/versions/AE2-lightoptimizer-1.21.1
+C:/Users/12252/Desktop/Files/Minecraft/PCL/.minecraft/versions/AE2-lightoptimizer-26.1.2
+```
+
+这两个实例已部署 0.0.5 开发 JAR；部署只替换对应 AE2LF 文件，并逐项核对存档、配置、依赖和其他实例文件的字节与时间戳。
+
+## 构建与测试
+
+在仓库根目录运行对应封装脚本：
+
+```powershell
+powershell -NoProfile -File .\build-1.21.1.ps1 --offline --no-daemon build
+powershell -NoProfile -File .\build-26.1.2.ps1 --offline --no-daemon build
+```
+
+已验收的 0.0.5 开发产物已与编译类和资源逐项比对，未包含嵌套 JAR、测试 probe 类或无关模组命名空间。
+
+最新验证数据：
+
+| 验证 | 1.21.1 | 26.1.2 |
+| --- | ---: | ---: |
+| 单元测试 | 262 通过 | 260 通过 |
+| 失败 / 错误 / 跳过 | 0 / 0 / 0 | 0 / 0 / 0 |
+| 原生终端刷新断言 | 67 | 67 |
+| 连续红石上升沿检查 | 32 | 32 |
+| 单次刷新替换的旧存档任务 | 18 | 18 |
+| 原生高亮 framebuffer 检查页 | 11 | 11 |
+| 原生滚动/光标像素检查 | 10 | 10 |
+
+终端生命周期测试使用隐藏的真实 Minecraft 客户端和集成服务器、真实箱子、红石方块、AE2 网络、二进制 NBT 重载及生产 `FactoryJob`。部分资源回收场景会人工注入已保存缓存，以检查归属和序列化；这不等同于物理键鼠操作、任意第三方能力覆盖或新的长期压力活动。完整证据见 [archive/2026-09-13-channel-face/REPORT.md](archive/2026-09-13-channel-face/REPORT.md)。
+
+## 兼容性与边界
+
+- 机器物流按对应世代原生物品、流体、FE 和已支持化学品能力解析指定面；显式指定面不会静默回退到其他面。
+- 未加载目标区块会进入可恢复等待或报告明确错误，不会伪造库存。
+- 配方执行以服务端实时配方管理器、完整物品组件、实时标签和带检查的 64 位算术为准。
+- `RETAIN`、`EACH`、`WITH`、`WITHOUT`、槽位范围、轮询、相对面等高级 SFM 子句，除非当前指南明确列出，否则不属于支持语法。
+- 一台实体机器可以属于多个标签。标签和 channel 是不同概念：channel 隔离来源声明和额度，重叠标签仍然指向同一个真实库存。
+- 已检查的用户存档中，输出箱 `(2,-60,8)` 同时属于 `Furnance`，且终端持久化了 18 个旧任务。当前 JAR 会在代码变化或红石上升沿清掉旧任务，但仍需在游戏中移除该输出箱的 `Furnance` 标签并保留 `out`。
+
+## 仓库结构
+
+```text
+shared/                         与加载器无关的工厂、存储、编译器和测试
+versions/neoforge-1.21.1/       NeoForge 21.1.235 适配器与产物
+versions/neoforge-26.1.2/       NeoForge 26.1.2.94 适配器与产物
+docs/                            通道、原生能力与编辑器行为说明
+tools/                           构建、部署、原生 probe 和验证脚本
+archive/                         不可变测试证据、部署记录和冷数据
+OVERVIEW.md                      完整文件树与模块职责
+taste.md                         跨世代实现和证据契约
+```
+
+## 项目状态
+
+当前公开发行版为 0.0.5。源代码、产物、PCL 部署、存档保护和已知限制都记录在按日期归档的报告中，便于区分已实现行为、候选行为和未验证兼容性。
+
+AE2LF 是独立仓库，使用自身 Git 历史和远端。后续贡献应保持 `shared`、两个 NeoForge 适配器、可选集成和测试 probe 之间的硬隔离。

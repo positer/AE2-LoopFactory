@@ -1,0 +1,80 @@
+{
+  "credit": "Made with Blockbench",
+  "textures": {
+    "0": "ae2lightoptimizer:block/loop_factory_terminal",
+    "1": "ae2lightoptimizer:block/loop_factory_terminal_top",
+    "particle": "ae2lightoptimizer:block/loop_factory_terminal"
+  },
+  "elements": [
+    {
+      "name": "loop_factory_network_terminal",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#0"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#0"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#0"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#0"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#1"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#1"
+        }
+      }
+    }
+  ],
+  "parent": "minecraft:block/block"
+}

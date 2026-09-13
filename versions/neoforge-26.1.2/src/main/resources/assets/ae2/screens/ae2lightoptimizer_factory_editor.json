@@ -1,0 +1,73 @@
+{
+  "includes": [
+    "common/common.json",
+    "common/player_inventory.json"
+  ],
+  "generatedBackground": {
+    "width": 360,
+    "height": 236
+  },
+  "slots": {
+    "AE2LF_FACTORY_PATTERN": {
+      "left": 334,
+      "top": 8
+    },
+    "PLAYER_INVENTORY": {
+      "left": 100,
+      "top": 154,
+      "grid": "BREAK_AFTER_9COLS"
+    },
+    "PLAYER_HOTBAR": {
+      "left": 100,
+      "top": 212,
+      "grid": "HORIZONTAL"
+    }
+  },
+  "text": {
+    "dialog_title": {
+      "text": {
+        "translate": "block.ae2lightoptimizer.loop_factory_network_terminal"
+      },
+      "position": {
+        "left": 8,
+        "top": 12
+      }
+    },
+    "status": {
+      "text": "",
+      "position": {
+        "left": 8,
+        "top": 132
+      }
+    },
+    "player_inventory_title": {
+      "text": {
+        "translate": "container.inventory"
+      },
+      "position": {
+        "left": 100,
+        "top": 143
+      }
+    }
+  },
+  "widgets": {
+    "save": {
+      "left": 308,
+      "top": 5,
+      "width": 20,
+      "height": 20
+    },
+    "recipePage": {
+      "left": 256,
+      "top": 5,
+      "width": 20,
+      "height": 20
+    },
+    "upload": {
+      "left": 282,
+      "top": 5,
+      "width": 20,
+      "height": 20
+    }
+  }
+}

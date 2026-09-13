@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "ae2:blank_pattern"
+    },
+    {
+      "item": "ae2lightoptimizer:loop_crystal_powder"
+    }
+  ],
+  "result": {
+    "id": "ae2lightoptimizer:loop_factory_pattern",
+    "count": 1
+  }
+}

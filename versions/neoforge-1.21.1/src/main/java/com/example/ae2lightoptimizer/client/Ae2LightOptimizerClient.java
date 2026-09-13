@@ -25,12 +25,20 @@ public final class Ae2LightOptimizerClient {
     private static final Map<String, ResourceLocation> LOOP_STORAGE_DRIVE_MODELS = createDriveModels();
 
     private static void registerScreens(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent event) {
+        appeng.init.client.InitScreens.register(event, com.example.ae2lightoptimizer.factory.FactoryPanelRecipeMenu.TYPE.get(), FactoryPanelRecipeScreen::new, "/screens/ae2lightoptimizer_factory_panel_recipe.json");
+        appeng.init.client.InitScreens.register(event,
+                com.example.ae2lightoptimizer.factory.FactoryEditorMenu.TYPE.get(),
+                FactoryEditorScreen::new, "/screens/ae2lightoptimizer_factory_editor.json");
         appeng.init.client.InitScreens.register(event,
                 com.example.ae2lightoptimizer.menu.CraftingRipperMenu.TYPE.get(),
                 CraftingRipperScreen::new, "/screens/ae2lightoptimizer_crafting_ripper.json");
     }
 
     public Ae2LightOptimizerClient(IEventBus modEventBus) {
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(FactoryEncoderClient::scroll);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(FactoryEncoderClient::use);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(FactoryEncoderClient::render);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(FactoryEncoderClient::renderGui);
         modEventBus.addListener(Ae2LightOptimizerClient::registerScreens);
         modEventBus.addListener(Ae2LightOptimizerClient::clientSetup);
         modEventBus.addListener(Ae2LightOptimizerClient::registerAdditionalModels);
@@ -50,6 +58,12 @@ public final class Ae2LightOptimizerClient {
     }
 
     private static void registerItemColors(RegisterColorHandlersEvent.Item event) {
+        event.register(
+                (stack, tintIndex) -> tintIndex == 0
+                        ? 0xFFFFFFFF
+                        : FastColor.ARGB32.opaque(
+                                appeng.api.util.AEColor.TRANSPARENT.getVariantByTintIndex(tintIndex)),
+                com.example.ae2lightoptimizer.factory.FactoryContent.PANEL.get());
         event.register((stack, tintIndex) -> {
             if (tintIndex != 1) {
                 return 0xFFFFFFFF;

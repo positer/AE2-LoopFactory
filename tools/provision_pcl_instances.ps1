@@ -37,7 +37,7 @@ $instances = @(
             'AppliedFlux-1.21-2.1.5-neoforge.jar'
             'Glodium-1.21-2.2-neoforge.jar'
         )
-        Artifact = 'versions\neoforge-1.21.1\build\libs\ae2lightoptimizer-neoforge-mc1.21.1-0.0.3.jar'
+        Artifact = 'versions\neoforge-1.21.1\build\libs\ae2lf-neoforge-mc1.21.1-0.0.5.jar'
     }
     @{
         Name = 'AE2-lightoptimizer-26.1.2'
@@ -49,7 +49,7 @@ $instances = @(
             'AppliedFlux-26.1-1.0.1-neoforge.jar'
             'Glodium-26.1-1.2-neoforge.jar'
         )
-        Artifact = 'versions\neoforge-26.1.2\build\libs\ae2lightoptimizer-neoforge-mc26.1.2-0.0.3.jar'
+        Artifact = 'versions\neoforge-26.1.2\build\libs\ae2lf-neoforge-mc26.1.2-0.0.5.jar'
     }
 )
 
@@ -69,7 +69,7 @@ function Get-SaveManifestJson {
                 throw "Cannot verify save integrity while a world file is locked. Close Minecraft before deployment: $($_.FullName)"
             }
             [pscustomobject]@{
-                Path = [System.IO.Path]::GetRelativePath($savesRoot, $_.FullName)
+                Path = $_.FullName.Substring($savesRoot.Length).TrimStart('\')
                 Length = $_.Length
                 LastWriteTimeUtcTicks = $_.LastWriteTimeUtc.Ticks
                 Sha256 = $sha256
@@ -145,7 +145,8 @@ foreach ($instance in $instances) {
         $existingModFiles = @(Get-ChildItem -LiteralPath (Join-Path $target 'mods') -File -ErrorAction SilentlyContinue)
         $unknownModFiles = @($existingModFiles | Where-Object {
                 $_.Name -notin $expectedModNames -and
-                $_.Name -notmatch '^(?i)(ae2lightoptimizer-neoforge-|appliedenergistics2-|guideme-|jei-|AppliedFlux-|Glodium-).+\.jar$'
+                $_.Name -notlike '*.bak' -and
+                $_.Name -notmatch '^(?i)(ae2lf-neoforge-|appliedenergistics2-|guideme-|jei-|AppliedFlux-|Glodium-).+\.jar$'
             })
         if ($unknownModFiles) {
             $names = ($unknownModFiles.Name | Sort-Object) -join ', '
@@ -158,7 +159,7 @@ foreach ($instance in $instances) {
     New-Item -ItemType Directory -Path (Join-Path $target 'PCL') -Force | Out-Null
 
     Get-ChildItem -LiteralPath (Join-Path $target 'mods') -File |
-        Where-Object { $_.Name -match '^(?i)(ae2lightoptimizer-neoforge-|appliedenergistics2-|guideme-|jei-|AppliedFlux-|Glodium-).+\.jar$' } |
+        Where-Object { $_.Name -match '^(?i)(ae2lf-neoforge-|appliedenergistics2-|guideme-|jei-|AppliedFlux-|Glodium-).+\.jar$' } |
         Remove-Item -Force
 
     $sourceJson = Join-Path $source ($sourceName + '.json')
@@ -197,6 +198,7 @@ foreach ($instance in $instances) {
         throw "ImmortalStorage artifact leaked into $($instance.Name)"
     }
     $deployedModNames = @(Get-ChildItem -LiteralPath (Join-Path $target 'mods') -File |
+        Where-Object { $_.Name -like '*.jar' } |
         Select-Object -ExpandProperty Name | Sort-Object)
     $expectedModNames = @($instance.Dependencies + (Split-Path -Leaf $instance.Artifact) | Sort-Object)
     if (Compare-Object $expectedModNames $deployedModNames) {

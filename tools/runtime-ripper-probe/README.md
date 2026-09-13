@@ -1,5 +1,26 @@
 # Isolated Crafting Ripper runtime acceptance probe
 
+## Hidden development-client gate
+
+Build the generation's production JAR and separate `ripperProbeJar`, then run from the repository root:
+
+```powershell
+powershell -NoProfile -File tools/runtime-ripper-probe/verify-background.ps1 -Generation 1.21.1 -Chain core256m -EvidenceName ripper-core-1.21.1-run1
+powershell -NoProfile -File tools/runtime-ripper-probe/verify-background.ps1 -Generation 26.1.2 -Chain native_catalog -EvidenceName ripper-maps-26.1.2-run1
+```
+
+`-PrepareOnly` performs read-only artifact and runtime-byte validation without starting a client or changing `run/mods`. Use a fresh evidence name for each actual launch. The runner uses the root generation launcher and a fresh development world, leaves PCL untouched, temporarily backs up conflicting factory/ripper helpers, and restores the exact original `run/mods` file/hash inventory in `finally`. Other runtime dependencies remain unchanged. Do not run another launcher against the same generation's development instance concurrently.
+
+The helper's production dependency is generated from the exact version it compiles against. Its metadata template becomes, for example, `[0.0.5]` during `ripperProbeJar`. The launcher reads the actual packaged helper metadata and refuses an old or incompatible helper before changing `run/mods` or starting Java. Updating source metadata alone is insufficient; rebuild the separate helper JAR.
+
+The existing hidden-window agent suppresses GLFW visibility before window creation. The ripper client independently checks `GLFW_VISIBLE` on every client tick and writes `hidden-window-state.json`, including observed tick counts, visible observations, loaded code-source locations and the final normal-stop marker. The observer never hides a window itself. The original native save/disconnect/stop sequence is preserved.
+
+The gate requires the selected fixture's actual `report.json` and independent reports to pass, both native world/UI frames, zero visible observations, native `save_complete` and completed server disconnect, `All chunks are saved` and `Stopping` log evidence, process exit zero, unchanged production/helper hashes and exact helper restoration. A successful craft followed by a native shutdown hang fails the overall gate. `background-summary.json`, the active/before/after mod inventories and immutable helper backups remain under `archive/2026-09-12-expanded-background-qa/<EvidenceName>`.
+
+Development `runClient` loads the main source set rather than the packaged production JAR. The runner checks each runtime class/resource byte against the frozen JAR before and after execution, excludes only the generated JAR manifest, and reports that boundary explicitly. It does not claim an installed PCL run.
+
+## Fixture contracts
+
 This directory builds a separate **test mod**, `ae2lo_runtime_probe`. Its classes and resources must never be included in an AE2LO production JAR or ordinary installation. The probe depends on the real generation-matched AE2 and AE2LO artifacts, and invokes their existing storage, recipe decoder, planner, CPU submission and execution APIs.
 
 The client helper creates a new `AE2LO-Ripper-Probe-*` world and refuses an existing save path. The server helper builds a physical 64-block 256k crafting-storage CPU (80 blocks for the layered fixture, 3,375 for the complete core fixture), an ME Drive containing an Infinite Loop Storage Cell, a finite Dense Energy Cell, a Recipe Ring Solver Terminal, and a Crafting Ripper. No CPU capacity field, recipe result, energy result or inventory result is overridden.

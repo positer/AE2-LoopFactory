@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "ae2:interface"
+    },
+    {
+      "item": "ae2:logic_processor"
+    },
+    {
+      "item": "ae2:logic_processor"
+    },
+    {
+      "item": "ae2lightoptimizer:loop_crystal"
+    },
+    {
+      "item": "ae2lightoptimizer:loop_crystal"
+    },
+    {
+      "item": "ae2:quartz_glass"
+    }
+  ],
+  "result": {
+    "id": "ae2lightoptimizer:loop_factory_network_terminal",
+    "count": 1
+  }
+}

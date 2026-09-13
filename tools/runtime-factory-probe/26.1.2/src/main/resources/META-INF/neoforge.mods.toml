@@ -1,0 +1,15 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="All Rights Reserved"
+[[mixins]]
+config="ae2lf_preview_probe.mixins.json"
+[[mods]]
+modId="ae2lf_runtime_probe"
+version="1"
+displayName="AE2LF isolated acceptance probe"
+[[dependencies.ae2lf_runtime_probe]]
+modId="ae2lightoptimizer"
+type="required"
+versionRange="[0.0.4,)"
+ordering="AFTER"
+side="BOTH"

@@ -1,0 +1,26 @@
+// A separate test JAR, never part of the production source set.
+allprojects {
+    afterEvaluate { p ->
+        if (!p.plugins.hasPlugin('java')) return
+        def generation = p.property('minecraft_version')
+        def probeRoot = new File(p.rootDir, "../../tools/runtime-factory-probe/${generation}")
+        def productionJar = p.tasks.named('jar').flatMap { it.archiveFile }
+        def compileProbe = p.tasks.register('compileFactoryProbe', JavaCompile) {
+            dependsOn p.tasks.named('jar')
+            source fileTree(new File(probeRoot, 'src/main/java')) { include '**/*.java' }
+            classpath = p.sourceSets.main.compileClasspath + p.files(productionJar) + p.configurations.runtimeClasspath.filter { it.name.startsWith("guideme-") }
+            destinationDirectory = new File(probeRoot, 'build/classes')
+            javaCompiler = p.tasks.named('compileJava', JavaCompile).get().javaCompiler
+            options.encoding = 'UTF-8'
+        }
+        p.tasks.register('factoryProbeJar', Jar) {
+            dependsOn compileProbe
+            archiveBaseName = "ae2lf-runtime-probe-mc${generation}"
+            archiveVersion = '1'
+            destinationDirectory = new File(probeRoot, 'build/libs')
+            from compileProbe.map { it.destinationDirectory }
+            from new File(probeRoot, 'src/main/resources')
+            from(new File(p.rootDir, '../../tools/runtime-factory-probe/examples')) { into 'factory-examples' }
+        }
+    }
+}

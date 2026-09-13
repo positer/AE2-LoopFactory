@@ -50,12 +50,13 @@ public final class SupercomputingCraftingOptimizerInterfaceBlockEntity extends B
         super.onLoad();
         if (level != null && !level.isClientSide) {
             GridHelper.onFirstTick(this, optimizer ->
-                    optimizer.mainNode.create(optimizer.getLevel(), optimizer.getBlockPos()));
+                    { optimizer.mainNode.create(optimizer.getLevel(), optimizer.getBlockPos()); com.example.ae2lightoptimizer.factory.UniqueNetworkServices.add(optimizer, optimizer.mainNode, com.example.ae2lightoptimizer.factory.UniqueNetworkServices.Kind.OPTIMIZER, false); });
         }
     }
 
     @Override
     public void setRemoved() {
+        com.example.ae2lightoptimizer.factory.UniqueNetworkServices.remove(this);
         mainNode.destroy();
         super.setRemoved();
     }

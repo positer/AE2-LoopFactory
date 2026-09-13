@@ -1,0 +1,8 @@
+{
+  "parent": "ae2:part/display_off",
+  "textures": {
+    "lightsBright": "ae2lightoptimizer:part/loop_factory_pattern_encoding_panel_bright",
+    "lightsMedium": "ae2lightoptimizer:part/loop_factory_pattern_encoding_panel_medium",
+    "lightsDark": "ae2lightoptimizer:part/loop_factory_pattern_encoding_panel_dark"
+  }
+}

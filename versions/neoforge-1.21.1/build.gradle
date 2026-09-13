@@ -6,17 +6,19 @@ plugins {
 version = mod_version
 group = mod_group_id
 
-base { archivesName = "${mod_id}-neoforge-mc${minecraft_version}" }
+base { archivesName = "ae2lf-neoforge-mc${minecraft_version}" }
 java.toolchain.languageVersion = JavaLanguageVersion.of(java_version as int)
 
 repositories {
     mavenCentral()
     maven { url = 'https://maven.blamejared.com' }
+    maven { url = 'https://repo.sleeping.town' }
 }
 
 dependencies {
     compileOnly "org.appliedenergistics:appliedenergistics2:${ae2_version}"
     compileOnly 'mezz.jei:jei-1.21.1-common-api:19.27.0.343'
+    compileOnly 'dev.emi:emi-neoforge:1.1.24+1.21.1:api'
     runtimeOnly "org.appliedenergistics:appliedenergistics2:${ae2_version}"
     testImplementation platform('org.junit:junit-bom:5.11.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'

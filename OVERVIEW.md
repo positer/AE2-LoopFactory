@@ -1,9 +1,128 @@
 # AE2-LoopFactory (AE2LF) Project Overview
 
+## 2026-09-12 editor scroll coordinate correction
+
+Both `FactoryEditorHighlightMixin.java` adapters now draw in the native parent's content coordinates and inherit its viewport scissor. Previously they subtracted scroll twice and established another clip inside an already translated pose, producing blank space below prematurely hidden text. Visibility checks retain the exact native scroll value; the caret uses the native cursor-line index.
+
+`tools/runtime-factory-probe/<generation>/.../EditorScrollAudit.java` adds ten native scenarios for top/down/end/up movement, fractional wheel scrolling, click positioning, selection, wrapped content, shorter text and empty text. `archive/2026-09-12-editor-scroll/` preserves the old JARs, native parent-source excerpts, before/fix source snapshots, the identical pre/post render checks, screenshots and deployment evidence. The old production JARs reproduce seven failed scroll scenarios in each generation.
+
+Both corrected native runs pass all 20 scroll scenarios, the existing 22 syntax screenshot checks and channel/MUST/function logistics regressions. Full build/test gates pass with 262/260 tests. The accepted JARs (`3d5ae037...` / `64dabb18...`) are installed in both PCL instances with previous JAR backups; 665/905 save files and all other existing instance files retain bytes and timestamps. All ten original development run/mods files were restored. [Final report](archive/2026-09-12-editor-scroll/REPORT.md).
+
+## 2026-09-13 README current-capability rewrite
+
+`README.md` now presents the current AE2LF feature set in complete English followed by complete Simplified Chinese. It distinguishes the public 0.0.4 release from the locally deployed 0.0.5 development build and covers Loop Factory execution refresh, redstone edges, lexical channels, comments/highlighting, recipe previews, ID insertion, unloaded chunks, crafting services, Loop Storage, and compatibility limits. Its new bulk-logistics section describes compressed batches, checked signed-64-bit accounting, independent job backpressure/recovery, and the bounded 4,096-round / 2,304-batch regression evidence without making universal throughput claims. The documentation-only change is recorded in [archive/2026-09-13-readme-rewrite/REPORT.md](archive/2026-09-13-readme-rewrite/REPORT.md).
+
+## 2026-09-12 complete editor highlighting and slash comments
+
+`shared/.../factory/FactorySyntaxHighlighter.java` lexes whole source into UTF-16 spans, including both supported languages, Unicode names, resource tags, logical/comparison operators, aggregate and indexed recipe references, strings, and comments. Its range intersection preserves token context across native soft-wrapped visual lines. Both adapters' `FactoryEditorHighlightMixin.java` cache spans only after a text change and restrict the render override to `FactoryEditorScreen`.
+
+`FactorySourceComments.java` masks unquoted `//` comments without changing offsets or line numbers. `FactoryCompiler.java` uses the masked text for indentation parsing; `SfmSyntax.java` uses it for dialect recognition and tokenization. Original program source remains editable and persisted. `FactoryCompletion.java` discovers Unicode declarations and ignores trailing slash comments. `FactorySyntaxHighlighterTest.java` adds 11 classification/wrapping/maximum-source tests; `FactorySlashCommentTest.java` adds 8 compiler, quotation, line-number and coloring regressions. Both full suites pass (262/260).
+
+`tools/runtime-factory-probe/<generation>/.../SyntaxHighlightAudit.java` supplies native widget fixtures, verifies render-cache refresh and captures 11 unmodified framebuffer pages per generation. `ChannelFunctionAudit.java` exercises commented function calls and SFM transfers with real containers. `docs/loop-factory-highlighting.md` contains bilingual syntax and comment examples. `archive/2026-09-12-complete-highlighting/` retains builds, focused test XML, frozen accepted JARs, artifact verification, native and pixel-check scripts, runtime-mod backups and exact-hash PCL deployment tooling.
+
+Final native runs pass on both generations, including all 22 original screenshot checks and the added SFM comment transfer ending at A/B/Dst = 0/0/15. Both PCL instances now contain the accepted JARs (`91db1f1f...` / `937e6830...`); all 1,570 save files and other instance bytes/timestamps remain unchanged. Ten original development run/mods files were restored after normal client exit. See [the dated report](archive/2026-09-12-complete-highlighting/REPORT.md) for exact hashes, scopes and evidence locations.
+
+## 2026-09-12 channel highlighting and function isolation
+
+`FactoryCompiler.RESERVED` now includes `channel`, so the native editor's shared highlighter classifies it correctly and tag/function names cannot shadow it. CALL instructions retain their lexical channel in their previously unused target field. `FactoryMachine.effectiveChannel` derives inherited function routing from the existing return-address stack; no instruction indexes or persisted snapshot fields change. Both adapters' `FactoryJob.transfer(GET, ..., channel)` also retain the requested channel.
+
+`FactoryChannelIsolationTest.java` adds six regressions that failed on the previous code and pass after the correction. Native `ChannelFunctionAudit.java` in each isolated helper verifies real container balances, nested function MUST resume, the direct channel-aware GET API and independent jobs. The legacy helper now includes the channel scene in its native tick lifecycle; screenshot capture waits for the editor to render. Final targeted native runs and screenshot checks pass on both generations, alongside 243/241 full unit tests. `docs/loop-factory-channels.md` defines the routing and shared-inventory boundaries. `archive/2026-09-12-channel-isolation/` retains red results, failed helper attempts, explicit final native verification, production-byte audits, runtime-mod restoration, and the PCL deployment/backup evidence.
+
+## 2026-09-12 PCL test deployment
+
+Following the completed native campaign, the user requested local installation for manual testing. Both accepted 0.0.5 JARs are now installed in the existing `AE2-lightoptimizer-1.21.1` and `AE2-lightoptimizer-26.1.2` PCL instances. Only each production JAR changed; all 1,570 save files and every other existing file retain their bytes and timestamps. No client was launched as part of deployment.
+
+`archive/2026-09-12-pcl-final-deployment/` contains `deploy.py` (exact artifact and target guards, previous-JAR backups, complete before/after inventories), `deployment.json` (installed hashes and preservation counts), `<generation>-before.json` / `-after.json` (every instance file), `backups/<generation>/` (the two previous production JARs), and `REPORT.md` (deployment scope and manual test handoff). This follow-up supersedes the earlier campaign's no-install status; its original completion evidence remains immutable.
+
+## 2026-09-12 expanded logistics and native pattern preview
+
+The current development update repairs channel-local unquantified MUST accounting, old inflated pending-count migration, native recipe target previews independent of factory-code validity, resource-only machine removal recovery and native chunk tick eligibility. It adds GUI-carried item/container ID insertion plus optional JEI/legacy EMI dragging. Final acceptance is complete for the frozen current JARs: 179/182 full native scenes, five input profiles (127 cases / 266 frames), separate-JVM restart, legacy Mekanism 2,304 batches, and all 18 final7 Ripper chains. Strict collectors pass 77 factory checks, 5/5 input profiles and 18/18 Ripper runs; unit tests pass 237/235. All ten original run/mods files are restored exactly. Scope, immutable failures and evidence live in `archive/2026-09-12-expanded-background-qa/REPORT.md`; this does not publish or install a new release.
+
+New and changed source/tool responsibilities:
+
+- Both adapters' `client/FactoryEditorScreen.java`: GUI-carried-only left/right ID insertion, exact native caret/selection replacement, atomic 4096-selector/65536-source limits, and shared viewer drop bounds.
+- Both adapters' `client/ContainerResourceIds.java`: read-only copies queried through native fluid/energy/item capabilities and AE cell inventories; deduplicated actual content IDs, canonical FE selector, and guarded legacy chemical lookup.
+- Both adapters' `client/FactoryEditorJeiPlugin.java` and legacy `client/FactoryEditorEmiPlugin.java`: independent optional public viewer plugins for typed item/fluid dragging into the code area. Viewer APIs are compile-only and never bundled.
+- `tools/runtime-factory-probe/<generation>/.../{ItemIdInsertionAudit,NativeIdInput,ViewerIdInput,IdInsertionJeiObserver}.java`: actual native menu/inventory synchronization, synthetic native GUI callbacks, real viewer sidebar drags, client/server resource snapshots, and framebuffer captures.
+- `tools/runtime-factory-probe/verify-id-insertion-background.ps1` and `verify-id-insertion.py`: exact viewer isolation/restoration and independently reconstructed per-case text/caret/resource/save/framebuffer gates.
+- `tools/runtime-factory-probe/verify-background.ps1 -ValidateExisting`: reuse every normal postcondition against immutable completed native evidence, verify current artifacts, and write a separate revalidation manifest; launch failures remain archived separately.
+- Both adapters' `FactoryServer.java`: tick factory hosts only when the existing native chunk holder is eligible to tick, without loading chunks or renewing tickets; this prevents waiting jobs from keeping their own FULL chunks loaded through save notifications.
+- Shared `FactoryMachine.java`: pass the executing instruction's channel into required-transfer accounting.
+- Both adapters' `FactoryJob.java`: channel-filtered outstanding MUST quotas and migration of persisted inflated pending remainders without replay.
+- Shared `FactoryChannelMustTest.java`: six compiler/VM/routing and migration behavioral regressions.
+- Both adapters' `FactoryPatternItem.java`: delegate output preview and native tooltip to the embedded ordinary AE encoded pattern, with a non-nested native recipe boundary.
+- Both adapters' `FactoryRecovery.java`: versioned resource-only machine cargo, segmented generic-resource quantities, pending opaque native recovery records, and accepted-amount accounting during ME reinsertion.
+- Both adapters' `FactoryBlock.java`, `FactoryBlockEntity.java`, `FactoryProviderLogic.java`: native removal/placement lifecycle, exactly-once physical buffer ownership, memory-card copy exclusion, separately saved return queue and native pattern/upgrade drops.
+- Legacy `mixin/MinecraftShutdownMixin.java` and its common Mixin registration: intercept only `MinecraftServer.stopServer`'s unique native chunk tick call, apply a one-millisecond unload budget and attempt up to 32 native task polls. Normal gameplay, original completion conditions, queued work and final saving remain native. Three retained shutdown failures precede a successful native 3,000-core run with the transformed server method independently observed.
+- `tools/runtime-factory-probe/<generation>/.../HugeQuantityAudit.java`: 21 real item/water/FE transfers, signed-long boundaries, missing-stock and saturated-destination continuation, 33 job codecs and 108 binary cell NBT round trips.
+- `tools/runtime-factory-probe/<generation>/.../RecoveryAudit.java`: actual world/wrench removal and native item placement, resource conservation above `Long.MAX_VALUE` in separate segments, MUST cancellation, induction resources and 64 maximum-length queued programs.
+- `tools/runtime-factory-probe/<generation>/.../ChunkLifecycleAudit.java`: real remote/whole-owner/partial-cargo unload and reload, native ticket-level diagnostics, new block-entity identity, persisted remainders and exact resource accounting. Its 33 chunks lie between x=2404 and x=2916, beyond earlier fixture ticket influence; native FULL inaccessibility alone never counts as completed unloading.
+- `tools/runtime-factory-probe/<generation>/.../PatternPreviewAudit.java`, `.../mixin/PatternPreviewInputMixin.java`, `ae2lf_preview_probe.mixins.json`: isolated QA screens, scoped test modifier input, and native render/tooltip comparisons. None belong to production JARs.
+- `tools/runtime-factory-probe/verify-preview-pixels.py`: compare regions of original normal/Shift/cleared framebuffer images without modifying source screenshots.
+- `tools/runtime-factory-probe/verify-runtime-identity.py`: complete class/resource inventory and byte equality between the frozen production JAR and ModDev's actual main source set.
+- `tools/runtime-factory-probe/verify-background.ps1`, `verify-restart.ps1`, `verify-focused-background.ps1`: requested load scale, exactly-once scene coverage, strict independent report/normal-exit gates and version-isolated optional machine fixtures.
+- `tools/runtime-ripper-probe/verify-background.ps1`: nine separate hidden native chain gates, exact tested production-version metadata, native CPU/fee evidence and restoration of the incoming mod manifest.
+- Legacy Ripper `ShutdownReadiness.java`: read-only native holder/queue readiness snapshots before ticket removal, after ticket removal and after a real flush save. Readiness is useful diagnostics but did not itself repair the retained shutdown loop; the production fix is independently required by the legacy runtime gate.
+- `archive/2026-09-12-expanded-background-qa/run-final-matrix.ps1`: generation-specific full/restart/legacy-MEK and nine-chain Ripper sequencing, immutable per-gate logs and immediate failure propagation.
+- `archive/2026-09-12-expanded-background-qa/campaign/run-final-ui-matrix.ps1`: fresh final source/helper hash freeze, full3, separate-JVM finalui restart, legacy Mek final3, and nine final7 Ripper chains per generation.
+- `archive/2026-09-12-expanded-background-qa/campaign/resume-modern-final-ui-matrix.ps1`: narrowly resume remaining modern gates only after the completed full3 evidence passes the full independent revalidation; preserve the original PowerShell Channel-variable failure and reject changed artifacts or existing future output.
+- `archive/2026-09-12-expanded-background-qa/new-id-insertion/verify-final-id-input.py`, `campaign/verify-final-factory.py`, and `collect-final-ripper.py`: exact named-run input/factory/Ripper collectors with no automatic latest-run fallback; final reports retain raw failures and version/feature boundaries.
+- `archive/2026-09-12-expanded-background-qa/restore-campaign-mods.ps1`: verifies native clients have exited, rejects unknown files and links, checks original backups and known changed helpers, archives those helpers and restores exact initial file names, bytes and hashes. `final-run-mods-restoration.json` records all ten files.
+- The campaign archive also contains initial manifests, current artifact audits, bounded JFR data from the final full3 native processes, payload-limit analysis, independently reviewed screenshots, root-cause notes for failed fixtures, and machine-readable run inventories. `completion.json` binds the final strict reports to the two production JAR hashes.
+
 English name: AE2-LoopFactory (AE2LF).
 中文名称：应用能源 2 循环工厂（AE2LF）。
 
 Current release: **[0.0.4](https://github.com/positer/AE2-LoopFactory/releases/tag/v0.0.4)**.
+
+## 2026-09-12 complete recipe sets P and O
+
+- `shared/src/main/java/com/example/ae2lightoptimizer/factory/FactorySelector.java`: new reserved operands `P` (every material the invocation allocated) and `O` (every product the recipe declares). A new `RecipeSet` resolver carries them; `validateParameters` rejects them without a recipe, and `membersMayOverlap` stays conservative.
+- `versions/neoforge-*/.../factory/FactoryResourceSelector.java` and `FactoryJob.java`: the provider job resolves `P` from its allocated `parameters` and `O` from the decoded recipe outputs, caches both sets per job, and feeds them to every GET, PUT, HAS, exclusion, `must` and native-capability selector. `resourceType` and `matchesKey` are shared so a set lookup compares canonical identity.
+- `FactoryCompiler` and `FactoryTags`: `P` and `O` are reserved words; `func P`, `import O` and `name O` are rejected, and `[PO][0-9]*` cannot be a tag or function name.
+- Guide trees (both languages, both generations) document the two new operand rows, the complete-set semantics, and the recipe-free error.
+- Real in-game fixture `recipe-set6-1.21.1-20260912` / `recipe-set6-26.1.2-20260912`: a real provider pattern with a two-material recipe moved the whole input set in one tick (`ticksToMoveCompleteInputSet=1`, machine contents `[1,1]`), rejected the same code on a recipe-free pattern with `P and O require a recipe-bound pattern`, and returned exactly one product through `while F has O < 1` / `get O` / `put O into source` with no machine residue. Unit gate: `FactoryRecipeSetTest` plus the existing suite, 231 tests on 1.21.1.
+- `tools/runtime-factory-probe/*/ComplexFlowAudit.java`: the complex-flow fixture now ends with twelve blocking and twelve parallel dispatch rounds that share one provider, each writing its own ledger row (ticks, primary delta, peak provider jobs, blocking-gate hold ticks, codec restores, duplicate and lost returns) and requiring exact output, exact input consumption and zero provider/CPU/furnace residue at the end.
+
+## 2026-09-12 full retest, soul capability and shutdown repair
+
+- Fresh hidden-window full audits on the current 0.0.5 sources: 1.21.1 `full-final-1.21.1-20260912` 172 rows / 0 failed / 0 visible windows / normal shutdown, 26.1.2 `full-final-26.1.2-20260912` 174 rows / 0 failed / 0 visible windows / normal shutdown. Unit gates: 1.21.1 225 tests, 26.1.2 223 tests, zero failures. Per-item results: `archive/2026-09-12-full-retest/REPORT.md`.
+- `versions/neoforge-1.21.1/src/main/java/com/example/ae2lightoptimizer/factory/FactoryNativeTransfers.java`: adds a reflective Industrial Foregoing Souls port (`industrialforegoingsouls::soul`) guarded by mod presence, plus `soulCapabilityPresent()`. Souls stay a NeoForge block capability, so they move machine-to-machine; the provider AE cache still holds AE keys only.
+- `tools/runtime-factory-probe/1.21.1/.../ClientBootstrap.java`: the exit path halts the integrated server directly and waits across normal ticks instead of calling `Minecraft.disconnect`, which stopped firing client ticks and hung the 1.21.1 harness after every full audit since the channel build. A ten-minute watchdog records `shutdown-timeout.txt` rather than hanging. All three 1.21.1 shutdowns after the change are normal.
+- `tools/runtime-factory-probe/*/CompatibilityAudit.java`: enumerates `AEKeyTypes.getAll()` and samples every type it can construct, samples registered item/fluid tags per loaded mod namespace, and runs a real tag-selector transfer. Unknown key types are reported as unsampled.
+- Addon fixture `addon-compat10-1.21.1-20260912` (Ars Nouveau + Ars Énergistique, Industrial Foregoing + Souls, Patchouli, Curios, GeckoLib): FE, `ars_nouveau:source`, items, fluids and 102 mod-tag members all pass the cell, VM, provider subnet cache and main-network return path; a real code round moves 128 souls through the capability system.
+- Mana remains blocked upstream: appbot 1.6.0-alpha.3 throws `NullPointerException: capability` in AE2's `RegisterPartCapabilitiesEvent` and aborts the mod load (`addon-compat3-1.21.1-20260912`). The in-game `channel` fixture still reports `missing-owner` on 26.1.2 while unit and editor coverage stay green; both are open items.
+- `tools/runtime-factory-probe/verify-background.ps1`: new `-AddonCompat`, `-Channel` and `-ChannelOnly` switches with staged addon dependencies and bounded-shutdown acceptance.
+
+## 2026-09-09 render and pattern-terminal repair
+
+- `versions/neoforge-*/src/main/java/com/example/ae2lightoptimizer/factory/FactoryBlock.java`: terminal orientation now keeps AE2's six-direction property for legacy saves, forces new terminal placements horizontal, and leaves legacy vertical states non-inverted. Provider and cable behavior are unchanged.
+- `versions/neoforge-*/src/main/resources/assets/ae2lightoptimizer/models/part/loop_factory_panel_{off,on}.json`: the panel preserves AE2's 100-pixel native mask union as the colored face footprint and overlays the 32-pixel Recipe Ring Solver core on the last rendered layer with alpha 96/160/255.
+- `versions/neoforge-*/src/main/resources/assets/ae2lightoptimizer/models/item/loop_factory_pattern_encoding_panel.json`: the item model is exactly AE2's native pattern-terminal `display_base` structure and substitutes only `front_bright` / `front_medium` / `front_dark` with the three core masks. The 26.1.2 descriptor keeps the native five `fluix` tints; custom item-base, empty, and GUI-light overrides are absent.
+- `versions/neoforge-*/src/main/java/com/example/ae2lightoptimizer/client/FactoryEditorScreen.java`: consumes the configured inventory key while editing; Escape remains the only close key.
+- `versions/neoforge-*/src/main/java/com/example/ae2lightoptimizer/factory/FactoryPanelRecipeMenu.java` plus the custom screen JSON: forces processing mode, removes the crafting/smithing/stonecutting pages from view and places a native 22×22 horizontal `TabButton` at the original crafting tab position.
+- `tools/generate_factory_panel_masks.py`: extracts only the Recipe Ring Solver core shape, emits three transparent tint masks, writes the native panel/item models and 26.1.2 item descriptor, validates dimensions/alpha/counts, updates both editable Blockbench projects, and writes `archive/2026-09-09-render-fix/panel-mask-report.json`.
+- `tools/blockbench/ae2lf_assets.js`: Blockbench exporter now embeds/exports only the three panel masks and writes the native panel/item models plus the 26.1.2 part and item descriptors.
+- `tools/runtime-factory-probe/*/BackgroundAudit.java`: adds a real client `QUICK_MOVE` insertion row for the unmodified AE2 pattern terminal and a legacy `facing=up` block-entity row. `-UiOnly` now excludes the heavy model/stress/native-flow scenes; `-PanelVisualOnly` also captures the panel item model.
+- `tools/runtime-factory-probe/*/ClientBootstrap.java`: shutdown now waits across ticks for the integrated server to stop instead of throwing on the first asynchronous disconnect.
+- `tools/provision_pcl_instances.ps1`: accepts existing `.bak` backups and compares only active `.jar` files during the managed whitelist check.
+- `shared/.../factory/FactoryCompletion.java` and `FactorySyntaxHighlighter.java`: shared Tab / Shift+Tab indentation, indentation-preserving newline, and token classification for the editor. Predictive completion is intentionally absent.
+
+`shared/.../factory/FactorySelector.java` parses a selector into a left-to-right expression tree over operands. `&` merges, `!` subtracts, parentheses regroup, `*` and `?` are wildcards, and `#namespace:path` resolves through a generation-supplied `TagLookup` that reads the item tag registry. The same tree serves GET, PUT, HAS, must quantities and exclusion lists, keeps `Pn`/`On` recipe validation, and is highlighted as operators. Evidence: `archive/2026-09-11-ampersand-union/REPORT.md`.
+
+Both `loop_factory.md` guide trees now document the language as tables: selector operands, logical operators, statements, recipe references, and a separate boolean/comparison operator section in the control-flow chapter. Guide-only real-client runs capture 60 frames per language per generation, and the 26.1.2 runner walks the laid-out document to reject text outside the 404 px viewport (164 paragraphs, 622 `en_us` / 582 `zh_cn` text runs, one mandatory example paragraph).
+
+`FactorySelector.TagLookup` is resolved per key type by `FactoryResourceSelector.RESOURCE_TAGS`, so `#tag` operands follow the item and fluid tag registries and pick up mod/datapack tags live. `FactoryExpression` accepts `has resource in Tag` and a bare `has resource`, `FactoryTags.expression` splits `A&B` machine groups for `get`/`put`/`redstone`/`has`, and `FactoryCompiler` patches `break` to the instruction after the innermost loop. Unit tests: 221 (1.21.1) and 219 (26.1.2).
+- `versions/neoforge-*/.../mixin/FactoryEditorHighlightMixin.java`: renders the highlighted editor text inside the native `MultiLineEditBox` text pass; `MultiLineEditBoxAccess` exposes cursor/text-field operations without duplicating the editor.
+- `versions/neoforge-*/.../client/FactoryEncoderClient.java` and `FactoryEncoderView`: project every visible machine's tag list to the HUD for through-block labels, with Shift+right-click single removal and Ctrl+Shift+right-click connected same-type removal.
+
+Actual verification is recorded in `archive/2026-09-09-render-fix/REPORT.md`: 98 focused UI/encoder rows per generation, full runs of 172 rows (1.21.1) and 174 rows (26.1.2), unit tests 210/208, syntax highlighting and through-block tag captures, and byte-identical PCL deployment of the two 0.0.5 JARs.
+
+Factory control nodes now set no channel flags and zero idle power. Ownership election preserves an earlier redstone edge, and `FactoryJob`, provider dispatch, induction return and provider upload do not gate on `getMainNode().isActive()`; a cable + terminal network therefore operates without an AE energy source.
+
+`FactoryServer.signal` reads redstone for a terminal across its whole factory grid, so a signal fed into the interface cable admits a round the same way a signal on the terminal body does; other factory hosts keep their previous block-level semantics and provider dispatch is unchanged. `FactoryBlockEntity.editingFactory()` returns the terminal itself, so saving code binds the pattern without depending on the ownership election. Evidence: `archive/2026-09-11-minimal-redstone/REPORT.md`.
+
+A player-world investigation (`archive/2026-09-11-minimal-redstone/USER-WORLD-FINDING.md`) proved the terminal button path works and isolated the remaining "nothing happens" case to selectors: `minecraft:item` is a registry ID that matches nothing, while `minecraft::item` is the item resource type. Both language guides now list that check under troubleshooting.
 
 ## Goal and status
 
@@ -158,7 +277,7 @@ Each standalone project owns:
 - `assets/ae2/screens/ae2lightoptimizer_crafting_ripper.json`: unique native ScreenStyle layout extending the provider controls to 36 pattern slots.
 - `item/ModItems.java`: service-block items, Loop Crystal materials, housing, ten cores, eleven cell items, and creative-tab placement without menus.
 - `storage/LoopStorageCellItem.java`, `LoopStorageCellHandler.java`, `LoopStorageCellInventory.java`: version-native item tooltip, AE2 handler registration, dynamic-key inventory, persistence, nested-cell guard, and shared-capacity enforcement.
-- `client/Ae2LightOptimizerClient.java`: `Dist.CLIENT`-isolated registration of eleven drive models; 1.21.1 also binds AE2 cell-state tinting through the item color handler while 26.1.2 uses its native item descriptor tint.
+- `client/Ae2LightOptimizerClient.java`: `Dist.CLIENT`-isolated registration of eleven drive models; 1.21.1 also binds AE2 cell-state tinting and explicitly registers opaque fluix variants for the factory panel PartItem, while 26.1.2 uses its native item descriptor tint.
 - `client/jei/InfiniteLoopStorageJeiPlugin.java` (26.1.2): optional JEI presentation adapter that replaces only the infinite transform's expanded 65-slot display with a 64-count core stack, one housing, and one output while leaving AE2's real explosion recipe unchanged. AE2 19.2.17 has no corresponding JEI transform category.
 - `integration/Ae2GlobalCraftingOptimizer.java`: reachable AE2 pattern conversion, substitute selection, byproduct/container modeling, inventory/emitter snapshots, policy gating, and native plan construction.
 - `integration/CraftingExecutionSchedule`, `ScheduledCraftingPlan`, `ScheduledCraftingJob`, and version-local codec: owner-tagged ordered batches, persisted final-output reserve, and generation-specific persistence.
@@ -279,3 +398,245 @@ This historical baseline did not include persistent in-game network submission o
 ## Branding update — 2026-09-08
 
 Public name: AE2-LoopFactory; abbreviation: AE2LF; repository: https://github.com/positer/AE2-LoopFactory. Both version adapters update mod display metadata, creative-tab translations and GuideME references. Internal IDs, package paths, artifact names and existing PCL instance paths remain stable. No project directories were moved. Historical release tags and assets remain intact.
+
+## 0.0.5 development structure
+
+- docs/loop-factory-0.0.5-design.md: user requirements, completed interaction decisions, bufferless routing correction, selectors, recipe parameters and SFM compatibility requirements.
+- shared/src/main/java/com/example/ae2lightoptimizer/factory/: native compiler, durable VM, exact Boolean expressions, A!(B,C)/Pn selectors, source-declaration budgets, tag reconciliation, Unicode chunking and supported SFM scheduling/compiler.
+- shared/src/test/java/com/example/ae2lightoptimizer/factory/: semantic compiler, continuation, source routing, selector, tag and SFM parser regressions.
+- Each version's factory package: component-backed native pattern wrapper, AE network/subnet hosts, provider job persistence, direct resource routing and editor menu foundations.
+- Each version's FactoryPattern* mixins: native AE2 recipe encoding preserves factory code/binding, native recipe ghosts load from the wrapped recipe, and only native encoding menus accept factory patterns in their input slots.
+- archive/2026-09-08-loop-factory-0.0.5/: acceptance checklist, API inspections and build evidence. Work is incomplete; no release/installation has occurred.
+- tools/runtime-factory-probe/: independent generation-specific test mods, fresh-world bootstrap, real barrel routing and native AE2 CPU/vanilla furnace fixtures. Helpers remain outside production source sets.
+- Each version's FactoryEditorScreen and factory editor screen style: native AE2 frame/slot/save action with multiline code editing. Live GUI checks are separate from build validation.
+- FactorySignalMixin and factory host persistence: tagged incoming redstone, pulse deadlines and terminal execution queues. Complete restart and destruction recovery remain separate acceptance gates.
+
+### Factory source map
+
+Shared source stays independent of Minecraft classes:
+
+| File | Responsibility |
+| --- | --- |
+| FactoryProgram.java | Immutable instructions, functions, imports and compiler diagnostics |
+| FactoryCompiler.java | Native indented syntax and recipe/material-index validation |
+| FactoryExpression.java | Checked signed-64-bit counts, comparisons and truth conversion |
+| FactorySelector.java | Typed resource selectors, wildcards, exclusions and Pn references |
+| FactoryMachine.java | Resumable instruction pointer, waits, call stack, finite budgets and safe suspension |
+| FactoryRoutes.java | Virtual source declarations and remaining committed-transfer budgets |
+| FactoryTags.java | Named position sets; preserve bindings for unchanged imports |
+| SfmSyntax.java / SfmCompiler.java | SFM reader and scheduler lowering for supported triggers, routes and conditions; advanced clauses remain unsupported |
+
+Each independent version adapter owns the following files in its factory package:
+
+| File | Responsibility |
+| --- | --- |
+| FactoryContent.java | Deferred block, item, entity and menu registration |
+| FactoryBlock.java | Provider/terminal/cable block interaction and native redstone notification |
+| FactoryBlockEntity.java | Distinct main/subnet nodes, energy forwarding, tag owner, pulses, terminal queue and persistence |
+| FactoryServer.java | Loaded-host lifecycle, logical owner selection and dimension-local network membership |
+| FactoryPatternData.java | Component codec, defensive native recipe copy and value identity |
+| FactoryPatternDetails.java | Native AE2 pattern interface with factory code/binding identity |
+| FactoryPatternItem.java | Native pattern preview/decode and shift-clear |
+| FactoryProviderLogic.java | Pattern acceptance, native CPU dispatch, bounded job queue and persisted snapshots |
+| FactoryBuffer.java | Exact-key provider job source/return storage |
+| FactoryJob.java | Concrete job continuation, allocated Pn keys, resource routing and main-grid output |
+| FactoryResourceSelector.java | Native AE key adaptation for shared selectors |
+| FactoryTransfers.java | Simulate-before-extract direct transfer and residual recovery |
+| FactoryEditorHost.java | Common code-editor host contract |
+| FactoryEditorMenu.java | Server-authoritative pattern slot, draft/save action and GUI synchronisation |
+
+The client package's FactoryEditorScreen.java and assets/ae2/screens/ae2lightoptimizer_factory_editor.json provide the actual code editor. FactoryPatternEncodingAccess, FactoryPatternEncodingMixin, FactoryPatternLoadMixin and FactoryPatternSlotMixin integrate native recipe menus; FactorySignalMixin contributes tagged incoming redstone. These UI/recipe interactions have separate runtime gates.
+
+tools/runtime-factory-probe contains probe.init.gradle (separate helper compilation), verify-restart.ps1 (two-process acceptance driver), README.md (reproduction and boundaries), and independent per-generation ClientBootstrap.java (owned world lifecycle), FactoryProbe.java (barrel topology/routing), NativeCraftingFixture.java (real CPU/furnace and restart assertions) and RestartState.java (test-only lifecycle flags).
+
+The two verified-restart summaries now confirm an unfinished native CPU job across normal save/exit and new-process load. This covers provider source, Pn, program continuation and final delivery; terminal-only queues and destruction recovery remain unverified.
+
+Final manual UI evidence: both clients accept keyboard code edits and native save actions; the final modern client saves all dimensions and exits normally. Debug helpers are removed from development run/mods after testing; their sources and archived evidence remain available.
+
+## Blockbench asset sources and full-round blocking
+
+- `tools/blockbench/ae2lf_assets.js`: local Blockbench desktop plugin; exact source-palette conversion, phone/panel pixel drawing, native Java model and BB project export for both adapters.
+- `design/loop_factory/README.md`: reproduction, source attribution and implementation boundaries.
+- `design/loop_factory/references/`: pinned AE2 generation source textures and SFM classic source textures.
+- `design/loop_factory/1.21.1/` and `26.1.2/`: six self-contained editable `.bbmodel` projects each, named for their content type.
+- `design/loop_factory/blockbench-export.json`: recorded Blockbench version and exported model inventory; `SFM-LICENSE.txt`: upstream source license.
+- Each adapter's `assets/ae2lightoptimizer/{textures,models,blockstates,items}`: exported production resources; modern item definitions remain generation-local. The phone is the handheld encoder, and the panel uses AE2's native `display_base` housing with only the three core masks substituted.
+- FactoryJob persists code continuation and physical resource obligations. FactoryProviderLogic keeps blocking active until the job is fully finished, including its code tail and resource settlement; primary return alone no longer admits the next task.
+
+The earlier final-assets inventory-admission checks are superseded by the user-confirmed primary-return contract. Current verification is recorded in archive/2026-09-08-primary-return-gate/. Actual framebuffer images verify the final grayscale provider, blue-code terminal and light-grey cable; normal shutdown and helper cleanup are recorded in the dated archive.
+
+2026-09-08 primary-return gate verification: both final clients passed the real two-batch CPU fixture, byproduct/partial-return checks and production CODEC continuation checks, then shut down normally. See archive/2026-09-08-primary-return-gate/REPORT.md.
+
+
+## Invisible native audit and provider direction correction
+
+- tools/runtime-factory-probe/background-agent/HiddenWindowAgent.java and MANIFEST.MF: test-only invisible GLFW creation and show/focus suppression, with a separate ASM dependency; never bundled in production.
+- build-background-agent.ps1: reproducibly compiles that helper for the Java 21/25 launchers. verify-background.ps1: unique evidence directories, generation-specific test dependencies and hidden launch properties, with optional supplier visual-only refresh.
+- Each generation's BackgroundAudit.java: native menu actions, inventory/block synchronization, registry item rendering, placed-block and six-facing supplier screenshots. CompatibilityAudit.java: real registered keys/cells and FactoryJob source/subnet/main storage paths. report-background.py: reads actual reports and unmodified PNGs to build the searchable gallery.
+- design/loop_factory provider projects and tools/blockbench/ae2lf_assets.js: up-facing base model, exactly four lateral arrows, independent neutral native rear texture; the six blockstates match pinned AE2 direction rotations.
+- archive/2026-09-08-background-full-audit/: REPORT.md and COVERAGE.md explain pass/gap boundaries; summary.json includes every case group, loaded storage types, current unit-test totals and production hashes; index.html exposes 174 selected native screenshots. Earlier failed fixture runs remain as evidence, superseded by final-* and provider-final-*.
+
+Both completed main runs contain 100 passing steps and normal shutdown evidence. Temporary probe/AppliedFlux/Glodium JARs were removed from both development mod folders after testing; PCL files were only read as matching dependency sources. Full 0.0.5 feature acceptance remains incomplete.
+
+
+## Factory encoder and panel additions (2026-09-08)
+
+The following files exist in each version adapter under `src/main/java/com/example/ae2lightoptimizer/`:
+
+| File | Role |
+| --- | --- |
+| `factory/FactoryEncoderItem.java` | Air/block interactions, persistent binding, server tag selection and bounded same-machine fill |
+| `factory/FactoryEncoderHost.java` | Native item menu host; stores the physical pattern in the encoder container component |
+| `factory/FactoryEncoderView.java` | Server-filtered tag/position snapshot, selected tag and dimension identity |
+| `factory/FactoryEncoderAction.java` | Registered client-to-server selection/marking requests with held-item, reach and membership validation |
+| `factory/FactoryEncodingPanel.java` | Native multipart recipe terminal subclass, shared encoded slot and durable code draft |
+| `factory/FactoryPanelRecipeMenu.java` | Native recipe menu with an action to switch to the code page |
+| `client/FactoryEncoderClient.java` | Tab-scroll, Ctrl-use dispatch and native world outline rendering |
+| `client/FactoryPanelRecipeScreen.java` | Native recipe screen with a distinct code-page control |
+| `client/FactoryIconButton.java` | Native AE2 icon button with matching localized tooltip and narration label |
+| `client/FactoryUploadScreen.java` | Localized, paginated provider chooser using server-provided identities |
+| `client/FactoryMessages.java` | Client-language rendering of synchronized statuses and common compiler diagnostics |
+
+`FactoryEditorMenu` now validates recipe material indices when saving, exposes page changes and validates physical uploads. `FactoryServer` resolves UUIDs and main-grid provider choices. `FactoryBlockEntity` persists user factory names. `FactoryContent` registers both items and menus. All six items have generation-specific recipes; language files and GuideME pages remain split by language.
+
+`tools/runtime-factory-probe/BackgroundAudit` adds real recipe/code transitions, upload, encoder container round-trip, validated selection/fill packets, native outline frames, multipart dye changes and client language reloads. Captures wait for loading overlays to disappear. That extension is recorded in `archive/2026-09-08-factory-encoder-panel/`; the later full-stress work below supersedes its induction, scheduling and uniqueness/recovery gaps.
+
+Final encoder/panel evidence (2026-09-08): REPORT.md documents coverage and gaps; summary.json records 122 passed steps per generation and artifact hashes; index.html links 208 raw screenshots. retired-test-mods/ holds the six temporary helper/dependency JARs removed after normal client shutdown.
+
+
+## 2026-09-08 pressure-test implementation
+
+`archive/2026-09-08-full-stress/` contains the current pressure regression report, raw-frame index, aggregate JSON and captured wildcard hang thread. Earlier intermediate evidence remains immutable. The runtime helper README describes each assertion and its limits.
+
+| Source | Structure and purpose |
+| --- | --- |
+| `shared/.../factory/SfmCompiler.java` | Lowers supported SFM timers, pulse triggers, routes, FORGET and conditions into durable VM instructions. |
+| `shared/.../factory/FactoryCodeChunks.java` | Splits long code without splitting UTF-16 surrogate pairs. |
+| `shared/.../factory/FactoryStressTest.java` | 100,000 tick/restore and route redeclaration pressure, long wildcard and Unicode boundaries. |
+| `shared/.../factory/SfmExecutionTest.java` | Timer, pulse, recipe completion, exclusion, quoted labels and Boolean semantics. |
+| Each adapter's `factory/UniqueNetworkServices.java` | Elects one physical service per kind/grid, disconnects duplicate nodes, and restores topology after changes. |
+| Each adapter's `factory/FactoryInduction.java` | Optional registry-discovered card support, bounded FE input cache and return on card removal. |
+| Each adapter's `mixin/FactoryInductionTickerMixin.java` | Optional AppliedFlux hook prevents native distribution from bypassing the factory program. |
+| Each adapter's `factory/FactoryCodeText.java` / `FactoryEditorMenu` | Native large-code S2C payload and ordered bounded C2S chunks. |
+| Each adapter's `factory/FactoryPatternData.java` | Backward-readable string-or-chunk-list codec avoids NBT single-string limits. |
+| Each adapter's `FactoryBlockEntity` / `FactoryProviderLogic` | Persist terminal scheduler and provider caches; expose native item/pattern destruction drops. |
+| Each adapter's `client/FactoryMessages.java` and language JSON | Client-local diagnostics, including SFM and selector limits, without concatenated translations. |
+| Each adapter's `loot_table/blocks/loop_factory_*.json` | Self-drop declarations for the provider, terminal and full cable block. |
+| `tools/runtime-factory-probe/<generation>/.../{StressAudit,TopologyAudit,TerminalAudit,InductionAudit,RestartExtras}.java` | Isolated real-world feature pressure and disk restart fixtures, never production dependencies. |
+| `tools/runtime-factory-probe/report-stress.py` | Asserts independent evidence success and builds searchable raw screenshot gallery. |
+
+The two full-stress restart pairs now also establish terminal wait continuation, SFM timer and held-pulse state, and induction FE preservation in separate JVMs. Native item/pattern destruction recovery is tested. Advanced SFM clauses, arbitrary unloaded-addon handlers and long-duration chunk/non-item destruction cases remain outside the verified scope.
+
+
+2026-09-09 extension: FactorySourceView in each adapter keeps per-key availability ceilings for a PUT without buffering items; FactoryJob target records retain physical endpoint identity and sorted machine positions. FactoryFunctionPlacementTest exercises program-scoped forward/nested definitions, and MultiTagAudit supplies seven real group machines plus overlap/replacement/redstone/128-cycle checks. RestartExtras now retains three real machines under one source tag. Latest runtime evidence is pending; see the full-stress progress record.
+
+
+2026-09-09 loop timing update: recipe programs must complete one round and reject unconditional loops even with waits; only recipe-free programs may run continuous yielding loops. The finite recipe lifetime budget remains. Ordinary instructions execute in the current tick, with explicit wait/redstone suspension and visible watchdog errors. Native English and Simplified Chinese Loop Factory guides now separately cover setup, editor icons, binding, group quotas, selectors, Pn, functions, blocking and supported SFM clauses.
+
+2026-09-09 循环时序更新：有配方必须完成一轮，即使带等待也禁止无条件循环并保留有限指令预算；只有无配方允许实际经过正时长等待/红石的持续循环。普通指令在当前 tick 执行，等待/红石显式暂停，执行保护以错误呈现。中英文原生工厂指南分别补全搭建、图标、绑定、组额度、选择器、Pn、函数、阻挡模式与 SFM 支持范围。
+
+Ordinary quantities advance after partial or zero transfer; must quantities require full completion. Tasks wait independently. 普通数量完全受阻时跳过，部分成功也可继续；must 要求足量完成，各任务独立等待。
+
+
+2026-09-09 latest accepted contract (supersedes earlier partial-return/skip wording): ordinary PUT advances even when zero is accepted and after partial success; must quantities accumulate in the owning task until complete. GET must declares the corresponding output obligation. Concurrent tasks retain separate continuations. Blocking now waits for complete code execution and physical resource settlement, not merely primary return.
+
+2026-09-09 最新确认规则（覆盖旧的主产物放行/跳过表述）：普通 put 完全受阻跳过、部分成功可继续，must 数量在本任务中累计足量才继续；get must 声明对应输出义务。并行任务各持有流程。阻挡模式等待代码完整结束及实物结清，不再仅凭主产物返回放行。
+
+
+Recipe output references: O1, O2, ... select native recipe outputs in order, independently of P1, P2 inputs. They support transfers, HAS, exclusions and must; missing recipes and out-of-range output indexes are errors. 配方输出引用 O1、O2 等按原生配方产物顺序编号，与 P1、P2 输入独立，支持物流、has、反选和 must；无配方与越界输出编号报错。
+
+
+### New execution and acceptance files
+
+| File | Responsibility |
+| --- | --- |
+| `shared/src/test/java/com/example/ae2lightoptimizer/factory/FactoryFunctionPlacementTest.java` | Forward and nested program-scoped function definitions, wait restoration and invalid names/end markers. |
+| `shared/src/test/java/com/example/ae2lightoptimizer/factory/FactoryContinuousLoopTest.java` | Recipe-free persistent yielding, same-tick ready instructions and recipe unconditional-loop rejection. |
+| `shared/src/test/java/com/example/ae2lightoptimizer/factory/FactoryMustTest.java` | Ordinary partial/zero behavior, mandatory remaining quantities, source obligations and independent VM progress. |
+| `shared/src/test/java/com/example/ae2lightoptimizer/factory/FactoryOutputReferenceTest.java` | Distinct Pn/On identities, output bounds, exclusions, HAS and SFM extensions. |
+| Per-generation `factory/FactorySourceView.java` | Numeric per-source-group PUT availability ceiling; actual resources remain in native storage. |
+| Per-generation probe `MultiTagAudit.java` | Seven real machine bindings, group quotas, replacement, redstone, 128 round trips and blocked MUST progress. |
+| Per-generation probe `RestartExtras.java` | True process restart for waits, SFM, FE, Unicode, tags and partial MUST completion. |
+| `tools/runtime-factory-probe/report-stress.py` | Strict evidence collection, production artifact checks and original-frame gallery. |
+| `tools/runtime-factory-probe/finish-stress-report.py` | Bilingual bounded acceptance report from validated evidence only. |
+
+Both native guide trees contain a separate `items-blocks-machines/loop_factory.md` for English and `_zh_cn/items-blocks-machines/loop_factory.md` for Simplified Chinese. They explain the same current behavior, including On, must and full-round blocking; language is selected by the client.
+
+### 2026-09-09 output references and final evidence
+
+- `archive/2026-09-08-full-stress/REPORT.md`: bilingual bounded acceptance results and remaining limitations.
+- `archive/2026-09-08-full-stress/summary.json`: strict machine-readable counts, loaded storage types and final artifact hashes.
+- `archive/2026-09-08-full-stress/index.html`: searchable gallery of 320 untouched native frames.
+- `archive/2026-09-08-full-stress/restart7-artifacts.json`: frozen production JAR and class hashes used by both true restart pairs; prior guide-resource hashes remain in `pre-guide-wrap-artifacts.json`.
+- `archive/2026-09-08-full-stress/runtime-inputs/`: six removed development-run helper/addon JARs and SHA-256 manifest. Original PCL dependencies are untouched.
+- `archive/2026-09-08-background-full-audit/final-stress7-<generation>/`: 147 passing feature/model/UI rows per generation, independent stress and compatibility reports.
+- `archive/2026-09-08-background-full-audit/guide9-<generation>/`: 38 passing guide rows per generation after correcting GuideME opening and old-generation Chinese wrapping; earlier guide7/8 remain historical diagnostics.
+- `archive/2026-09-08-loop-factory-0.0.5/full-stress-restart7-<generation>-prepare/resume`: separate JVM persistence fixtures, including On recipe continuation and must 24-before/40-after recovery.
+
+Both runtime generations exited normally and their temporary run/mods inputs were archived. Final unit counts 195 / 193, with no failures/errors/skips. Full SFM, arbitrary addon handlers, long chunk lifecycle, non-item destruction recovery and exact general wildcard-must overlap remain outside a complete acceptance claim.
+
+
+### 2026-09-09 runnable examples and complex flow implementation
+
+| Path | Structure and purpose |
+| --- | --- |
+| `tools/runtime-factory-probe/examples/catalog.json` | Eight recipe-mode-labelled runnable programs; shared by documentation and the native fixture. |
+| `tools/runtime-factory-probe/sync-guide-examples.py` | Writes localized setup/expected-result descriptions and identical fenced programs to four MDX guide pages. |
+| `shared/src/test/.../factory/FactoryGuideExamplesTest.java` | Compiles examples, checks recipe context and exact bilingual code synchronization; rejects HTML comments. |
+| `shared/src/main/.../factory/FactoryRoutes.java` | Source declarations and quotas; restore preserves the mandatory flag before the first PUT. |
+| `tools/runtime-factory-probe/<generation>/.../ComplexFlowAudit.java` | Six real terminal networks, continuous/multi-job restoration checks and four native CPU furnace orders. |
+| `versions/neoforge-26.1.2/src/main/.../mixin/GuideCodeLineWrapMixin.java` | Client-only compatibility correction for GuideME 26.1.10-alpha explicit-newline width accumulation. |
+| `tools/runtime-factory-probe/<generation>/.../BackgroundAudit.java` | Original-frame catalogue and compiled guide content checks; modern helper also validates actual rendered text geometry. |
+| `tools/runtime-factory-probe/report-flows.py` | Strict results/artifact validation and searchable native screenshot gallery. |
+| `archive/2026-09-09-factory-flows/` | This campaign's build logs, artifact snapshots, layout diagnosis and final report/gallery; prior rejected captures remain at their original paths. |
+
+The guide fix changes only modern client layout; factory execution code is unchanged after the completed full flow scenes. Final source/JAR checks and separate-process restart validation are recorded in the campaign report.
+
+2026-09-09 flow campaign completed: each generation passed 148 full native rows, 126 guide rows, four real CPU orders / twelve recipe batches, 32 redstone admissions and 4096 world round trips, plus a fresh separate-JVM restart pair. Unit tests: 197 (1.21.1), 195 (26.1.2), no failures/errors/skips. The [final report](archive/2026-09-09-factory-flows/REPORT.md) and [gallery](archive/2026-09-09-factory-flows/index.html) contain 398 selected original frames; guide scroll frames overlap and are not distinct scenarios. Six temporary helper/addon JARs are archived under `archive/2026-09-09-factory-flows/runtime-inputs/`; original PCL files and release 0.0.4 are unchanged. This supersedes earlier test counts, not the documented unsupported-feature boundaries.
+
+
+### 2026-09-09 native capability and parallel-order work
+
+- `versions/neoforge-1.21.1/.../factory/FactoryNativeTransfers.java`: physical item, fluid, FE and optional MEK chemical capability transport; no additional AE chemical key registration. Native recovery records are persisted in `FactoryJob.Saved`.
+- `tools/runtime-factory-probe/1.21.1/.../NativeCapabilityAudit.java`: real MEK tank/cube must, exclusion, HAS, group transport and codec restoration fixtures.
+- `tools/runtime-factory-probe/1.21.1/.../MekanismBulkAudit.java`: three simultaneous CPU orders sharing one nonblocking provider/subnet; per-order admission/completion/active accounting with real enrichment and smelting.
+- `tools/runtime-factory-probe/report-mekanism.py`: strict evidence, unit, JAR boundary and separate-process checks before generating campaign acceptance.
+- `docs/loop-factory-native-capabilities-1.21.1.md`: bilingual native interface contract and examples.
+- `archive/2026-09-09-mekanism-bulk/`: pinned optional test inputs, build provenance and campaign records; pending runs are not acceptance evidence.
+
+Both generations share the latest quantity rule: ordinary zero/partial transfers continue; only must obligations retain the instruction until their amount is fulfilled. Both generations now use native machine capability adapters: legacy simulation/execution on 1.21.1 and transactions plus registered-resource discovery on 26.1.2.
+
+- `versions/neoforge-26.1.2/.../factory/FactoryNativeTransfers.java`: transactional native item/fluid/FE and additional RegisteredResource handler discovery, isolated from the older capability API.
+- `tools/runtime-factory-probe/26.1.2/.../NativeTransactionalAudit.java`: persistent world endpoints registered by the helper for explicit native interface/rollback tests; no claim of modern MEK execution.
+- `tools/runtime-factory-probe/26.1.2/.../ParallelOrderAudit.java`: three native CPUs submitting iron/gold/copper recipes simultaneously to one nonblocking provider and real vanilla blast furnaces;12invocations per type.
+- `docs/loop-factory-native-capabilities-26.1.2.md`: modern adapter and fixture boundaries.
+
+
+- `shared/src/main/java/com/example/ae2lightoptimizer/factory/FactoryLazyPorts.java`: lazy operation-local capability traversal, shared by both native adapters.
+- `shared/src/test/java/com/example/ae2lightoptimizer/factory/FactoryLazyPortsTest.java`: successful unsided lookup, fallback order/reuse, full rejection and fresh-operation tests.
+- `FactoryServer.members` in both adapters: single live-grid traversal for one tag, validated against per-position membership across block replacement; no cross-tick membership cache.
+
+
+Final native factory performance evidence is archived under `archive/2026-09-09-mekanism-bulk/`; the accepted report separates local membership and stress timings from universal TPS claims.
+
+
+- `shared/src/test/java/com/example/ae2lightoptimizer/factory/FactoryParserBoundaryTest.java`: regression cases for constant-true recipe loops and malformed destinations, with legal alternatives.
+- `archive/2026-09-09-debug-boundaries/`: failing reproductions, both unit/build logs, exact artifact manifests and native editor results for the compiler boundary fixes.
+
+- 2026-09-09：FactoryPatternSlotMixin 扩展普通样板编码器槽位兼容循环工厂样板。
+
+- 2026-09-09：PCL 部署使用 ae2lf-neoforge-mc*-0.0.5.jar。
+
+
+### 2026-09-13 terminal lifecycle and saved-scene diagnosis
+
+- `versions/neoforge-{1.21.1,26.1.2}/src/main/java/com/example/ae2lightoptimizer/factory/FactoryBlockEntity.java`: terminal-only cancellation/restart, installed-program comparison, persistent pending restart and physical-cargo handoff. Provider order lifecycle stays independent.
+- `tools/runtime-factory-probe/{1.21.1,26.1.2}/src/main/java/com/example/ae2lfprobe/TerminalRefreshAudit.java`: native terminal/signal/container fixture, 67 named assertions including 32 repeated edges, binary NBT and explicitly seeded cargo; called by `ChannelAudit.java` after existing UI/ledger gates.
+- `tools/runtime-factory-probe/26.1.2/src/main/java/com/example/ae2lfprobe/SavedSceneMisrouteAudit.java`: six independent saved-code/overlapping-label/real-furnace-face reproductions in a separate world.
+- `docs/loop-factory-channels.md` and both generations' bilingual `ae2guide/.../loop_factory.md`: restart semantics, resource ownership and physical label overlap.
+- `archive/2026-09-13-channel-face/`: [dated result and full evidence index](archive/2026-09-13-channel-face/REPORT.md); raw read-only world extraction, region hashes, compiler preflight, native reports/verifiers, build/byte manifests, frozen accepted JARs and guarded PCL deployment/restoration backups. Both deployed generations passed 262/260 unit tests and 67/67 native refresh assertions.
+
+### 2026-09-13 README rewrite
+
+- `README.md`: consolidated bilingual current project description. It distinguishes public release 0.0.4 from the tested local 0.0.5 development build and links historical validation to dated archive reports.
+- `archive/2026-09-13-readme-rewrite/REPORT.md`: records the documentation scope and confirms that this pass changed no code, artifact, PCL, save, dependency, or release metadata.

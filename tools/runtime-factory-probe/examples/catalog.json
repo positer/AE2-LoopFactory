@@ -1,0 +1,58 @@
+[
+  {
+    "id": "transfer",
+    "recipe": false,
+    "inputs": 0,
+    "outputs": 0,
+    "code": "import Input,Output\nget 64 minecraft::item!(minecraft:gold_ingot) from Input\nput minecraft::item into Output\ndone"
+  },
+  {
+    "id": "must_wait",
+    "recipe": false,
+    "inputs": 0,
+    "outputs": 0,
+    "code": "import Input,Output\nget must 64 minecraft:iron_ingot from Input\nwait 4 tick\nput minecraft:iron_ingot into Output\ndone"
+  },
+  {
+    "id": "continuous",
+    "recipe": false,
+    "inputs": 0,
+    "outputs": 0,
+    "code": "import Input,Buffer,Output,Ready\nwhile true do\n    if Input has minecraft:iron_ingot > 0 do\n        moveOne\n    else\n        wait 1 tick\n    wait 1 tick\nfunc moveOne\n    get must 1 minecraft:iron_ingot from Input\n    put minecraft:iron_ingot into Buffer\n    while Buffer has minecraft:iron_ingot > 0 do\n        get must 1 minecraft:iron_ingot from Buffer\n        put minecraft:iron_ingot into Output\n    redstone Ready 1 tick\nend"
+  },
+  {
+    "id": "finite_nested",
+    "recipe": false,
+    "inputs": 0,
+    "outputs": 0,
+    "code": "import Input,Buffer,Output,Ready\nwhile Input has minecraft:iron_ingot > 0 do\n    if Output has minecraft:iron_ingot < 128 do\n        moveOne\n    else\n        done\ndone\nfunc moveOne\n    get must 1 minecraft:iron_ingot from Input\n    wait 1 tick\n    put minecraft:iron_ingot into Buffer\n    get must 1 minecraft:iron_ingot from Buffer\n    put minecraft:iron_ingot into Output\n    redstone Ready 1 tick\nend"
+  },
+  {
+    "id": "recipe_two_stage",
+    "recipe": true,
+    "inputs": 1,
+    "outputs": 1,
+    "code": "import StageOne,StageTwo\nfeed\nget must 1 minecraft:stone from StageOne on down\nput minecraft:stone into StageTwo on up\nget must 1 O1 from StageTwo on down\nput O1 into source\nwait 2 tick\ndone\nfunc feed\n    get must 1 P1 from source\n    put P1 into StageOne on up\nend"
+  },
+  {
+    "id": "recipe_multi_output",
+    "recipe": true,
+    "inputs": 2,
+    "outputs": 2,
+    "code": "import IronFurnace,GoldFurnace\nget must 1 P1 from source\nput P1 into IronFurnace on up\nget must 1 P2 from source\nput P2 into GoldFurnace on up\nget must 1 O2 from GoldFurnace on down\nput O2 into source\nget must 1 O1 from IronFurnace on down\nput O1 into source\nwait 2 tick\ndone"
+  },
+  {
+    "id": "sfm_timer",
+    "recipe": false,
+    "inputs": 0,
+    "outputs": 0,
+    "code": "EVERY 2 TICKS DO\n    IF \"Input\" HAS GT 0 minecraft:iron_ingot THEN\n        INPUT MUST 1 minecraft:iron_ingot FROM \"Input\"\n        OUTPUT minecraft:iron_ingot TO \"Output\"\n    END\nEND\nEVERY REDSTONE PULSE DO\n    IF \"Input\" HAS GT 0 minecraft:gold_ingot THEN\n        INPUT MUST 1 minecraft:gold_ingot FROM \"Input\"\n        OUTPUT minecraft:gold_ingot TO \"Output\"\n    END\nEND"
+  },
+  {
+    "id": "sfm_recipe",
+    "recipe": true,
+    "inputs": 1,
+    "outputs": 1,
+    "code": "EVERY TICK DO\n    INPUT MUST 1 P1 FROM source\n    OUTPUT P1 TO Furnace TOP SIDE\n    FORGET\n    INPUT MUST 1 O1 FROM Furnace BOTTOM SIDE\n    OUTPUT O1 TO source\nEND"
+  }
+]

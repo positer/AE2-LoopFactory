@@ -13,12 +13,20 @@ import net.neoforged.neoforge.client.event.InitializeClientRegistriesEvent;
 @Mod(value = Ae2LightOptimizer.MOD_ID, dist = Dist.CLIENT)
 public final class Ae2LightOptimizerClient {
     private static void registerScreens(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent event) {
+        appeng.client.InitScreens.register(event, com.example.ae2lightoptimizer.factory.FactoryPanelRecipeMenu.TYPE.get(), FactoryPanelRecipeScreen::new, "/screens/ae2lightoptimizer_factory_panel_recipe.json");
+        appeng.client.InitScreens.register(event,
+                com.example.ae2lightoptimizer.factory.FactoryEditorMenu.TYPE.get(),
+                FactoryEditorScreen::new, "/screens/ae2lightoptimizer_factory_editor.json");
         appeng.client.InitScreens.register(event,
                 com.example.ae2lightoptimizer.menu.CraftingRipperMenu.TYPE.get(),
                 CraftingRipperScreen::new, "/screens/ae2lightoptimizer_crafting_ripper.json");
     }
 
     public Ae2LightOptimizerClient(IEventBus modEventBus) {
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(FactoryEncoderClient::scroll);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(FactoryEncoderClient::use);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(FactoryEncoderClient::render);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(FactoryEncoderClient::renderGui);
         modEventBus.addListener(Ae2LightOptimizerClient::registerScreens);
         modEventBus.addListener(Ae2LightOptimizerClient::initializeClientRegistries);
     }

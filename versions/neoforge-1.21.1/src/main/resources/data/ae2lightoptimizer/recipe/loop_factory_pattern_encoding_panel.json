@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "ae2:pattern_encoding_terminal"
+    },
+    {
+      "item": "ae2lightoptimizer:loop_crystal"
+    },
+    {
+      "item": "ae2:calculation_processor"
+    }
+  ],
+  "result": {
+    "id": "ae2lightoptimizer:loop_factory_pattern_encoding_panel",
+    "count": 1
+  }
+}

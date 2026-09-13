@@ -1,0 +1,81 @@
+{
+  "credit": "Made with Blockbench",
+  "textures": {
+    "0": "ae2lightoptimizer:block/loop_factory_provider_front",
+    "1": "ae2lightoptimizer:block/loop_factory_provider_side",
+    "particle": "ae2lightoptimizer:block/loop_factory_provider_front",
+    "2": "ae2lightoptimizer:block/loop_factory_provider_back"
+  },
+  "elements": [
+    {
+      "name": "loop_factory_pattern_provider",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#1"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#1"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#1"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#1"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#0"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#2"
+        }
+      }
+    }
+  ],
+  "parent": "minecraft:block/block"
+}

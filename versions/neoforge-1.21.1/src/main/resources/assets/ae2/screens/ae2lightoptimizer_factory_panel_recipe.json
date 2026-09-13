@@ -1,0 +1,113 @@
+{
+  "includes": [
+    "terminals/pattern_encoding_terminal.json"
+  ],
+  "slots": {
+    "CRAFTING_GRID": {
+      "left": -1000,
+      "bottom": -1000
+    },
+    "CRAFTING_RESULT": {
+      "left": -1000,
+      "bottom": -1000
+    },
+    "SMITHING_TABLE_TEMPLATE": {
+      "left": -1000,
+      "bottom": -1000
+    },
+    "SMITHING_TABLE_BASE": {
+      "left": -1000,
+      "bottom": -1000
+    },
+    "SMITHING_TABLE_ADDITION": {
+      "left": -1000,
+      "bottom": -1000
+    },
+    "SMITHING_TABLE_RESULT": {
+      "left": -1000,
+      "bottom": -1000
+    },
+    "STONECUTTING_INPUT": {
+      "left": -1000,
+      "bottom": -1000
+    }
+  },
+  "text": {
+    "crafting_grid_title": {
+      "position": {
+        "left": -1000,
+        "bottom": -1000
+      }
+    }
+  },
+  "widgets": {
+    "factoryCodePage": {
+      "left": 173,
+      "bottom": 174,
+      "width": 22,
+      "height": 22
+    },
+    "modeTabButton0": {
+      "left": -1000,
+      "bottom": -1000,
+      "width": 1,
+      "height": 1
+    },
+    "modeTabButton2": {
+      "left": -1000,
+      "bottom": -1000,
+      "width": 1,
+      "height": 1
+    },
+    "modeTabButton3": {
+      "left": -1000,
+      "bottom": -1000,
+      "width": 1,
+      "height": 1
+    },
+    "modePanel0": {
+      "left": -1000,
+      "bottom": -1000
+    },
+    "modePanel2": {
+      "left": -1000,
+      "bottom": -1000
+    },
+    "modePanel3": {
+      "left": -1000,
+      "bottom": -1000
+    },
+    "modePanel4": {
+      "left": -1000,
+      "bottom": -1000
+    },
+    "modePanel5": {
+      "left": -1000,
+      "bottom": -1000
+    },
+    "craftingSubstitutions": {
+      "left": -1000,
+      "bottom": -1000
+    },
+    "craftingFluidSubstitutions": {
+      "left": -1000,
+      "bottom": -1000
+    },
+    "craftingClearPattern": {
+      "left": -1000,
+      "bottom": -1000
+    },
+    "smithingTableSubstitutions": {
+      "left": -1000,
+      "bottom": -1000
+    },
+    "smithingTableClearPattern": {
+      "left": -1000,
+      "bottom": -1000
+    },
+    "stonecuttingPatternModeScrollbar": {
+      "left": -1000,
+      "bottom": -1000
+    }
+  }
+}

@@ -40,6 +40,10 @@ public final class ClientBootstrap {
     private static volatile long savedAtNanos;
     private static volatile int savedAtServerTick;
     private static boolean oldPauseOnLostFocus;
+    private static long hiddenClientTicks;
+    private static long visibleObservations;
+    private static int lastWindowVisible = -1;
+    private static boolean hiddenNormalStopObserved;
     private static int oldRenderDistance;
     private static int oldSimulationDistance;
     private static net.minecraft.client.tutorial.TutorialSteps oldTutorialStep;
@@ -52,6 +56,7 @@ public final class ClientBootstrap {
 
     private static void onClientTick(ClientTickEvent.Post event) {
         var minecraft = Minecraft.getInstance();
+        verifyHiddenWindow(minecraft);
         if (!attempted && Boolean.getBoolean("ae2lo.probe")
                 && minecraft.level == null && minecraft.getSingleplayerServer() == null
                 && minecraft.getOverlay() == null && (minecraft.screen instanceof TitleScreen
@@ -93,6 +98,44 @@ public final class ClientBootstrap {
             if (CAPTURED.contains(UI_SCREENSHOT) && Boolean.getBoolean("ae2lo.probe.autoExit")) {
                 advanceNormalShutdown(minecraft);
             }
+        }
+    }
+
+    /** Observe every real client tick; the launcher agent, not this observer, hides the window. */
+    private static void verifyHiddenWindow(Minecraft minecraft) {
+        if (!Boolean.getBoolean("ae2lo.probe") || !Boolean.getBoolean("ae2lo.probe.background")) return;
+        hiddenClientTicks++;
+        lastWindowVisible = org.lwjgl.glfw.GLFW.glfwGetWindowAttrib(
+                minecraft.getWindow().handle(), org.lwjgl.glfw.GLFW.GLFW_VISIBLE);
+        if (lastWindowVisible != 0) visibleObservations++;
+        if (hiddenClientTicks == 1 || hiddenClientTicks % 100 == 0 || lastWindowVisible != 0) {
+            writeHiddenWindowState(minecraft);
+        }
+        if (lastWindowVisible != 0) {
+            throw new IllegalStateException("Background ripper probe window became visible at client tick " + hiddenClientTicks);
+        }
+    }
+
+    private static void writeHiddenWindowState(Minecraft minecraft) {
+        if (!Boolean.getBoolean("ae2lo.probe.background")) return;
+        var state = new java.util.LinkedHashMap<String, Object>();
+        state.put("observedAt", java.time.Instant.now().toString());
+        state.put("clientTicksChecked", hiddenClientTicks);
+        state.put("visibleObservations", visibleObservations);
+        state.put("lastWindowVisible", lastWindowVisible);
+        state.put("normalStopObserved", hiddenNormalStopObserved);
+        state.put("phase", ProbeState.phase);
+        state.put("world", minecraft.getSingleplayerServer() == null ? "" :
+                minecraft.getSingleplayerServer().getWorldData().getLevelName());
+        state.put("productionCodeSource", String.valueOf(
+                com.example.ae2lightoptimizer.block.CraftingRipperBlockEntity.class
+                        .getProtectionDomain().getCodeSource().getLocation()));
+        state.put("probeCodeSource", String.valueOf(ClientBootstrap.class.getProtectionDomain().getCodeSource().getLocation()));
+        try {
+            Files.writeString(evidenceDirectory(minecraft).resolve("hidden-window-state.json"),
+                    new com.google.gson.GsonBuilder().setPrettyPrinting().create().toJson(state));
+        } catch (java.io.IOException error) {
+            throw new IllegalStateException("Cannot persist hidden-window evidence", error);
         }
     }
 
@@ -156,6 +199,8 @@ public final class ClientBootstrap {
                 + " simulationDistance=" + oldSimulationDistance + " pauseOnLostFocus=" + oldPauseOnLostFocus
                 + "; helper does not call Options.save");
         shutdownEvent(minecraft, "normal_stop_requested", "Calling Minecraft.stop after native integrated-server disconnect completed");
+        hiddenNormalStopObserved = true;
+        writeHiddenWindowState(minecraft);
         minecraft.stop();
     }
 
@@ -233,6 +278,7 @@ public final class ClientBootstrap {
         var path = evidenceDirectory(minecraft).resolve("screenshots").resolve(fileName);
         if (Files.isRegularFile(path)) {
             CAPTURED.add(fileName);
+            writeHiddenWindowState(minecraft);
             if (!UI_SCREENSHOT.equals(fileName)) ProbeState.screenshotCompleted = fileName;
             LOG.info("AE2LO native frame saved {}: {}", path.toAbsolutePath(), message.getString());
         } else {

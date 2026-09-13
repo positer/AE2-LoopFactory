@@ -227,9 +227,9 @@ if ((Get-FileHash -LiteralPath $clientJar -Algorithm SHA1).Hash -ne $clientRecor
 $classpath.Add($clientJar)
 $assetIndexPath = Get-ChildPath $assetsDir ('indexes/' + $assetIndex.id + '.json')
 Assert-File $assetIndexPath
-$productionPath = Get-ChildPath $gameDir ('mods/ae2lightoptimizer-neoforge-mc' + $Generation + '-0.0.4.jar')
+$productionPath = Get-ChildPath $gameDir ('mods/ae2lf-neoforge-mc' + $Generation + '-0.0.5.jar')
 $probePath = Get-ChildPath $gameDir ('mods/ae2lo-runtime-probe-mc' + $Generation + '-1.jar')
-$production = Get-ModInfo $productionPath 'ae2lightoptimizer' '0.0.4'
+$production = Get-ModInfo $productionPath 'ae2lightoptimizer' '0.0.5'
 $probe = $null
 if (Test-Path -LiteralPath $probePath -PathType Leaf) {
     $probe = Get-ModInfo $probePath 'ae2lo_runtime_probe' ''

@@ -4,6 +4,7 @@
   "package": "com.example.ae2lightoptimizer.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "MinecraftShutdownMixin",
     "CraftingCalculationMixin",
     "CraftingCpuLogicMixin",
     "CraftingTaskProgressAccessor",
@@ -12,12 +13,21 @@
     "ExecutingCraftingJobMixin",
     "ExecutingCraftingJobPersistenceMixin",
     "TransformRecipeDisplayMixin",
-    "PatternProviderLogicInvoker"
+    "PatternProviderLogicInvoker",
+    "FactoryPatternEncodingAccess",
+    "FactoryPatternEncodingMixin",
+    "FactoryPatternSlotMixin",
+    "FactoryPatternLoadMixin",
+    "FactorySignalMixin",
+    "FactoryInductionTickerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "client": [
-    "WidgetContainerAccessor"
+    "WidgetContainerAccessor",
+    "MultiLineEditBoxAccess",
+    "AbstractScrollWidgetAccess",
+    "FactoryEditorHighlightMixin"
   ]
 }

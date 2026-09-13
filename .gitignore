@@ -16,3 +16,10 @@ out/
 Thumbs.db
 archive/
 tasks/
+
+.tools/
+.codex-tmp/
+tools/__pycache__/
+
+tools/runtime-factory-probe/background-agent/*.jar
+tools/runtime-factory-probe/dependencies/*.jar

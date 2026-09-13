@@ -15,11 +15,18 @@ allprojects {
         }
         p.tasks.register('ripperProbeJar', Jar) {
             dependsOn compileProbe
+            def testedVersion = p.version.toString()
+            inputs.property('ae2lf_tested_version', testedVersion)
+            filteringCharset = 'UTF-8'
             archiveBaseName = "ae2lo-runtime-probe-mc${generation}"
             archiveVersion = '1'
             destinationDirectory = new File(probeRoot, 'build/libs')
             from compileProbe.map { it.destinationDirectory }
-            from new File(probeRoot, 'src/main/resources')
+            from(new File(probeRoot, 'src/main/resources')) {
+                filesMatching('META-INF/neoforge.mods.toml') {
+                    expand(ae2lf_tested_version: testedVersion)
+                }
+            }
         }
         p.tasks.register('writeRipperProbeClasspath') {
             doLast {

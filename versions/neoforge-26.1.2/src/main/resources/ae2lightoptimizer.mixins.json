@@ -12,12 +12,21 @@
     "ExecutingCraftingJobMixin",
     "ExecutingCraftingJobPersistenceMixin",
     "TransformCategoryDisplayMixin",
-    "PatternProviderLogicInvoker"
+    "PatternProviderLogicInvoker",
+    "FactoryPatternEncodingAccess",
+    "FactoryPatternEncodingMixin",
+    "FactoryPatternSlotMixin",
+    "FactoryPatternLoadMixin",
+    "FactorySignalMixin",
+    "FactoryInductionTickerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "client": [
-    "WidgetContainerAccessor"
+    "WidgetContainerAccessor",
+    "GuideCodeLineWrapMixin",
+    "MultiLineEditBoxAccess",
+    "FactoryEditorHighlightMixin"
   ]
 }
