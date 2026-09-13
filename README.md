@@ -269,7 +269,7 @@ C:/Users/12252/Desktop/Files/Minecraft/PCL/.minecraft/versions/AE2-lightoptimize
 C:/Users/12252/Desktop/Files/Minecraft/PCL/.minecraft/versions/AE2-lightoptimizer-26.1.2
 ```
 
-这两个实例已部署 0.0.5 开发 JAR；部署只替换对应 AE2LF 文件，并逐项核对存档、配置、依赖和其他实例文件的字节与时间戳。
+这两个实例已部署 0.0.5 发布 JAR；部署只替换对应 AE2LF 文件，并逐项核对存档、配置、依赖和其他实例文件的字节与时间戳。
 
 ## 构建与测试
 
@@ -280,7 +280,7 @@ powershell -NoProfile -File .\build-1.21.1.ps1 --offline --no-daemon build
 powershell -NoProfile -File .\build-26.1.2.ps1 --offline --no-daemon build
 ```
 
-已验收的 0.0.5 开发产物已与编译类和资源逐项比对，未包含嵌套 JAR、测试 probe 类或无关模组命名空间。
+已验收的 0.0.5 发布产物已与编译类和资源逐项比对，未包含嵌套 JAR、测试 probe 类或无关模组命名空间。
 
 最新验证数据：
 

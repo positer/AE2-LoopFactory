@@ -10,7 +10,7 @@ Both corrected native runs pass all 20 scroll scenarios, the existing 22 syntax 
 
 ## 2026-09-13 README current-capability rewrite
 
-`README.md` now presents the current AE2LF feature set in complete English followed by complete Simplified Chinese. It distinguishes the public 0.0.4 release from the locally deployed 0.0.5 development build and covers Loop Factory execution refresh, redstone edges, lexical channels, comments/highlighting, recipe previews, ID insertion, unloaded chunks, crafting services, Loop Storage, and compatibility limits. Its new bulk-logistics section describes compressed batches, checked signed-64-bit accounting, independent job backpressure/recovery, and the bounded 4,096-round / 2,304-batch regression evidence without making universal throughput claims. The documentation-only change is recorded in [archive/2026-09-13-readme-rewrite/REPORT.md](archive/2026-09-13-readme-rewrite/REPORT.md).
+`README.md` now presents the current AE2LF feature set in complete English followed by complete Simplified Chinese. It identifies 0.0.5 as the public release and covers Loop Factory execution refresh, redstone edges, lexical channels, comments/highlighting, recipe previews, ID insertion, unloaded chunks, crafting services, Loop Storage, and compatibility limits. Its bulk-logistics section describes compressed batches, checked signed-64-bit accounting, independent job backpressure/recovery, and the bounded 4,096-round / 2,304-batch regression evidence without making universal throughput claims. The documentation-only change is recorded in [archive/2026-09-13-readme-rewrite/REPORT.md](archive/2026-09-13-readme-rewrite/REPORT.md).
 
 ## 2026-09-12 complete editor highlighting and slash comments
 
@@ -73,7 +73,7 @@ New and changed source/tool responsibilities:
 English name: AE2-LoopFactory (AE2LF).
 中文名称：应用能源 2 循环工厂（AE2LF）。
 
-Current release: **[0.0.4](https://github.com/positer/AE2-LoopFactory/releases/tag/v0.0.4)**.
+Current release: **[0.0.5](https://github.com/positer/AE2-LoopFactory/releases/tag/v0.0.5)**.
 
 ## 2026-09-12 complete recipe sets P and O
 
@@ -638,5 +638,12 @@ Final native factory performance evidence is archived under `archive/2026-09-09-
 
 ### 2026-09-13 README rewrite
 
-- `README.md`: consolidated bilingual current project description. It distinguishes public release 0.0.4 from the tested local 0.0.5 development build and links historical validation to dated archive reports.
+- `README.md`: consolidated bilingual current project description. It identifies public release 0.0.5 and links historical validation to dated archive reports.
 - `archive/2026-09-13-readme-rewrite/REPORT.md`: records the documentation scope and confirms that this pass changed no code, artifact, PCL, save, dependency, or release metadata.
+
+### 2026-09-13 public release 0.0.5
+
+- Commit `1ea5964` was pushed to `origin/main` and tag `v0.0.5` was published as a non-draft, non-prerelease GitHub release.
+- Release assets are `ae2lf-neoforge-mc1.21.1-0.0.5.jar` (699,793 bytes, SHA-256 `1a07eb16816e15acde1910e75a8da01306ed6dcbc0dff219599d5dccaf6e7401`) and `ae2lf-neoforge-mc26.1.2-0.0.5.jar` (717,249 bytes, SHA-256 `663319c64ec9246743d64711d0d98a33ee018ac21221058badec8dfcf4a1d332`).
+- Release notes use the complete English 0.0.5 section followed by the complete Simplified Chinese section from `CHANGELOG.md`; no internal paths, hashes, commands, or deployment details appear in the public notes.
+- The release archive is [archive/2026-09-13-release-0.0.5/REPORT.md](archive/2026-09-13-release-0.0.5/REPORT.md). Historical sections retain their original test and deployment claims.
