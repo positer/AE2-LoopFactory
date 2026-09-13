@@ -638,8 +638,9 @@ Final native factory performance evidence is archived under `archive/2026-09-09-
 
 ### 2026-09-13 README rewrite
 
-- `README.md`: consolidated bilingual current project description. It identifies public release 0.0.5 and links historical validation to dated archive reports.
-- `archive/2026-09-13-readme-rewrite/REPORT.md`: records the documentation scope and confirms that this pass changed no code, artifact, PCL, save, dependency, or release metadata.
+- `README.md`: consolidated bilingual, long-lived project description. It describes product behavior, language, channel isolation, bulk logistics, editor input, recipe services, storage, compatibility boundaries, installation, documentation, and development layout without embedding a release number, local deployment path, or one-off validation result.
+- `archive/2026-09-13-readme-rewrite/REPORT.md`: records the stable documentation scope and confirms that this pass changed no code, artifact, PCL, save, dependency, or release metadata. Dated measurements and release details remain in their historical archive reports.
+- `archive/2026-09-13-readme-stable/REPORT.md`: final dated handoff record for the version-independent README and its retained evidence boundaries.
 
 ### 2026-09-13 public release 0.0.5
 
