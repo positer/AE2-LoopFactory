@@ -26,6 +26,10 @@ public final class CraftingRipperMenu extends PatternProviderMenu {
     @GuiSync(9) public int patternRows = 1;
     @GuiSync(10) public int firstPatternRow;
     @GuiSync(11) public int scrollAcknowledgement;
+    @GuiSync(12) public boolean networkAvailable;
+    @GuiSync(13) public boolean importingPatterns;
+    @GuiSync(14) public long importedPatterns;
+    private com.example.ae2lightoptimizer.block.RipperPatternImporter importer;
     private RipperPatternViewport viewport;
     private int requestedSequence;
     private int requestedRow;
@@ -33,6 +37,9 @@ public final class CraftingRipperMenu extends PatternProviderMenu {
     public record ScrollRequest(int row, int sequence) {}
     private static final appeng.menu.guisync.ClientActionKey<ScrollRequest> SCROLL =
             new appeng.menu.guisync.ClientActionKey<>("ripperScroll");
+
+    private static final appeng.menu.guisync.ClientActionKey<Void> IMPORT =
+            new appeng.menu.guisync.ClientActionKey<>("ripperImportPatterns");
 
     /** Called by the narrow native-constructor adapter before the subclass constructor body. */
     public appeng.api.inventories.InternalInventory createPatternViewport(appeng.helpers.patternprovider.PatternProviderLogic logic) {
@@ -52,6 +59,8 @@ public final class CraftingRipperMenu extends PatternProviderMenu {
                 net.minecraft.network.codec.ByteBufCodecs.VAR_INT, ScrollRequest::row,
                 net.minecraft.network.codec.ByteBufCodecs.VAR_INT, ScrollRequest::sequence, ScrollRequest::new), this::scroll);
 
+        registerClientAction(IMPORT, this::importPatterns);
+
         // Keep AE2's return inventory for compatibility, but expose no return slots on either menu side.
         for (var slot : getSlots(SlotSemantics.STORAGE)) {
             if (slot instanceof AppEngSlot aeSlot) aeSlot.setSlotEnabled(false);
@@ -61,6 +70,20 @@ public final class CraftingRipperMenu extends PatternProviderMenu {
             addSlot(new RestrictedInputSlot(RestrictedInputSlot.PlacableItemType.UPGRADES,
                     host.getUpgrades(), 0), SlotSemantics.UPGRADE);
         }
+    }
+
+    public void importPatterns() {
+        if (isClientSide()) { sendClientAction(IMPORT); return; }
+        if (importer != null || getPlayer().containerMenu != this || !stillValid(getPlayer())
+                || !host.getMainNode().isActive()) return;
+        importer = new com.example.ae2lightoptimizer.block.RipperPatternImporter(host, getPlayer(), getActionSource());
+        importedPatterns = 0;
+        importingPatterns = !importer.finished();
+        if (!importingPatterns) importer = null;
+    }
+    @Override public void removed(net.minecraft.world.entity.player.Player player) {
+        importer = null;
+        super.removed(player);
     }
 
     public appeng.api.upgrades.IUpgradeInventory getRipperUpgrades() {
@@ -95,6 +118,16 @@ public final class CraftingRipperMenu extends PatternProviderMenu {
     }
     @Override public void broadcastChanges() {
         if (isServerSide()) {
+            networkAvailable = !host.isRemoved() && host.getMainNode().isActive();
+            if (importer != null) {
+                if (!stillValid(getPlayer()) || getPlayer().containerMenu != this) importer = null;
+                else {
+                    importer.tick();
+                    importedPatterns = importer.moved();
+                    if (importer.finished()) importer = null;
+                }
+            }
+            importingPatterns = importer != null;
             loopCardInstalled = host.isLoopCardInstalled();
             int rows = host.getLogic().getPatternInv().size() / 9;
             // Keep physical slot identities stable when another viewer removes the tail.

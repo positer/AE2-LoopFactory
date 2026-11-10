@@ -740,3 +740,16 @@ Final native factory performance evidence is archived under `archive/2026-09-09-
 - `tools/factory-runtime-benchmark/README.md`：微基准用途与复现命令；`FactoryPerf.java` 构造固定纯 Java 工作负载；`benchmark.py` 提取 Git 基线、编译前后版本并输出分配与耗时 JSON。
 
 归档入口为 `../Minecraft Forge Workspace/archive/20261110-193404-ae2lf-factory-wrench/`；最终制品与 Git 标签以该归档的验收记录为准。
+
+## 2026-11-10 撕裂者导入按钮与验收结构
+
+- 两代 `block/RipperPatternImporter.java`：菜单持有的分批转移任务，枚举 ME 样板物品、原生 `PatternContainer` 和分子装配室的真实样板槽；检查当前网络、权限和库存身份后提取，在目标批处理内放入稳定空槽。源撕裂者按稀疏占用索引遍历，关闭菜单取消未提交工作。
+- 两代 `block/RipperPatternInventory.java`：增加占用槽索引快照供导入器使用，避免高索引稀疏库逐个扫描空槽。
+- 两代 `menu/CraftingRipperMenu.java`：注册服务器动作，同步网络状态、任务状态和已移动数量；每 tick 推进任务并沿用现有窗口同步。
+- 两代 `client/RipperImportButton.java`：原生图标按钮、向下箭头与中英文状态提示；`CraftingRipperScreen` 注册按钮并按服务器状态更新可用性。
+- 两代 `assets/ae2/screens/ae2lightoptimizer_crafting_ripper.json`：新增 `importPatterns`，位置为左 170、顶 24，不占用原有槽位；`lang` 与 `ae2guide` 说明真实转移和关闭中止行为。
+- `tools/generate_crafting_ripper_resources.py`：同步按钮布局和完整双语指南，GuideME 输出固定 UTF-8／LF。
+- 两代测试助手 `RipperImportFixture.java`：搭建真实 ME、隐藏供应器、供应器部件、高索引撕裂者、分子装配室和独立网络，验证三类配方、精确组件、来源守恒、分批上限、取消和继续。
+- 两代测试助手 `RipperImportClient.java`：通过生产按钮的鼠标处理发送真实菜单动作，检查实际 GUI 缩放，采集正常、悬停、进度、完成及离线界面。`ClientBootstrap` 将其接在动态样板验收后，启动器要求对应报告和全部截图。
+
+证据入口为 `../Minecraft Forge Workspace/archive/20261110-195356-ae2lf-ripper-import/`。产品 JAR 保留在两代 `build/libs/`；测试助手与截图作为证据保存，不进入产品资源包。

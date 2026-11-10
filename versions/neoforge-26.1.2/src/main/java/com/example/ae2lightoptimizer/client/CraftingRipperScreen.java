@@ -10,10 +10,12 @@ import net.minecraft.world.entity.player.Inventory;
 
 /** AE2 supplies the toolbar, priority submenu and native pattern rendering. */
 public final class CraftingRipperScreen extends PatternProviderScreen<CraftingRipperMenu> {
+    private final RipperImportButton importPatterns;
     private final appeng.client.gui.widgets.Scrollbar patternScroll = new appeng.client.gui.widgets.Scrollbar(appeng.client.gui.widgets.Scrollbar.BIG);
     public CraftingRipperScreen(CraftingRipperMenu menu, Inventory inventory, Component title, ScreenStyle style) {
         super(menu, inventory, title, style);
         widgets.add("patternScroll", patternScroll);
+        widgets.add("importPatterns", importPatterns = new RipperImportButton(menu));
         var existing = (com.example.ae2lightoptimizer.mixin.WidgetContainerAccessor) widgets;
         if (!existing.ae2lightoptimizer$getWidgets().containsKey("upgrades")
                 && !existing.ae2lightoptimizer$getCompositeWidgets().containsKey("upgrades")) {
@@ -48,6 +50,7 @@ public final class CraftingRipperScreen extends PatternProviderScreen<CraftingRi
 
     @Override protected void updateBeforeRender() {
         super.updateBeforeRender();
+        importPatterns.active = menu.networkAvailable && !menu.importingPatterns;
         patternScroll.setRange(0, Math.max(0, menu.patternRows - 4), 1);
         if (patternScroll.getCurrentScroll() != menu.requestedRow())
             menu.requestPatternRow(patternScroll.getCurrentScroll());

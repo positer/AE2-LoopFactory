@@ -72,6 +72,10 @@
       "top": 45,
       "width": 12,
       "height": 70
+    },
+    "importPatterns": {
+      "left": 170,
+      "top": 24
     }
   }
 }

@@ -51,6 +51,7 @@ public final class ClientBootstrap {
 
     public ClientBootstrap() {
         NeoForge.EVENT_BUS.addListener(ClientBootstrap::onClientTick);
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) -> RipperImportFixture.observe());
         LOG.info("AE2LO client probe bootstrap armed; only a brand-new {} world can be created", WORLD_PREFIX);
     }
 
@@ -97,6 +98,7 @@ public final class ClientBootstrap {
             if (minecraft.screen != null && minecraft.screen.getClass().getSimpleName().equals("CraftingRipperScreen")
                     && !CAPTURED.contains(UI_SCREENSHOT) && uiDelay > 0 && --uiDelay == 0) capture(UI_SCREENSHOT);
             if (CAPTURED.contains(UI_SCREENSHOT) && !DynamicPatternClient.tick(minecraft)) return;
+            if (CAPTURED.contains(UI_SCREENSHOT) && !RipperImportClient.tick(minecraft)) return;
             if (CAPTURED.contains(UI_SCREENSHOT) && Boolean.getBoolean("ae2lo.probe.autoExit")) {
                 advanceNormalShutdown(minecraft);
             }

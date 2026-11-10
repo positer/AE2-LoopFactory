@@ -52,6 +52,10 @@ For example, install a plank pattern and a stick pattern, then request sticks.
 The ripper validates both steps and consumes the available logs for the final
 sticks in one execution. Adding the ring terminal allows supported template
 growth chains to preserve their seed while delivering only the requested gain.
+
+## Import network patterns
+
+Click the down-arrow button beside the pattern area to move supported encoded patterns from ME storage and installed pattern slots on the same network, including other rippers. Processing, invalid and stale patterns stay in their source. Existing patterns in this ripper stay in place. Imports move the real items in batches; no patterns are created. Keep the screen open until import finishes. Closing the screen or losing the network stops further transfers; completed transfers remain in the ripper.
 """,
         """<BlockImage id="ae2lightoptimizer:crafting_ripper" scale="6" />
 
@@ -88,6 +92,10 @@ growth chains to preserve their seed while delivering only the requested gain.
 
 例如放入木板与木棍样板后请求木棍，撕裂者会检查两步配方并在一次执行中消耗原木、
 产出最终木棍。配合环解算终端执行受支持的模板增长链时，会保留种子，只交付所需净增长。
+
+## 导入网络样板
+
+点击样板区右侧的向下箭头按钮，可将 ME 存储和同网络设备样板槽中的有效样板移入撕裂者，也包括其他撕裂者内的样板。仅接收合成台、锻造台和切石机样板，加工、失效或无效样板留在原处；当前撕裂者内的样板保持原位。导入分批移动真实物品，不生成新样板。请保持界面打开直到完成；关闭界面或网络断开会停止后续转移，已完成的部分保留。
 """),
     "loop_card": (
         "Loop Card", "循环卡",
@@ -128,6 +136,10 @@ require a Loop Card; the card supplies automatic AE recharging.
 At zero AE charge the capacitor is unavailable until the cell is recharged.
 Legacy integer energy queries saturate at their API maximum while the real stored
 amount remains 64-bit; the newer energy interface reports long amounts directly.
+
+## 导入网络样板
+
+点击样板区右侧的向下箭头按钮，可将 ME 存储和同网络设备样板槽中的有效样板移入撕裂者，也包括其他撕裂者内的样板。仅接收合成台、锻造台和切石机样板，加工、失效或无效样板留在原处；当前撕裂者内的样板保持原位。导入分批移动真实物品，不生成新样板。请保持界面打开直到完成；关闭界面或网络断开会停止后续转移，已完成的部分保留。
 """,
         """<ItemImage id="ae2lightoptimizer:loop_card" scale="4" />
 
@@ -178,7 +190,8 @@ CRAFTING_RIPPER_SCREEN = {'includes': ['common/common.json', 'common/player_inve
           'interface_config': {'text': {'translate': 'gui.ae2.Patterns'}, 'position': {'left': 8, 'top': 34}},
           'player_inventory_title': {'text': {'translate': 'container.inventory'},
                                      'position': {'left': 8, 'top': 118}}},
- 'widgets': {'openPriority': {'left': 170, 'top': 0, 'width': 20, 'height': 20},
+ 'widgets': {'importPatterns': {'left': 170, 'top': 24},
+             'openPriority': {'left': 170, 'top': 0, 'width': 20, 'height': 20},
              'lockReason': {'left': 5, 'top': 15},
              'patternScroll': {'left': 176, 'top': 45, 'width': 12, 'height': 70}}}
 
@@ -241,6 +254,6 @@ for generation in ("1.21.1", "26.1.2"):
         for prefix, title, body in (("", english_title, english_body), ("_zh_cn/", chinese_title, chinese_body)):
             path = assets / f"ae2guide/{prefix}items-blocks-machines/{item}.md"
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(f"---\nnavigation:\n  parent: ae2:items-blocks-machines/items-blocks-machines-index.md\n"
+            path.write_bytes((f"---\nnavigation:\n  parent: ae2:items-blocks-machines/items-blocks-machines-index.md\n"
                 f"  title: {title}\n  icon: {MOD}:{item}\n  position: {904 if item == 'crafting_ripper' else 905}\n"
-                f"categories:\n- devices\nitem_ids:\n- {MOD}:{item}\n---\n\n# {title}\n\n{body}", encoding="utf-8")
+                f"categories:\n- devices\nitem_ids:\n- {MOD}:{item}\n---\n\n# {title}\n\n{body}").encode("utf-8"))

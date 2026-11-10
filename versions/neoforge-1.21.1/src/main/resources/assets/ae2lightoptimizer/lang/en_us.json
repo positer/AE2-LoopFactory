@@ -171,5 +171,12 @@
   "gui.ae2lightoptimizer.factory.waiting_transfer": "Waiting for resources or destination capacity",
   "gui.ae2lightoptimizer.factory.error.must_quantity": "must requires a positive quantity",
   "gui.ae2lightoptimizer.factory.error.output_range": "%s exceeds the recipe's %s outputs",
-  "gui.ae2lightoptimizer.factory.error.output_invalid": "Invalid recipe output %s"
+  "gui.ae2lightoptimizer.factory.error.output_invalid": "Invalid recipe output %s",
+  "gui.ae2lightoptimizer.ripper.import": "Import Network Patterns",
+  "gui.ae2lightoptimizer.ripper.import.sources": "Move patterns from ME storage and connected devices.",
+  "gui.ae2lightoptimizer.ripper.import.types": "Crafting, smithing and stonecutting patterns only.",
+  "gui.ae2lightoptimizer.ripper.import.close": "Closing this screen stops further imports.",
+  "gui.ae2lightoptimizer.ripper.import.offline": "Network offline or insufficient power.",
+  "gui.ae2lightoptimizer.ripper.import.running": "Importing: %s patterns moved",
+  "gui.ae2lightoptimizer.ripper.import.result": "%s patterns moved"
 }

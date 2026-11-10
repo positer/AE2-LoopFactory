@@ -56,3 +56,7 @@ For example, install a plank pattern and a stick pattern, then request sticks.
 The ripper validates both steps and consumes the available logs for the final
 sticks in one execution. Adding the ring terminal allows supported template
 growth chains to preserve their seed while delivering only the requested gain.
+
+## Import network patterns
+
+Click the down-arrow button beside the pattern area to move supported encoded patterns from ME storage and installed pattern slots on the same network, including other rippers. Processing, invalid and stale patterns stay in their source. Existing patterns in this ripper stay in place. Imports move the real items in batches; no patterns are created. Keep the screen open until import finishes. Closing the screen or losing the network stops further transfers; completed transfers remain in the ripper.

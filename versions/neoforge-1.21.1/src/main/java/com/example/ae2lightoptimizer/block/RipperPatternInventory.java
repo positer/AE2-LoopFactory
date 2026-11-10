@@ -45,6 +45,7 @@ public final class RipperPatternInventory extends BaseInternalInventory {
     @Override public void clear() {
         batch(() -> { stacks.clear(); dirty = true; });
     }
+    public List<Integer> occupiedSlots() { return List.copyOf(stacks.keySet()); }
     public List<ItemStack> nonEmptyStacks() { return List.copyOf(stacks.values()); }
     public void batch(Runnable operation) {
         batching++;

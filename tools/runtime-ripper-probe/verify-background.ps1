@@ -3,7 +3,9 @@ param(
     [Parameter(Mandatory=$true)][ValidateSet('template','channel_capacity','smithing','layered','core256m','catalog_audit','native_catalog','exact_components','pack_catalog','tool_components')][string]$Chain,
     [Parameter(Mandatory=$true)][ValidatePattern('^ripper-[A-Za-z0-9_.-]+$')][string]$EvidenceName,
     [string]$EvidenceRoot,
-    [switch]$PrepareOnly
+    [switch]$PrepareOnly,
+    [switch]$ValidateExisting,
+    [ValidatePattern('^[A-Za-z0-9][A-Za-z0-9_.-]*$')][string]$ValidationName
 )
 $ErrorActionPreference = 'Stop'
 $taskRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
@@ -37,7 +39,7 @@ function Get-ModSnapshot {
     }
 }
 function Read-PassingFixture([string]$Name) {
-    $report = Get-Content -Raw -LiteralPath (Join-Path $evidence $Name) | ConvertFrom-Json
+    $report = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $evidence $Name) | ConvertFrom-Json
     if ($report.passed -ne $true) { throw "Independent fixture did not pass: $Name" }
     return $report
 }
@@ -91,8 +93,145 @@ function Assert-RuntimeMatchesProduction {
     } finally { $archive.Dispose() }
 }
 
+function Assert-GameplayEvidence([string]$world) {
+    $report = Read-PassingFixture 'report.json'
+    if ($report.minecraft -ne $Generation -or $report.world -ne $world) { throw 'Report generation/world is not this run' }
+    $chainNames = @{channel_capacity='channel_capacity';template='template_growth';smithing='template_growth_then_netherite_pickaxe_smithing';layered='logs_planks_sticks_tool_and_template_growth_then_smithing';core256m='all_ten_core_tiers_crystal_growth_and_netherite_ingots';native_catalog='native_catalog_map_extension';exact_components='exact_components';catalog_audit='catalog_audit';pack_catalog='pack_catalog';tool_components='tool_components'}
+    if ($report.chain -ne $chainNames[$Chain]) { throw 'The requested chain is not the completed fixture' }
+    if ($report.ripperConfiguredIdleAEPerTick -ne 5) { throw 'Ripper idle drain did not remain 5 AE/t' }
+    $independentReports = @{
+        exact_components=@('exact-components-report.json');native_catalog=@('native-catalog-report.json','native-continuation-roundtrip.json');
+        pack_catalog=@('pack-catalog-report.json');tool_components=@('tool-components-report.json');catalog_audit=@('catalog-report.json')
+    }
+    if ($independentReports.ContainsKey($Chain)) {
+        foreach ($file in $independentReports[$Chain]) { $null = Read-PassingFixture $file }
+    }
+    if ($Chain -eq 'template' -or $Chain -eq 'channel_capacity') {
+        $null = Read-PassingFixture 'dynamic-patterns-report.json'
+        $null = Read-PassingFixture 'dynamic-pattern-ui.json'
+        $import = Read-PassingFixture 'pattern-import-report.json'
+        if ($import.expectedMoved -ne 309 -or $import.maxTransferredPerTick -gt 128 -or
+            $import.assemblerPhysicalPatternOnly -ne $true -or $import.exactComponentsConserved -ne $true -or $import.resumeConserved -ne $true -or
+            $import.closeCancelsUncommittedWork -ne $true -or $import.ui.offlineClickRejected -ne $true) {
+            throw 'Native pattern import/conservation/UI contract failed'
+        }
+        foreach ($state in @('en-normal-1x','en-hover-1x','zh-hover-1x','zh-complete-1x','en-hover-2x','running-2x','offline-2x','zh-hover-2x','restored')) {
+            if (-not (Test-Path -LiteralPath (Join-Path $evidence ("screenshots/ae2lo-ripper-import-$state.png")))) {
+                throw "Missing pattern import UI frame: $state"
+            }
+        }
+        foreach ($frame in @('ae2lo-ripper-bottom.png','ae2lo-ripper-after-bulk.png','ae2lo-ripper-pattern-access-high-slot.png')) {
+            if (-not (Test-Path -LiteralPath (Join-Path $evidence ('screenshots/' + $frame)))) { throw "Missing dynamic native frame: $frame" }
+        }
+    }
+    if ($Chain -eq 'channel_capacity') {
+        $capacity = Read-PassingFixture 'channel-capacity-report.json'
+        $requiredCapacityChecks=@('baseline_dense_32_active','baseline_adhoc_15_rejected','dense_40_active_over_old_face_limit','adhoc_16_including_optimizer_active','all_six_faces_verified','native_smart_visual_normalizes_40_of_64_to_20_of_32','adhoc_17_rejected_without_boost_oscillation','adhoc_recovers_after_excess_load_removed','configured_x2_mode_is_doubled_not_replaced','infinite_mode_unchanged','duplicate_optimizers_do_not_stack','removing_optimizer_restores_face_and_dense_limits','removing_optimizer_restores_adhoc_limit','reinstalling_optimizer_repaths_both_networks','split_load_grids_do_not_keep_stale_capacity','merged_network_restores_capacity')
+        foreach ($check in $requiredCapacityChecks) { if ($capacity.$check -ne $true) {throw "Missing native capacity check: $check"} }
+        foreach ($index in 0..5) {if ($capacity.("controller_face_${index}_64") -ne $true) {throw 'Not all six controller faces passed'}}
+        foreach ($index in @(1,2,7,8,12)) {if ($capacity.("independent_grid_unchanged_phase_$index") -ne $true) {throw 'Independent network isolation failed'}}
+        $crafting=Read-PassingFixture 'dynamic-patterns-report.json'
+        if ($capacity.duplicateStableServerTicks -lt 60 -or $crafting.originalOptimizerCpuOwnership -ne $true -or $report.channelOptimizerOnline -ne $true) {throw 'Stable duplicate election or original optimizer CPU ownership failed'}
+    }
+    if ($Chain -eq 'core256m') {
+        if ($report.scheduleOwner -ne 'RING_TERMINAL' -or $report.bothPlannerServicesOnline -ne $true -or
+            $report.run1.passed -ne $true -or $report.run1.nativeCpuTicks -ne 1 -or $report.run1.ripperCalls -ne 1 -or
+            $report.run1.isolatedExecutionAE -ne 50 -or $report.run1.sameExecutionTick -ne $true -or
+            $report.run1.after.core_256m -ne 3000 -or $report.run1.after.loop_crystal -ne 1) {
+            throw 'Core256M native CPU/fee/seed/output contract failed'
+        }
+    }
+    if ($Chain -eq 'exact_components') {
+        $exact = Read-PassingFixture 'exact-components-report.json'
+        if (@($exact.runs).Count -ne 2 -or @($exact.runs | Where-Object {
+            $_.passed -ne $true -or $_.outputFullKeyCount -ne 3000 -or $_.nativeCpuCalls -ne 1 -or
+            $_.ripperCalls -ne 1 -or $_.executionFeeAE -ne 50 -or $_.nativeCpuFinished -ne $true -or $_.fullInventoryExact -ne $true
+        }).Count -ne 0 -or $exact.runs[0].mode -ne 'manual' -or $exact.runs[1].mode -ne 'loop_card') {
+            throw 'Both 3000-copy exact component orders must pass'
+        }
+    }
+    if ($Chain -eq 'native_catalog') {
+        $native = Read-PassingFixture 'native-catalog-report.json'
+        $continuation = Read-PassingFixture 'native-continuation-roundtrip.json'
+        if ($native.validNewScaledMapCount -ne 3 -or $native.nativeCpuIdle -ne $true -or $native.nativeMultiTickProgressObserved -ne $true -or
+            $native.remainingSourceMaps -ne 0 -or $native.remainingPaper -ne 0 -or
+            $continuation.roundTripPerformed -ne $true -or $continuation.cpuRoundTripPerformed -ne $true -or
+            $continuation.completeCpuRoundTrip.passed -ne $true -or
+            $continuation.totalExecutionFeeAE -ne 50 -or -not (Test-Path -LiteralPath (Join-Path $evidence 'native-cpu-first-commit.nbt'))) {
+            throw 'Native map identities, CPU persistence or one-time fee contract failed'
+        }
+    }
+    foreach ($frame in @('ae2lo-ripper-after.png','ae2lo-ripper-ui.png')) {
+        $framePath = Join-Path $evidence ('screenshots/' + $frame)
+        if (-not (Test-Path -LiteralPath $framePath -PathType Leaf) -or (Get-Item -LiteralPath $framePath).Length -le 8) { throw "Missing native framebuffer: $frame" }
+    }
+    $hidden = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $evidence 'hidden-window-state.json') | ConvertFrom-Json
+    if ($Generation -eq '1.21.1' -and $hidden.shutdownBudgetHookApplied -ne $true) {
+        throw 'The production native shutdown Mixin did not transform the actual MinecraftServer class'
+    }
+    if ($hidden.clientTicksChecked -le 0 -or $hidden.visibleObservations -ne 0 -or $hidden.lastWindowVisible -ne 0 -or $hidden.normalStopObserved -ne $true) {
+        throw 'Hidden-window observation or final normal-stop evidence failed'
+    }
+    $shutdown = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $evidence 'client-shutdown.log')
+    $client = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $evidence 'client.log')
+    if ($shutdown -notmatch 'save_complete saved=true' -or $shutdown -notmatch 'disconnect_complete serverShutdown=true integratedServerPresent=false' -or
+        $shutdown -notmatch 'normal_stop_requested' -or $shutdown -match 'prepare_failed|disconnect_incomplete|prepare_refused' -or
+        $client -notmatch 'All chunks are saved' -or $client -notmatch 'Stopping' -or
+        $client -notmatch 'AE2LF background agent: GLFW creation forced invisible; show/focus disabled') {
+        throw 'Missing complete native save, disconnect, hidden-agent or process shutdown evidence'
+    }
+    $summary['hiddenWindow'] = $hidden
+    $summary['gameplayPassed'] = $true
+    $summary['normalShutdown'] = $true
+    $summary['status'] = 'passed'
+}
+
 Assert-WorkspacePath $runMods
 if (-not $evidence.StartsWith($resolvedEvidenceRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw 'Evidence must remain within its selected root' }
+if ($ValidateExisting) {
+    if ($PrepareOnly -or -not $ValidationName) { throw 'ValidateExisting requires a unique ValidationName and cannot prepare/launch a client' }
+    if (-not (Test-Path -LiteralPath $evidence -PathType Container)) { throw 'Existing evidence directory not found' }
+    $validation = Join-Path $resolvedEvidenceRoot "$EvidenceName-validation-$ValidationName"
+    if (Test-Path -LiteralPath $validation) { throw 'Refusing to overwrite validation evidence' }
+    function Get-EvidenceSnapshot {
+        Get-ChildItem -LiteralPath $evidence -File -Recurse | Sort-Object FullName | ForEach-Object {
+            [ordered]@{name=$_.FullName.Substring($evidence.Length + 1);sha256=(Get-Sha256 $_.FullName)}
+        }
+    }
+    $beforeEvidence = @(Get-EvidenceSnapshot)
+    $artifact = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $evidence 'artifact.json') | ConvertFrom-Json
+    $original = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $evidence 'background-summary.json') | ConvertFrom-Json
+    if ($original.exitCode -ne 0 -or $original.runModsRestored -ne $true -or $original.generation -ne $Generation -or $original.chain -ne $Chain) {
+        throw 'Original run did not finish normally and restore its mods for this generation/chain'
+    }
+    if ((Get-Sha256 $production) -ne $artifact.productionSha256 -or (Get-Sha256 $helper) -ne $artifact.helperSha256) { throw 'Original tested artifacts differ from current artifacts' }
+    $compatibility = Assert-HelperMatchesProduction
+    $identity = Assert-RuntimeMatchesProduction
+    $initialMods = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $evidence 'run-mods-before.json') | ConvertFrom-Json
+    $restoredMods = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $evidence 'run-mods-after.json') | ConvertFrom-Json
+    $actualMods = @(Get-ModSnapshot)
+    foreach ($candidate in @($restoredMods, $actualMods)) {
+        if ($candidate.Count -ne $initialMods.Count) { throw 'Restored/current mod inventory count differs' }
+        foreach ($entry in $initialMods) {
+            $matches = @($candidate | Where-Object { $_.name -eq $entry.name -and $_.bytes -eq $entry.bytes -and $_.sha256 -eq $entry.sha256 })
+            if ($matches.Count -ne 1) { throw "Restored/current mod inventory differs: $($entry.name)" }
+        }
+    }
+    $summary = [ordered]@{generation=$Generation;chain=$Chain;status='running';sourceEvidence=$evidence;originalStatus=$original.status;
+        productionSha256=$artifact.productionSha256;helperSha256=$artifact.helperSha256;helperCompatibility=$compatibility;runtimeIdentity=$identity;
+        clientStarted=$false;runModsChanged=$false;runModsRestored=$true;exitCode=0}
+    Assert-GameplayEvidence $original.world
+    $afterEvidence = @(Get-EvidenceSnapshot)
+    if (($beforeEvidence | ConvertTo-Json -Depth 5 -Compress) -ne ($afterEvidence | ConvertTo-Json -Depth 5 -Compress)) { throw 'Read-only validation changed original evidence' }
+    $summary['originalEvidenceChanged'] = $false
+    New-Item -ItemType Directory -Path $validation | Out-Null
+    foreach ($item in @(@{name='summary.json';value=$summary},@{name='evidence-before.json';value=$beforeEvidence},@{name='evidence-after.json';value=$afterEvidence})) {
+        [IO.File]::WriteAllText((Join-Path $validation $item.name),(ConvertTo-Json -InputObject $item.value -Depth 20),(New-Object Text.UTF8Encoding($false)))
+    }
+    Write-Output ($summary | ConvertTo-Json -Depth 8)
+    return
+}
+if ($ValidationName) { throw 'ValidationName is only valid with ValidateExisting' }
 if (Test-Path -LiteralPath $evidence) { throw "Refusing to overwrite evidence: $evidence" }
 foreach ($required in @($helper,$agent,$production)) {
     if (-not (Test-Path -LiteralPath $required -PathType Leaf)) { throw "Build the isolated artifacts before launching: $required" }
@@ -165,85 +304,7 @@ try {
     if ((Get-Sha256 $helper) -ne $helperHash -or (Get-Sha256 $staged) -ne $helperHash) { throw 'Ripper helper changed during the run' }
     $summary['runtimeIdentityAfter'] = Assert-RuntimeMatchesProduction
 
-    $report = Read-PassingFixture 'report.json'
-    if ($report.minecraft -ne $Generation -or $report.world -ne $world) { throw 'Report generation/world is not this run' }
-    $chainNames = @{channel_capacity='channel_capacity';template='template_growth';smithing='template_growth_then_netherite_pickaxe_smithing';layered='logs_planks_sticks_tool_and_template_growth_then_smithing';core256m='all_ten_core_tiers_crystal_growth_and_netherite_ingots';native_catalog='native_catalog_map_extension';exact_components='exact_components';catalog_audit='catalog_audit';pack_catalog='pack_catalog';tool_components='tool_components'}
-    if ($report.chain -ne $chainNames[$Chain]) { throw 'The requested chain is not the completed fixture' }
-    if ($report.ripperConfiguredIdleAEPerTick -ne 5) { throw 'Ripper idle drain did not remain 5 AE/t' }
-    $independentReports = @{
-        exact_components=@('exact-components-report.json');native_catalog=@('native-catalog-report.json','native-continuation-roundtrip.json');
-        pack_catalog=@('pack-catalog-report.json');tool_components=@('tool-components-report.json');catalog_audit=@('catalog-report.json')
-    }
-    if ($independentReports.ContainsKey($Chain)) {
-        foreach ($file in $independentReports[$Chain]) { $null = Read-PassingFixture $file }
-    }
-    if ($Chain -eq 'template' -or $Chain -eq 'channel_capacity') {
-        $null = Read-PassingFixture 'dynamic-patterns-report.json'
-        $null = Read-PassingFixture 'dynamic-pattern-ui.json'
-        foreach ($frame in @('ae2lo-ripper-bottom.png','ae2lo-ripper-after-bulk.png','ae2lo-ripper-pattern-access-high-slot.png')) {
-            if (-not (Test-Path -LiteralPath (Join-Path $evidence ('screenshots/' + $frame)))) { throw "Missing dynamic native frame: $frame" }
-        }
-    }
-    if ($Chain -eq 'channel_capacity') {
-        $capacity = Read-PassingFixture 'channel-capacity-report.json'
-        $requiredCapacityChecks=@('baseline_dense_32_active','baseline_adhoc_15_rejected','dense_40_active_over_old_face_limit','adhoc_16_including_optimizer_active','all_six_faces_verified','native_smart_visual_normalizes_40_of_64_to_20_of_32','adhoc_17_rejected_without_boost_oscillation','adhoc_recovers_after_excess_load_removed','configured_x2_mode_is_doubled_not_replaced','infinite_mode_unchanged','duplicate_optimizers_do_not_stack','removing_optimizer_restores_face_and_dense_limits','removing_optimizer_restores_adhoc_limit','reinstalling_optimizer_repaths_both_networks','split_load_grids_do_not_keep_stale_capacity','merged_network_restores_capacity')
-        foreach ($check in $requiredCapacityChecks) { if ($capacity.$check -ne $true) {throw "Missing native capacity check: $check"} }
-        foreach ($index in 0..5) {if ($capacity.("controller_face_${index}_64") -ne $true) {throw 'Not all six controller faces passed'}}
-        foreach ($index in @(1,2,7,8,12)) {if ($capacity.("independent_grid_unchanged_phase_$index") -ne $true) {throw 'Independent network isolation failed'}}
-        $crafting=Read-PassingFixture 'dynamic-patterns-report.json'
-        if ($capacity.duplicateStableServerTicks -lt 60 -or $crafting.originalOptimizerCpuOwnership -ne $true -or $report.channelOptimizerOnline -ne $true) {throw 'Stable duplicate election or original optimizer CPU ownership failed'}
-    }
-    if ($Chain -eq 'core256m') {
-        if ($report.scheduleOwner -ne 'RING_TERMINAL' -or $report.bothPlannerServicesOnline -ne $true -or
-            $report.run1.passed -ne $true -or $report.run1.nativeCpuTicks -ne 1 -or $report.run1.ripperCalls -ne 1 -or
-            $report.run1.isolatedExecutionAE -ne 50 -or $report.run1.sameExecutionTick -ne $true -or
-            $report.run1.after.core_256m -ne 3000 -or $report.run1.after.loop_crystal -ne 1) {
-            throw 'Core256M native CPU/fee/seed/output contract failed'
-        }
-    }
-    if ($Chain -eq 'exact_components') {
-        $exact = Read-PassingFixture 'exact-components-report.json'
-        if (@($exact.runs).Count -ne 2 -or @($exact.runs | Where-Object {
-            $_.passed -ne $true -or $_.outputFullKeyCount -ne 3000 -or $_.nativeCpuCalls -ne 1 -or
-            $_.ripperCalls -ne 1 -or $_.executionFeeAE -ne 50 -or $_.nativeCpuFinished -ne $true -or $_.fullInventoryExact -ne $true
-        }).Count -ne 0 -or $exact.runs[0].mode -ne 'manual' -or $exact.runs[1].mode -ne 'loop_card') {
-            throw 'Both 3000-copy exact component orders must pass'
-        }
-    }
-    if ($Chain -eq 'native_catalog') {
-        $native = Read-PassingFixture 'native-catalog-report.json'
-        $continuation = Read-PassingFixture 'native-continuation-roundtrip.json'
-        if ($native.validNewScaledMapCount -ne 3 -or $native.nativeCpuIdle -ne $true -or $native.nativeMultiTickProgressObserved -ne $true -or
-            $native.remainingSourceMaps -ne 0 -or $native.remainingPaper -ne 0 -or
-            $continuation.roundTripPerformed -ne $true -or $continuation.cpuRoundTripPerformed -ne $true -or
-            $continuation.completeCpuRoundTrip.passed -ne $true -or
-            $continuation.totalExecutionFeeAE -ne 50 -or -not (Test-Path -LiteralPath (Join-Path $evidence 'native-cpu-first-commit.nbt'))) {
-            throw 'Native map identities, CPU persistence or one-time fee contract failed'
-        }
-    }
-    foreach ($frame in @('ae2lo-ripper-after.png','ae2lo-ripper-ui.png')) {
-        $framePath = Join-Path $evidence ('screenshots/' + $frame)
-        if (-not (Test-Path -LiteralPath $framePath -PathType Leaf) -or (Get-Item -LiteralPath $framePath).Length -le 8) { throw "Missing native framebuffer: $frame" }
-    }
-    $hidden = Get-Content -Raw -LiteralPath (Join-Path $evidence 'hidden-window-state.json') | ConvertFrom-Json
-    if ($Generation -eq '1.21.1' -and $hidden.shutdownBudgetHookApplied -ne $true) {
-        throw 'The production native shutdown Mixin did not transform the actual MinecraftServer class'
-    }
-    if ($hidden.clientTicksChecked -le 0 -or $hidden.visibleObservations -ne 0 -or $hidden.lastWindowVisible -ne 0 -or $hidden.normalStopObserved -ne $true) {
-        throw 'Hidden-window observation or final normal-stop evidence failed'
-    }
-    $shutdown = Get-Content -Raw -LiteralPath (Join-Path $evidence 'client-shutdown.log')
-    $client = Get-Content -Raw -LiteralPath (Join-Path $evidence 'client.log')
-    if ($shutdown -notmatch 'save_complete saved=true' -or $shutdown -notmatch 'disconnect_complete serverShutdown=true integratedServerPresent=false' -or
-        $shutdown -notmatch 'normal_stop_requested' -or $shutdown -match 'prepare_failed|disconnect_incomplete|prepare_refused' -or
-        $client -notmatch 'All chunks are saved' -or $client -notmatch 'Stopping' -or
-        $client -notmatch 'AE2LF background agent: GLFW creation forced invisible; show/focus disabled') {
-        throw 'Missing complete native save, disconnect, hidden-agent or process shutdown evidence'
-    }
-    $summary['hiddenWindow'] = $hidden
-    $summary['gameplayPassed'] = $true
-    $summary['normalShutdown'] = $true
-    $summary['status'] = 'passed'
+    Assert-GameplayEvidence $world
 } catch {
     $originalFailure = $_
     $summary['status'] = 'failed'
