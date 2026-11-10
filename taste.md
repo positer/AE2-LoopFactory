@@ -201,3 +201,11 @@ Recipe output references: O1, O2, ... select native recipe outputs in order, ind
 - 上传页使用 `BackgroundGenerator` 与 `AE2Button`，配方切换用横向 `TabButton`；保留服务器列表、UUID、原生编辑器与完整名称提示。
 
 - 1.21.1 的 `Screen.render` 会先执行背景模糊；自定义窗口与标题必须放在 `renderBackground` 的原生背景之后。渲染通过与视觉清晰是两项验收，保留模糊反例并比较原生边框像素。
+
+
+## 2026-11-10 编码终端 UI 对齐
+
+- 原版 `crafting_grid_title` 是所有编码模式共用的“样板编码”标题，不能在仅加工的面板上隐藏。
+- 编辑页复用原生标题与背包锚点（top 6；left 8；bottom 84／26／95），避免另写偏移制造风格漂移。
+- 打开代码页沿用原生工作台图标；返回仅加工配方页使用加工图标。22px 水平页签与边框重叠 3px，并与编辑区域对齐。
+- UI 对齐需与同语言下实际打开的原版页面比较槽位和标题像素，不能只证明继承了同一个 Screen。

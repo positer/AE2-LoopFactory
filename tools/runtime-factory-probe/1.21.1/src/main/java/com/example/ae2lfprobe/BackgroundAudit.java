@@ -578,6 +578,41 @@ public final class BackgroundAudit {
                 "stress-world-transfers", "topology-service-uniqueness", "terminal-runtime-sfm",
                 "induction-card-cache", "compatibility-registry", "complex-factory-flows",
                 "parallel-native-orders", "native-transaction-capabilities").contains(step.id));
+        if (Boolean.getBoolean("ae2lf.probe.panelUiOnly")) {
+            steps.removeIf(step -> !(step.id.startsWith("ui-native-recipe-")
+                    || step.id.startsWith("ui-factory-panel-") || step.id.startsWith("ui-debug-")
+                    || step.id.startsWith("ui-invalid-upload") || java.util.Set.of("ui-invalid-output-reference",
+                    "ui-invalid-recipe-loop", "ui-sfm-error-zh-cn", "part-factory-panel-blue",
+                    "part-factory-panel-red", "language-en-us").contains(step.id)));
+            for (String locale : java.util.List.of("en_us", "zh_cn")) {
+                add("panel-align-language-"+locale, () -> { server(p -> p.closeContainer()); language(locale); },
+                        "", () -> languageReload.isDone() && mc.getOverlay() == null);
+                add("panel-align-native-open-"+locale, () -> server(p -> {
+                    p.closeContainer();
+                    var part = appeng.api.parts.PartHelper.getPart(p.serverLevel(), new BlockPos(3,100,0), net.minecraft.core.Direction.SOUTH);
+                    appeng.menu.MenuOpener.open(appeng.menu.me.items.PatternEncodingTermMenu.TYPE, p,
+                            appeng.menu.locator.MenuLocators.forPart((appeng.parts.AEBasePart)part));
+                }), "PatternEncodingTermScreen", () -> true);
+                add("panel-align-native-processing-"+locale, () ->
+                        ((appeng.menu.me.items.PatternEncodingTermMenu)mc.player.containerMenu).setMode(appeng.parts.encoding.EncodingMode.PROCESSING),
+                        "PatternEncodingTermScreen", () -> ((appeng.menu.me.items.PatternEncodingTermMenu)mc.player.containerMenu).getMode()==appeng.parts.encoding.EncodingMode.PROCESSING);
+                add("panel-align-factory-recipe-"+locale, () -> server(p -> {
+                    p.closeContainer();
+                    var part = appeng.api.parts.PartHelper.getPart(p.serverLevel(), new BlockPos(2,100,1), net.minecraft.core.Direction.SOUTH);
+                    appeng.menu.MenuOpener.open(FactoryPanelRecipeMenu.TYPE.get(), p,
+                            appeng.menu.locator.MenuLocators.forPart((appeng.parts.AEBasePart)part));
+                }), "FactoryPanelRecipeScreen", () -> ((FactoryPanelRecipeMenu)mc.player.containerMenu).getMode()==appeng.parts.encoding.EncodingMode.PROCESSING);
+                add("panel-align-factory-code-"+locale, () -> ((FactoryPanelRecipeMenu)mc.player.containerMenu).codePage(),
+                        "FactoryEditorScreen", () -> ((FactoryEditorMenu)mc.player.containerMenu).isPanel());
+                add("panel-align-return-recipe-"+locale, () -> {
+                    var label = Component.translatable("gui.ae2lightoptimizer.factory.recipe_page").getString();
+                    var tab = mc.screen.children().stream().filter(widget -> widget instanceof appeng.client.gui.widgets.TabButton
+                            && ((appeng.client.gui.widgets.TabButton)widget).getMessage().getString().equals(label))
+                            .map(widget -> (appeng.client.gui.widgets.TabButton)widget).findFirst().orElseThrow();
+                    tab.onPress();
+                }, "FactoryPanelRecipeScreen", () -> mc.player.containerMenu instanceof FactoryPanelRecipeMenu);
+            }
+        }
         started=true;
     }
     public static void tick(Minecraft client) {
@@ -637,9 +672,16 @@ public final class BackgroundAudit {
                 row.put("windowVisible",org.lwjgl.glfw.GLFW.glfwGetWindowAttrib(mc.getWindow().getWindow(),org.lwjgl.glfw.GLFW.GLFW_VISIBLE));
                 if(mc.screen!=null) {
                     row.put("width",mc.screen.width);row.put("height",mc.screen.height);
+                    if (Boolean.getBoolean("ae2lf.probe.panelUiOnly") && mc.screen instanceof appeng.client.gui.AEBaseScreen<?> ae) {
+                        row.put("gui", Map.of("left", ae.getGuiLeft(), "top", ae.getGuiTop(), "width", ae.getXSize(), "height", ae.getYSize()));
+                        row.put("slots", ae.getMenu().slots.stream().filter(slot -> slot.isActive()).map(slot ->
+                                Map.of("semantic", String.valueOf(ae.getMenu().getSlotSemantic(slot)),
+                                        "x", slot.x, "y", slot.y)).toList());
+                    }
+
                     row.put("widgets",mc.screen.children().stream().filter(x->x instanceof net.minecraft.client.gui.components.AbstractWidget).map(x->{
                         var w=(net.minecraft.client.gui.components.AbstractWidget)x;
-                        return Map.of("class",x.getClass().getSimpleName(),"x",w.getX(),"y",w.getY(),"width",w.getWidth(),"height",w.getHeight(),"visible",w.visible);
+                        return Map.of("class",x.getClass().getSimpleName(),"x",w.getX(),"y",w.getY(),"width",w.getWidth(),"height",w.getHeight(),"visible",w.visible,"label",w.getMessage().getString(),"active",w.active);
                     }).toList());
                 }
                 results.add(row);capture(step.id);captured=true;write();

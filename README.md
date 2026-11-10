@@ -122,7 +122,7 @@ Create, Mekanism, Applied Flux, JEI, EMI, and other integrations are optional. W
 
 - [`docs/loop-factory-channels.md`](docs/loop-factory-channels.md): channel scope, function inheritance, quotas, and physical-inventory boundaries.
 - [`docs/loop-factory-highlighting.md`](docs/loop-factory-highlighting.md): syntax highlighting, comments, caret behavior, and editor range rules.
-- [`docs/ae2-visual-style.md`](docs/ae2-visual-style.md)：方块、面板、原生界面及双版本资源生成规范。
+- [`docs/ae2-visual-style.md`](docs/ae2-visual-style.md)：方块、面板、原生界面、编码终端 UI 对齐及双版本资源生成规范。
 - Generation-specific native capability references under [`docs`](docs/).
 - AE2 GuideME pages shipped with each adapter: in-game reference for blocks, patterns, language examples, and supported boundaries.
 - [`CHANGELOG.md`](CHANGELOG.md): release-specific additions, fixes, and compatibility notes.
@@ -271,7 +271,7 @@ Create、Mekanism、Applied Flux、JEI、EMI 及其他联动均为可选。缺�
 
 - [`docs/loop-factory-channels.md`](docs/loop-factory-channels.md)：channel 作用域、函数继承、额度和真实库存边界。
 - [`docs/loop-factory-highlighting.md`](docs/loop-factory-highlighting.md)：代码高亮、注释、光标行为和编辑器范围规则。
-- [`docs/ae2-visual-style.md`](docs/ae2-visual-style.md)：方块、面板、原生界面及双版本资源生成规范。
+- [`docs/ae2-visual-style.md`](docs/ae2-visual-style.md)：方块、面板、原生界面、编码终端 UI 对齐及双版本资源生成规范。
 - [`docs`](docs/)：各世代原生能力说明。
 - 各适配层随包提供的 AE2 GuideME 页面：方块、样板、语言示例和支持边界的游戏内参考。
 - [`CHANGELOG.md`](CHANGELOG.md)：逐版本新增内容、修复和兼容说明。

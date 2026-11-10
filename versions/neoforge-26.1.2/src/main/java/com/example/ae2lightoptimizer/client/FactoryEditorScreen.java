@@ -23,7 +23,7 @@ public final class FactoryEditorScreen extends AEBaseScreen<FactoryEditorMenu> {
     public FactoryEditorScreen(FactoryEditorMenu menu, Inventory inventory, Component title, ScreenStyle style) {
         super(menu, inventory, title, style);
         if(menu.isPanel()) {
-            var recipeTab = new appeng.client.gui.widgets.TabButton(appeng.util.Icon.TAB_CRAFTING,
+            var recipeTab = new appeng.client.gui.widgets.TabButton(appeng.util.Icon.TAB_PROCESSING,
                     Component.translatable("gui.ae2lightoptimizer.factory.recipe_page"), button -> menu.recipePage());
             recipeTab.setStyle(appeng.client.gui.widgets.TabButton.Style.HORIZONTAL);
             widgets.add("recipePage", recipeTab);

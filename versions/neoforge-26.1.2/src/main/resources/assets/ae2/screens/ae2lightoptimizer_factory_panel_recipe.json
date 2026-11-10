@@ -32,14 +32,6 @@
       "bottom": -1000
     }
   },
-  "text": {
-    "crafting_grid_title": {
-      "position": {
-        "left": -1000,
-        "bottom": -1000
-      }
-    }
-  },
   "widgets": {
     "factoryCodePage": {
       "left": 173,

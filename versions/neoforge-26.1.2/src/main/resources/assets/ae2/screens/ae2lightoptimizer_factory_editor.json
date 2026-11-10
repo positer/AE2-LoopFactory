@@ -11,16 +11,6 @@
     "AE2LF_FACTORY_PATTERN": {
       "left": 334,
       "top": 8
-    },
-    "PLAYER_INVENTORY": {
-      "left": 100,
-      "top": 154,
-      "grid": "BREAK_AFTER_9COLS"
-    },
-    "PLAYER_HOTBAR": {
-      "left": 100,
-      "top": 212,
-      "grid": "HORIZONTAL"
     }
   },
   "text": {
@@ -30,7 +20,7 @@
       },
       "position": {
         "left": 8,
-        "top": 12
+        "top": 6
       }
     },
     "status": {
@@ -38,15 +28,6 @@
       "position": {
         "left": 8,
         "top": 132
-      }
-    },
-    "player_inventory_title": {
-      "text": {
-        "translate": "container.inventory"
-      },
-      "position": {
-        "left": 100,
-        "top": 143
       }
     }
   },
@@ -58,8 +39,8 @@
       "height": 20
     },
     "recipePage": {
-      "left": 360,
-      "top": 0,
+      "left": 357,
+      "top": 30,
       "width": 22,
       "height": 22
     },

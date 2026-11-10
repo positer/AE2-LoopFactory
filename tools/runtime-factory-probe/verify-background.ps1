@@ -6,6 +6,7 @@ param(
     [ValidatePattern('^[A-Za-z0-9][A-Za-z0-9_.-]*$')][string]$ValidationName,
     [switch]$VisualOnly,
     [switch]$PanelVisualOnly,
+    [switch]$PanelUiOnly,
     [switch]$GroupOnly,
     [switch]$GuideOnly,
     [switch]$UiOnly,
@@ -38,7 +39,7 @@ param(
     [ValidateRange(20,100)][int]$TickRate=20
 )
 $ErrorActionPreference='Stop'
-$exclusiveModes=@($VisualOnly,$StyleOnly,$PanelVisualOnly,$GroupOnly,$GuideOnly,$UiOnly,$MekOnly,$NativeOnly,$ParserOnly,$AddonCompat,$ChannelOnly,$RecipeSetOnly,$DispatchOnly,$HugeOnly,$RecoveryOnly,$ExtremeOnly,$ChunkOnly,$IdInsertionOnly) | Where-Object { $_ }
+$exclusiveModes=@($VisualOnly,$StyleOnly,$PanelUiOnly,$PanelVisualOnly,$GroupOnly,$GuideOnly,$UiOnly,$MekOnly,$NativeOnly,$ParserOnly,$AddonCompat,$ChannelOnly,$RecipeSetOnly,$DispatchOnly,$HugeOnly,$RecoveryOnly,$ExtremeOnly,$ChunkOnly,$IdInsertionOnly) | Where-Object { $_ }
 if(@($exclusiveModes).Count -gt 1){throw 'Choose only one exclusive audit mode; combined filters can silently remove required steps'}
 if($ChunkLifecycle -and @($exclusiveModes).Count -gt 0 -and -not $ChunkOnly){throw 'ChunkLifecycle augments the full audit; use ChunkOnly for the independent chunk lifecycle scene'}
 if(($MekOnly -or $AddonCompat) -and $Generation -ne '1.21.1'){throw 'MEK and addon fixtures are isolated to 1.21.1'}
@@ -59,7 +60,7 @@ function Assert-RuntimeIdentity([string]$Stage,[string]$OutputDirectory=$reportP
     if($LASTEXITCODE -ne 0){throw "ModDev main classes/resources do not match the production JAR ($Stage); see runtime-identity-$Stage.json"}
 }
 function Assert-BulkReport([string]$Name,[int]$Batches,[int]$OutputPerBatch){
-    $bulk=Get-Content -Raw -LiteralPath (Join-Path $reportPath $Name) | ConvertFrom-Json
+    $bulk=Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath $Name) | ConvertFrom-Json
     if($bulk.status -ne 'passed' -or @($bulk.orders).Count -ne 3 -or $bulk.targetBatchesPerOrder -ne $Batches -or $bulk.configuredTickRate -ne $TickRate -or $bulk.peakJobs -ne 16){throw "Bulk target/concurrency mismatch: $Name"}
     if(@($bulk.orders | Where-Object {$_.batches -ne $Batches -or $_.admitted -ne $Batches -or $_.completed -ne $Batches -or $_.active -ne 0 -or $_.output -ne $Batches*$OutputPerBatch}).Count -gt 0){throw "Bulk per-order conservation or completion mismatch: $Name"}
 }
@@ -104,12 +105,12 @@ function Invoke-ExistingValidation {
         $beforeFiles=@(Get-EvidenceManifest)
         if($beforeFiles.Count -eq 0){throw 'Existing evidence is empty'}
         Write-ValidationJson 'original-manifest-before.json' $beforeFiles
-        $originalScale=Get-Content -Raw -LiteralPath (Join-Path $reportPath 'requested-scale.json') | ConvertFrom-Json
+        $originalScale=Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath 'requested-scale.json') | ConvertFrom-Json
         if(@($originalScale.PSObject.Properties).Count -ne $requestedScale.Count -or @(Compare-Object @($originalScale.PSObject.Properties.Name) @($requestedScale.Keys)).Count -ne 0){throw 'Original requested-scale keys differ from the supplied scale'}
         foreach($entry in $requestedScale.GetEnumerator()) {
             if([string]$originalScale.($entry.Key) -cne [string]$entry.Value){throw "Original requested-scale differs from supplied value: $($entry.Key)"}
         }
-        $originalAudit=Get-Content -Raw -LiteralPath (Join-Path $reportPath 'ui-item-block-audit.json') | ConvertFrom-Json
+        $originalAudit=Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath 'ui-item-block-audit.json') | ConvertFrom-Json
         $summary.completedScenes=@($originalAudit.results).Count
         $modeValues=[ordered]@{
             visualOnly=[bool]$VisualOnly;panelVisualOnly=[bool]$PanelVisualOnly;groupOnly=[bool]$GroupOnly;guideOnly=[bool]$GuideOnly;uiOnly=[bool]$UiOnly
@@ -121,25 +122,26 @@ function Invoke-ExistingValidation {
             chunkLifecycle=([bool]$ChunkLifecycle -or [bool]$ChunkOnly);chunkOnly=[bool]$ChunkOnly;idInsertionOnly=[bool]$IdInsertionOnly
         }
         if($StyleOnly){$modeValues.styleOnly=$true}
+        if($PanelUiOnly){$modeValues.panelUiOnly=$true}
         foreach($entry in $modeValues.GetEnumerator()) {
             if($originalAudit.probeProperties.('ae2lf.probe.'+$entry.Key) -cne ([string]$entry.Value).ToLowerInvariant()){throw "Original runtime mode differs from supplied flags: $($entry.Key)"}
         }
         if($originalAudit.probeProperties.'ae2lf.probe.viewerMode' -cne $IdInsertionViewer){throw 'Original runtime viewer mode differs'}
         foreach($requiredTrue in @('background','fullAudit','blocking')){if($originalAudit.probeProperties.('ae2lf.probe.'+$requiredTrue) -cne 'true'){throw "Missing original runtime property: $requiredTrue"}}
         if([IO.Path]::GetFullPath($originalAudit.probeProperties.'ae2lf.probe.reportDir') -ne [IO.Path]::GetFullPath($reportPath)){throw 'Runtime report directory differs from the selected original evidence'}
-        $nativeExit=Get-Content -Raw -LiteralPath (Join-Path $reportPath 'process-exit.json') | ConvertFrom-Json
+        $nativeExit=Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath 'process-exit.json') | ConvertFrom-Json
         $summary.nativeExitCode=$nativeExit.exitCode
         if($null -eq $nativeExit.exitCode -or $nativeExit.exitCode -ne 0 -or -not $nativeExit.finishedAt){throw 'Original native process did not finish with exit code zero'}
         if(Test-Path -LiteralPath (Join-Path $reportPath 'shutdown-timeout.txt')){throw 'Original native shutdown timed out'}
-        if((Get-Content -Raw -LiteralPath (Join-Path $reportPath 'normal-shutdown.txt')).Trim() -cne 'Integrated server fully stopped; requesting normal process exit'){throw 'Original normal shutdown marker is absent or invalid'}
+        if((Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath 'normal-shutdown.txt')).Trim() -cne 'Integrated server fully stopped; requesting normal process exit'){throw 'Original normal shutdown marker is absent or invalid'}
         $summary.productionSha256=(Get-FileHash -LiteralPath $productionJar -Algorithm SHA256).Hash.ToLowerInvariant()
         $summary.helperSha256=(Get-FileHash -LiteralPath $helperSource -Algorithm SHA256).Hash.ToLowerInvariant()
-        $artifact=Get-Content -Raw -LiteralPath (Join-Path $reportPath 'artifact.json') | ConvertFrom-Json
+        $artifact=Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath 'artifact.json') | ConvertFrom-Json
         if($artifact.generation -cne $Generation -or $artifact.productionSha256 -cne $summary.productionSha256 -or $artifact.helperSha256 -cne $summary.helperSha256){throw 'Original artifact does not match the current production and helper JAR hashes'}
         Assert-RuntimeIdentity 'current' $validationPath
-        $currentIdentity=Get-Content -Raw -LiteralPath (Join-Path $validationPath 'runtime-identity-current.json') | ConvertFrom-Json
+        $currentIdentity=Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $validationPath 'runtime-identity-current.json') | ConvertFrom-Json
         foreach($stage in @('before','after')) {
-            $identity=Get-Content -Raw -LiteralPath (Join-Path $reportPath "runtime-identity-$stage.json") | ConvertFrom-Json
+            $identity=Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath "runtime-identity-$stage.json") | ConvertFrom-Json
             if($identity.status -cne 'passed' -or $identity.generation -cne $Generation -or $identity.productionSha256 -cne $summary.productionSha256 -or $identity.failure -or @($identity.failures).Count -ne 0){throw "Original runtime identity failed or differs: $stage"}
             if([IO.Path]::GetFullPath($identity.production) -ne [IO.Path]::GetFullPath($productionJar)){throw "Original runtime identity names a different JAR: $stage"}
             foreach($count in @('classCount','resourceCount','runtimeClassCount','runtimeResourceCount')){if($identity.$count -ne $currentIdentity.$count){throw "Original/current runtime inventory count differs: $stage/$count"}}
@@ -191,7 +193,7 @@ function Invoke-ExistingValidation {
 }
 
 function Assert-GameplayEvidence {
-    $audit=Get-Content -Raw -LiteralPath (Join-Path $reportPath 'ui-item-block-audit.json') | ConvertFrom-Json
+    $audit=Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath 'ui-item-block-audit.json') | ConvertFrom-Json
     Write-Output "$Generation background audit: $($audit.status); $($audit.results.Count) rows"
     $audit.results | Where-Object { -not $_.passed } | Select-Object id,failure,serverError
     $planned=@($audit.plannedSteps)
@@ -209,32 +211,39 @@ function Assert-GameplayEvidence {
             if($planned -notcontains $requiredScene){throw "Style audit omitted a required scene: $requiredScene"}
         }
     }
+    if($PanelUiOnly){
+        foreach($locale in @('en_us','zh_cn')){
+            foreach($scene in @('native-processing','factory-recipe','factory-code','return-recipe')){
+                if($planned -notcontains "panel-align-$scene-$locale"){throw "Panel UI audit omitted $scene/$locale"}
+            }
+        }
+    }
     if(Test-Path -LiteralPath (Join-Path $reportPath 'shutdown-timeout.txt')){throw 'Shutdown timed out; bounded or forced exit cannot pass normal shutdown'}
     if(-not (Test-Path -LiteralPath (Join-Path $reportPath 'normal-shutdown.txt'))){throw 'Missing normal shutdown evidence'}
     if($IdInsertionOnly){
         if($planned.Count -ne 1 -or $planned[0] -ne 'code-id-insertion'){throw 'ID insertion audit did not execute exactly its required native scene'}
-        $insertion=Get-Content -Raw -LiteralPath (Join-Path $reportPath 'item-id-insertion-report.json') | ConvertFrom-Json
+        $insertion=Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath 'item-id-insertion-report.json') | ConvertFrom-Json
         if($insertion.status -ne 'passed' -or $insertion.viewerMode -ne $IdInsertionViewer){throw 'Native code ID insertion report failed or viewer differs'}
         if($insertion.loadedJei -ne ($IdInsertionViewer -eq 'jei') -or $insertion.loadedEmi -ne ($IdInsertionViewer -eq 'emi')){throw 'ID insertion viewer mod isolation differs from the requested profile'}
         & python (Join-Path $PSScriptRoot 'verify-id-insertion.py') $reportPath --generation $Generation --viewer $IdInsertionViewer
         if($LASTEXITCODE -ne 0){throw 'Native ID insertion per-case text, caret, resource, save, or framebuffer verification failed'}
     }
     if($GroupOnly) {
-        $group=Get-Content -Raw -LiteralPath (Join-Path $reportPath 'multi-tag-report.json') | ConvertFrom-Json
+        $group=Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath 'multi-tag-report.json') | ConvertFrom-Json
         if($group.status -ne 'passed') {throw 'Group fixture failed'}
     }
-    if($MekOnly){if((Get-Content -Raw (Join-Path $reportPath "mekanism-bulk-report.json") | ConvertFrom-Json).status -ne "passed"){throw "MEK bulk fixture failed"};if((Get-Content -Raw (Join-Path $reportPath "native-capability-report.json") | ConvertFrom-Json).status -ne "passed"){throw "Native chemistry/FE fixture failed"}}
-    if($NativeOnly){foreach($required in @('native-transactions-report.json','parallel-orders-report.json','compatibility-audit.json')){if((Get-Content -Raw (Join-Path $reportPath $required) | ConvertFrom-Json).status -ne 'passed'){throw "Modern native report failed: $required"}}}
+    if($MekOnly){if((Get-Content -Raw -Encoding UTF8 (Join-Path $reportPath "mekanism-bulk-report.json") | ConvertFrom-Json).status -ne "passed"){throw "MEK bulk fixture failed"};if((Get-Content -Raw -Encoding UTF8 (Join-Path $reportPath "native-capability-report.json") | ConvertFrom-Json).status -ne "passed"){throw "Native chemistry/FE fixture failed"}}
+    if($NativeOnly){foreach($required in @('native-transactions-report.json','parallel-orders-report.json','compatibility-audit.json')){if((Get-Content -Raw -Encoding UTF8 (Join-Path $reportPath $required) | ConvertFrom-Json).status -ne 'passed'){throw "Modern native report failed: $required"}}}
     if($AddonCompat){
         foreach($required in @('compatibility-audit.json','addon-soul-report.json')){
-            if((Get-Content -Raw -LiteralPath (Join-Path $reportPath $required) | ConvertFrom-Json).status -ne 'passed'){throw "Addon compatibility fixture failed: $required"}
+            if((Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath $required) | ConvertFrom-Json).status -ne 'passed'){throw "Addon compatibility fixture failed: $required"}
         }
     }
     if($Channel -or $ChannelOnly){
-        $channelReport=Get-Content -Raw -LiteralPath (Join-Path $reportPath 'channel-report.json') | ConvertFrom-Json
+        $channelReport=Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath 'channel-report.json') | ConvertFrom-Json
         if($channelReport.status -ne 'passed'){throw 'Indentation channel fixture failed'}
-        if($channelReport.complete_highlighting_native_passed -ne $true -or (Get-Content -Raw (Join-Path $reportPath 'syntax-highlight-report.json') | ConvertFrom-Json).status -ne 'passed'){throw 'Native complete syntax highlighting failed'}
-        if($channelReport.function_channel_isolation_passed -ne $true -or (Get-Content -Raw (Join-Path $reportPath 'channel-function-report.json') | ConvertFrom-Json).status -ne 'passed'){throw 'Channel function isolation failed'}
+        if($channelReport.complete_highlighting_native_passed -ne $true -or (Get-Content -Raw -Encoding UTF8 (Join-Path $reportPath 'syntax-highlight-report.json') | ConvertFrom-Json).status -ne 'passed'){throw 'Native complete syntax highlighting failed'}
+        if($channelReport.function_channel_isolation_passed -ne $true -or (Get-Content -Raw -Encoding UTF8 (Join-Path $reportPath 'channel-function-report.json') | ConvertFrom-Json).status -ne 'passed'){throw 'Channel function isolation failed'}
         foreach($assertion in @(
             'native_channel_editor_captured','exact_initial_inventory','exact_channel_source_and_destination_balances',
             'channel_1_trillion_must_does_not_block_channel_0_empty_put',
@@ -278,20 +287,20 @@ function Assert-GameplayEvidence {
         if($outerRoutes.Count -ne 1 -or $outerRoutes[0].remaining -ne 0){throw 'Channel-0 real source quota did not settle exactly'}
     }
     if($RecipeSet -or $RecipeSetOnly){
-        if((Get-Content -Raw -LiteralPath (Join-Path $reportPath 'recipe-set-report.json') | ConvertFrom-Json).status -ne 'passed'){throw 'Complete recipe set fixture failed'}
+        if((Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath 'recipe-set-report.json') | ConvertFrom-Json).status -ne 'passed'){throw 'Complete recipe set fixture failed'}
     }
     if($DispatchOnly){
         if(@($audit.results).Count -ne 1 -or $audit.results[0].id -ne 'complex-factory-flows' -or @($audit.plannedSteps).Count -ne 1 -or $audit.plannedSteps[0] -ne 'complex-factory-flows'){throw 'DispatchOnly did not execute exactly the complex-factory-flows step'}
-        if((Get-Content -Raw -LiteralPath (Join-Path $reportPath 'complex-flow-report.json') | ConvertFrom-Json).status -ne 'passed'){throw 'Dispatch stability fixture failed'}
+        if((Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath 'complex-flow-report.json') | ConvertFrom-Json).status -ne 'passed'){throw 'Dispatch stability fixture failed'}
     }
     if($HugeQuantities -or $HugeOnly -or $ExtremeOnly){
-        $huge=Get-Content -Raw -LiteralPath (Join-Path $reportPath 'huge-quantity-report.json') | ConvertFrom-Json
+        $huge=Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath 'huge-quantity-report.json') | ConvertFrom-Json
         if($huge.status -ne 'passed' -or $huge.targetCases -ne 21 -or $huge.completedCases -ne 21 -or @($huge.cases).Count -ne 21 -or $huge.categoryCounts.direct -ne 15 -or $huge.categoryCounts.partialMust -ne 3 -or $huge.categoryCounts.saturatedReturn -ne 3 -or $huge.jobCodecRestores -ne 33 -or $huge.cellBinaryNbtRoundTrips -ne 108 -or $huge.configuredTickRate -ne $TickRate){throw 'Extreme-quantity native AE logistics coverage or persistence count mismatch'}
         if(@($huge.cases | Where-Object {$_.status -ne 'passed' -or $_.conserved -ne $true -or $_.actualMovedDecimal -ne $_.requestedQuantityDecimal -or ($_.category -eq 'direct' -and $_.jobTicks -ne 1) -or ($_.category -ne 'direct' -and $_.jobTicks -ne 3)}).Count -gt 0){throw 'Extreme-quantity movement, conservation, or bounded tick cost failed'}
         if($HugeOnly -and ($planned.Count -ne 1 -or $planned[0] -ne 'huge-quantity-logistics')){throw 'HugeOnly did not execute its required native scene'}
     }
     if(@($audit.results | Where-Object {$_.id -eq 'complex-factory-flows'}).Count -gt 0){
-        $flow=Get-Content -Raw -LiteralPath (Join-Path $reportPath 'complex-flow-report.json') | ConvertFrom-Json
+        $flow=Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath 'complex-flow-report.json') | ConvertFrom-Json
         $expectedCpuOrders=4+$BlockingRounds+2*$ParallelRounds
         $expectedPrimary=2*($BlockingRounds+2*$ParallelRounds)
         if($flow.status -ne 'passed' -or $flow.stabilityBlockingRounds -ne $BlockingRounds -or $flow.stabilityParallelRounds -ne $ParallelRounds -or $flow.submittedCpuOrders -ne $expectedCpuOrders -or $flow.stabilityTotalReturnedPrimary -ne $expectedPrimary -or $flow.configuredTickRate -ne $TickRate){throw 'Dispatch stability actual rounds/orders/returns differ from requested scale'}
@@ -300,7 +309,7 @@ function Assert-GameplayEvidence {
     if(@($audit.results | Where-Object {$_.id -eq 'parallel-native-orders'}).Count -gt 0){Assert-BulkReport 'parallel-orders-report.json' $ParallelBatches 1}
     if($MekOnly){Assert-BulkReport 'mekanism-bulk-report.json' $MekBatches 12}
     if($HugeQuantities -or $RecoveryOnly -or $ExtremeOnly){
-        $recovery=Get-Content -Raw -LiteralPath (Join-Path $reportPath 'huge-recovery-report.json') | ConvertFrom-Json
+        $recovery=Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath 'huge-recovery-report.json') | ConvertFrom-Json
         if($recovery.status -ne 'passed' -or $recovery.targetCases -ne 3 -or $recovery.completedCases -ne 3 -or @($recovery.cases).Count -ne 3 -or $recovery.configuredTickRate -ne $TickRate){throw 'Extreme-quantity machine removal and recovery coverage failed'}
         if(@($recovery.cases | Where-Object {$_.status -ne 'passed' -or $_.conserved -ne $true}).Count -gt 0){throw 'A physical recovery case failed its exact conservation check'}
         if($recovery.cases[0].actualReturnedDecimal -ne '18446744073709543422'){throw 'Segmented recovery did not return the full amount above Long.MAX_VALUE'}
@@ -308,7 +317,7 @@ function Assert-GameplayEvidence {
         if($RecoveryOnly -and ($planned.Count -ne 1 -or $planned[0] -ne 'huge-recovery-logistics')){throw 'RecoveryOnly did not execute its required native scene'}
     }
     if($ChunkLifecycle -or $ChunkOnly){
-        $chunk=Get-Content -Raw -LiteralPath (Join-Path $reportPath 'chunk-lifecycle-report.json') | ConvertFrom-Json
+        $chunk=Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath 'chunk-lifecycle-report.json') | ConvertFrom-Json
         $chunkCaseNames=@('remote_storage_unload_must','whole_owner_unload_must','partial_return_cargo_unload')
         if($chunk.status -ne 'passed' -or $chunk.targetCases -ne 3 -or $chunk.completedCases -ne 3 -or @($chunk.cases).Count -ne 3 -or @($chunk.cases.case | Select-Object -Unique).Count -ne 3 -or @(Compare-Object @($chunk.cases.case) $chunkCaseNames).Count -ne 0){throw 'Chunk lifecycle case coverage is incomplete or duplicated'}
         if($chunk.manualJobTicks -ne 0 -or $chunk.manuallyInvokedUnloadCallbacks -ne 0 -or $chunk.playerMustRemainBeyondBlocks -ne 512){throw 'Chunk lifecycle used manual execution/lifecycle callbacks or an incorrect player-distance contract'}
@@ -349,18 +358,18 @@ function Assert-GameplayEvidence {
         if($ChunkOnly -and ($planned.Count -ne 1 -or $planned[0] -ne 'chunk-lifecycle-logistics')){throw 'ChunkOnly did not execute exactly its independent native lifecycle scene'}
     }
     if(@($observed | Where-Object {$_ -like 'factory-pattern-preview-*'}).Count -gt 0){
-        $preview=Get-Content -Raw -LiteralPath (Join-Path $reportPath 'pattern-preview-report.json') | ConvertFrom-Json
+        $preview=Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath 'pattern-preview-report.json') | ConvertFrom-Json
         if($preview.status -ne 'passed'){throw 'Native factory pattern target previews failed'}
         Assert-PreviewPixels
     }
     if($ExtremeOnly -and ($planned.Count -ne 5 -or @(Compare-Object $planned @('huge-quantity-logistics','huge-recovery-logistics','factory-pattern-preview-normal','factory-pattern-preview-shift','factory-pattern-preview-cleared')).Count -ne 0)){throw 'ExtremeOnly did not run all quantity, recovery, and preview scenes'}
-    if(-not $ChunkOnly -and -not $ExtremeOnly -and -not $RecoveryOnly -and -not $HugeOnly -and -not $ParserOnly -and -not $NativeOnly -and -not $MekOnly -and -not $AddonCompat -and -not $ChannelOnly -and -not $RecipeSetOnly -and -not $DispatchOnly -and -not $VisualOnly -and -not $PanelVisualOnly -and -not $UiOnly -and -not $StyleOnly -and -not $GroupOnly -and -not $GuideOnly -and -not $IdInsertionOnly) {
+    if(-not $ChunkOnly -and -not $ExtremeOnly -and -not $RecoveryOnly -and -not $HugeOnly -and -not $ParserOnly -and -not $NativeOnly -and -not $MekOnly -and -not $AddonCompat -and -not $ChannelOnly -and -not $RecipeSetOnly -and -not $DispatchOnly -and -not $VisualOnly -and -not $PanelVisualOnly -and -not $PanelUiOnly -and -not $UiOnly -and -not $StyleOnly -and -not $GroupOnly -and -not $GuideOnly -and -not $IdInsertionOnly) {
         foreach($requiredReport in @('factory-report.json','native-cpu-report.json','compatibility-audit.json','topology-report.json','terminal-report.json','induction-report.json','multi-tag-report.json','complex-flow-report.json')) {
-            $result=Get-Content -Raw -LiteralPath (Join-Path $reportPath $requiredReport) | ConvertFrom-Json
+            $result=Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath $requiredReport) | ConvertFrom-Json
             if($result.status -ne 'passed') { throw "Failed independent report: $requiredReport" }
         }
-        if($Generation -eq '26.1.2'){foreach($nativeReport in @('native-transactions-report.json','parallel-orders-report.json')){if((Get-Content -Raw (Join-Path $reportPath $nativeReport) | ConvertFrom-Json).status -ne 'passed'){throw "Modern native gate failed: $nativeReport"}}}
-        $stress=Get-Content -Raw -LiteralPath (Join-Path $reportPath 'stress-report.json') | ConvertFrom-Json
+        if($Generation -eq '26.1.2'){foreach($nativeReport in @('native-transactions-report.json','parallel-orders-report.json')){if((Get-Content -Raw -Encoding UTF8 (Join-Path $reportPath $nativeReport) | ConvertFrom-Json).status -ne 'passed'){throw "Modern native gate failed: $nativeReport"}}}
+        $stress=Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath 'stress-report.json') | ConvertFrom-Json
         if($stress.status -ne 'passed' -or $stress.completedRoundTrips -ne 8*$StressCycles -or $stress.jobCodecRestores -ne 16*$StressCycles -or $stress.cyclesPerNetwork -ne $StressCycles -or $stress.configuredTickRate -ne $TickRate) { throw 'Incomplete world stress evidence' }
     }
 }
@@ -425,6 +434,7 @@ try {
     if($ParserOnly){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.parserOnly=true"}
     if($NativeOnly){if($Generation -ne '26.1.2'){throw 'NativeOnly targets modern transactional interfaces'};$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.nativeOnly=true"}
     if($MekOnly){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.mekOnly=true"}
+    if($PanelUiOnly){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.panelUiOnly=true"}
     if($PanelVisualOnly){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.panelVisualOnly=true"}
     if($VisualOnly){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.visualOnly=true"}
     if($GuideOnly){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.guideOnly=true"}

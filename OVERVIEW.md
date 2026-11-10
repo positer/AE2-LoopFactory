@@ -1,5 +1,15 @@
 # AE2-LoopFactory (AE2LF) Project Overview
 
+## 2026-11-10 编码面板 UI 专项
+
+- 两代 `assets/ae2/screens/ae2lightoptimizer_factory_panel_recipe.json`：直接继承原版共用“样板编码”标题；保留现有加工限定与附加代码页签。
+- 两代 `ae2lightoptimizer_factory_editor.json` 与 `client/FactoryEditorScreen.java`：原生标题／背包锚点、加工返回图标及贴框水平页签；共用编辑器输入行为不变。
+- `tools/runtime-factory-probe/verify-background.ps1 -PanelUiOnly`：只运行相关配方／代码／上传与双语原版对照，保留完整覆盖、加载身份和正常退出门禁。
+- `BackgroundAudit.java`：本专项记录实际窗口和槽位坐标，并通过原生页签回调返回配方页。
+- 证据：`../Minecraft Forge Workspace/archive/20261110-100300-ae2lf-panel-ui/`，含修改前截图、原版对照和像素检查脚本。
+- 验收：262／260 项单测、两代各 44 项中英文客户端场景、四组原版坐标与标题像素对照及独立回读通过；开发目录助手已恢复。
+
+
 ## 2026-11-10 AE2 原生视觉资源
 
 - `docs/ae2-visual-style.md`：固定 AE2 参考版本、资源来源、方块／面板保护边界与界面约定。
