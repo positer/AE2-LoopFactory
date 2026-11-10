@@ -18,7 +18,11 @@
     "FactoryPatternSlotMixin",
     "FactoryPatternLoadMixin",
     "FactorySignalMixin",
-    "FactoryInductionTickerMixin"
+    "FactoryInductionTickerMixin",
+    "RipperPatternMenuMixin",
+    "RipperPatternTrackerMixin",
+    "RipperPatternAccessMixin",
+    "AEBaseMenuPacketInvoker"
   ],
   "injectors": {
     "defaultRequire": 1

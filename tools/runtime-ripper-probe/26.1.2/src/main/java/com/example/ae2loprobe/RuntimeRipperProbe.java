@@ -267,6 +267,16 @@ public final class RuntimeRipperProbe {
                     if (player == null || "ae2lo-ripper-before.png".equals(ProbeState.screenshotCompleted)
                             || tick() - stateTick > 160) beginRun(1);
                 }
+                case "dynamic_patterns" -> {
+                    if (DynamicPatternFixture.tick()) {
+                        report.put("dynamicPatterns", true);
+                        report.put("passed", true);
+                        ProbeState.phase = "passed";
+                        ProbeState.screenshotRequest = "ae2lo-ripper-after.png";
+                        writeReport();
+                        ProbeState.finished = true;
+                    }
+                }
                 case "planning" -> pollPlan();
                 case "submitted" -> {
                     if (cpuFinished) completeRun();
@@ -592,10 +602,15 @@ public final class RuntimeRipperProbe {
             report.put("firstRunOutputRemovedByProbe", extracted);
             ripper.getUpgrades().setItemDirect(0, ModItems.LOOP_CARD.get().getDefaultInstance());
             check(ripper.isLoopCardInstalled(), "Loop card installation did not register");
-            check(!ripper.getLogic().getPatternInv().isItemValid(1,
-                    ripper.getLogic().getPatternInv().getStackInSlot(0)), "Loop card did not disable new patterns");
+            check(ripper.getLogic().getPatternInv().isItemValid(1,
+                    ripper.getLogic().getPatternInv().getStackInSlot(0)), "Loop card unexpectedly disabled manual pattern insertion");
             phase("second_settling");
         } else {
+            if (!SMITHING_CHAIN && !Core256MFixture.ENABLED) {
+                DynamicPatternFixture.start(level, player, grid, cpu, ripper, output);
+                phase("dynamic_patterns");
+                return;
+            }
             report.put("passed", true);
             ProbeState.status = Core256MFixture.ENABLED
                     ? "PASS: 3000 256M cores from all ten tiers and crystal growth, exact full-chain balances, one tick and 50 AE total"
@@ -682,6 +697,7 @@ public final class RuntimeRipperProbe {
         } catch (Exception error) { throw new IllegalStateException("Cannot record runtime probe evidence", error); }
     }
     private static void fail(Throwable failure) {
+        DynamicPatternFixture.enabled = false;
         report.put("passed", false); report.put("failedPhase", ProbeState.phase);
         report.put("error", failure.toString());
         ProbeState.status = "FAIL: " + failure;

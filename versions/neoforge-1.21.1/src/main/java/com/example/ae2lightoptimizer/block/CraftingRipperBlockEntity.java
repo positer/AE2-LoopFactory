@@ -28,7 +28,7 @@ import net.minecraft.world.level.block.state.BlockState;
 /** Native provider settings and inventory, with CPU-owned atomic execution. */
 public final class CraftingRipperBlockEntity extends AENetworkedBlockEntity
         implements PatternProviderLogicHost, IUpgradeableObject {
-    public static final int PATTERN_SLOTS = 36;
+    public static final int VISIBLE_PATTERN_SLOTS = com.example.ae2lightoptimizer.crafting.RipperPatternLayout.VISIBLE_SLOTS;
     private final CraftingRipperLogic logic;
     private final IUpgradeInventory upgrades;
 
@@ -64,6 +64,10 @@ public final class CraftingRipperBlockEntity extends AENetworkedBlockEntity
     @Override public ItemStack getMainMenuIcon() { return ModItems.CRAFTING_RIPPER.get().getDefaultInstance(); }
     @Override public void openMenu(Player player, MenuHostLocator locator) {
         MenuOpener.open(CraftingRipperMenu.TYPE.get(), player, locator);
+    }
+
+    @Override public void returnToMainMenu(Player player, appeng.menu.ISubMenu subMenu) {
+        MenuOpener.returnTo(CraftingRipperMenu.TYPE.get(), player, subMenu.getLocator());
     }
 
     @Override public void onReady() {

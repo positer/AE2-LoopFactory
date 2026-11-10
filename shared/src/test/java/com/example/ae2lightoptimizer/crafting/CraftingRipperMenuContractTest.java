@@ -61,9 +61,7 @@ class CraftingRipperMenuContractTest {
         assertTrue(screen.contains("SlotSemantics.PLAYER_INVENTORY"));
         assertTrue(screen.contains("SlotSemantics.PLAYER_HOTBAR"));
         var logic = Files.readString(source.resolve("block/CraftingRipperLogic.java"));
-        assertTrue(logic.contains("!host.isLoopCardInstalled() && acceptsPattern(stack)"));
-        assertTrue(logic.contains("delegate.setItemDirect(slot, stack)"));
-        assertFalse(logic.contains("if (stack.isEmpty()"), "Rollback must restore retained patterns while insertion is locked");
+        assertFalse(logic.contains("!host.isLoopCardInstalled() && acceptsPattern(stack)"));
         assertTrue(logic.contains("ICraftingProvider.requestUpdate(host.getMainNode())"));
         var entity = Files.readString(source.resolve("block/CraftingRipperBlockEntity.java"));
         assertTrue(entity.contains("logic.addDrops(drops)"));

@@ -18,7 +18,8 @@ item_ids:
 
 Connect the Crafting Ripper to an ME Network with an available channel and power,
 then right-click it. Its interface reuses AE2's Pattern Provider controls and
-priority page with four rows of nine pattern slots. Insert crafting-table,
+priority page with a scrollable four-row window. Pattern storage grows as needed,
+with one completely empty row after the last occupied row. Insert crafting-table,
 smithing-table or stonecutter patterns; other processing patterns are rejected.
 
 ## Whole-chain crafting
@@ -42,18 +43,14 @@ charge again. The face is cyan while its grid node is active and dim while offli
 
 Insert a [Loop Card](loop_card.md) into the upgrade slot to advertise encodable
 crafting-table, smithing and stonecutting recipes from the server's recipe list.
-The 36 pattern slots turn grey: existing patterns stay in place and can be removed,
-but cannot be inserted again until the card is removed. The same rule applies to
-the Pattern Access Terminal. Remove the card to restore normal pattern use.
+Manual patterns remain editable, including through the Pattern Access Terminal.
+For each exact output covered by an installed pattern, only the given patterns
+are advertised: missing ingredients never trigger another automatic recipe for
+that output. All other encodable outputs retain their automatic recipes.
 
 Automatic patterns are backed by real matching inputs and assembled outputs.
-Special recipes and component variants are resolved from native recipe inputs and
-real network contents. New component keys refresh the catalog automatically;
-arbitrary text and every possible color mixture are not globally pre-generated.
-
-Map expansion and non-deterministic item effects run one native recipe operation
-per tick, without an external assembler. Real products, progress and the single
-50 AE job payment stay attached to the original CPU job and survive saving.
+Dynamic recipes with no finite encodable representative, such as arbitrary dye
+or component combinations, still require a concrete encoded pattern.
 
 For example, install a plank pattern and a stick pattern, then request sticks.
 The ripper validates both steps and consumes the available logs for the final

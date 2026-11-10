@@ -14,7 +14,8 @@ GUIDES = {
 
 Connect the Crafting Ripper to an ME Network with an available channel and power,
 then right-click it. Its interface reuses AE2's Pattern Provider controls and
-priority page with four rows of nine pattern slots. Insert crafting-table,
+priority page with a scrollable four-row window. Pattern storage grows as needed,
+with one completely empty row after the last occupied row. Insert crafting-table,
 smithing-table or stonecutter patterns; other processing patterns are rejected.
 
 ## Whole-chain crafting
@@ -38,9 +39,10 @@ charge again. The face is cyan while its grid node is active and dim while offli
 
 Insert a [Loop Card](loop_card.md) into the upgrade slot to advertise encodable
 crafting-table, smithing and stonecutting recipes from the server's recipe list.
-The 36 pattern slots turn grey: existing patterns stay in place and can be removed,
-but cannot be inserted again until the card is removed. The same rule applies to
-the Pattern Access Terminal. Remove the card to restore normal pattern use.
+Manual patterns remain editable, including through the Pattern Access Terminal.
+For each exact output covered by an installed pattern, only the given patterns
+are advertised: missing ingredients never trigger another automatic recipe for
+that output. All other encodable outputs retain their automatic recipes.
 
 Automatic patterns are backed by real matching inputs and assembled outputs.
 Dynamic recipes with no finite encodable representative, such as arbitrary dye
@@ -56,7 +58,8 @@ growth chains to preserve their seed while delivering only the requested gain.
 <RecipeFor id="ae2lightoptimizer:crafting_ripper" />
 
 将合成撕裂者接入有可用频道与电力的 ME 网络，右键打开界面。
-界面复用 AE2 样板供应器控件与优先级页面，样板区扩展为四排九列。
+界面复用 AE2 样板供应器控件与优先级页面，使用四行可滚动窗口。
+样板库存按需扩容，最后一个已占用行后始终保留一整行空槽。
 可放入工作台、锻造台和切石机样板，其他加工样板不会被接受。
 
 ## 整条链合成
@@ -76,9 +79,9 @@ growth chains to preserve their seed while delivering only the requested gain.
 ## 自动样板
 
 在升级槽安装[循环卡](loop_card.md)，即可从服务端配方列表发布可编码的工作台、
-锻造台与切石机配方。36 个样板槽全部变灰：已放入样板保持原位，可以取出，
-但在移除循环卡前不能再放入。样板管理终端也遵守相同规则。
-取出循环卡后恢复正常样板使用。
+锻造台与切石机配方。手动样板仍可正常放取，样板管理终端也可编辑。
+对于槽内样板指定的目标产物，仅发布这些给定样板；即使缺料，也不会切换到
+同产物的自动配方。其他目标产物继续发布全部可编码的自动配方。
 
 自动样板必须有真实匹配的输入与组装结果。没有有限可编码输入代表的动态配方，
 例如任意染色或组件组合，仍需使用具体编码样板。
@@ -99,9 +102,10 @@ The Loop Card fits a [Crafting Ripper](crafting_ripper.md) or any
 ## Crafting Ripper
 
 The card publishes automatically discovered, encodable crafting, smithing and
-stonecutting recipes. Installed patterns remain in the four grey rows and may
-be removed, but new patterns cannot be inserted until the card is removed.
-Removing the card immediately restores the retained physical patterns.
+stonecutting recipes. Manual patterns remain editable in the scrollable inventory.
+Installed patterns exclusively select recipes for their exact outputs, including
+components; automatic alternatives for those outputs are excluded even when
+manual ingredients are missing. Other outputs retain all encodable automatic recipes.
 
 ## Portable charging
 
@@ -136,8 +140,9 @@ amount remains 64-bit; the newer energy interface reports long amounts directly.
 ## 合成撕裂者
 
 安装后发布自动发现、可编码的工作台、锻造台与切石机配方。
-原样板保留在四排灰色槽中，可以取出；移除循环卡前不能放入新样板。
-取出循环卡后立即恢复剩余实体样板的正常使用。
+样板页支持滚动和自动扩容，插卡后仍可正常放取样板。
+槽内样板对应的目标产物（含组件）只使用给定样板，缺料也不自动换配方；
+未被手动样板覆盖的产物继续发布全部可编码自动配方。
 
 ## 便携充能
 
@@ -163,7 +168,7 @@ AE 电量归零后，电容器暂不可用，重新充电即可恢复。
 
 # Match native AE2 slot geometry while fitting the minimum 240 logical pixel viewport.
 CRAFTING_RIPPER_SCREEN = {'includes': ['common/common.json', 'common/player_inventory.json'],
- 'generatedBackground': {'width': 176, 'height': 210},
+ 'generatedBackground': {'width': 194, 'height': 210},
  'slots': {'ENCODED_PATTERN': {'left': 8, 'top': 45, 'grid': 'BREAK_AFTER_9COLS'},
            'STORAGE': {'hidden': True},
            'PLAYER_INVENTORY': {'left': 8, 'top': 129, 'grid': 'BREAK_AFTER_9COLS'},
@@ -173,8 +178,9 @@ CRAFTING_RIPPER_SCREEN = {'includes': ['common/common.json', 'common/player_inve
           'interface_config': {'text': {'translate': 'gui.ae2.Patterns'}, 'position': {'left': 8, 'top': 34}},
           'player_inventory_title': {'text': {'translate': 'container.inventory'},
                                      'position': {'left': 8, 'top': 118}}},
- 'widgets': {'openPriority': {'left': 152, 'top': 0, 'width': 20, 'height': 20},
-             'lockReason': {'left': 5, 'top': 15}}}
+ 'widgets': {'openPriority': {'left': 170, 'top': 0, 'width': 20, 'height': 20},
+             'lockReason': {'left': 5, 'top': 15},
+             'patternScroll': {'left': 176, 'top': 45, 'width': 12, 'height': 70}}}
 
 
 def write(path, value):

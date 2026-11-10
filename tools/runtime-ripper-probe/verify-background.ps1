@@ -2,6 +2,7 @@ param(
     [Parameter(Mandatory=$true)][ValidateSet('1.21.1','26.1.2')][string]$Generation,
     [Parameter(Mandatory=$true)][ValidateSet('template','smithing','layered','core256m','catalog_audit','native_catalog','exact_components','pack_catalog','tool_components')][string]$Chain,
     [Parameter(Mandatory=$true)][ValidatePattern('^ripper-[A-Za-z0-9_.-]+$')][string]$EvidenceName,
+    [string]$EvidenceRoot,
     [switch]$PrepareOnly
 )
 $ErrorActionPreference = 'Stop'
@@ -9,8 +10,8 @@ $taskRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $projectRoot = Join-Path $taskRoot "versions/neoforge-$Generation"
 $runRoot = Join-Path $projectRoot 'run'
 $runMods = [IO.Path]::GetFullPath((Join-Path $runRoot 'mods'))
-$evidenceRoot = Join-Path $taskRoot 'archive/2026-09-12-expanded-background-qa'
-$evidence = [IO.Path]::GetFullPath((Join-Path $evidenceRoot $EvidenceName))
+$resolvedEvidenceRoot = if ($EvidenceRoot) { [IO.Path]::GetFullPath($EvidenceRoot) } else { Join-Path $taskRoot 'archive/2026-09-12-expanded-background-qa' }
+$evidence = [IO.Path]::GetFullPath((Join-Path $resolvedEvidenceRoot $EvidenceName))
 $helper = Join-Path $PSScriptRoot "$Generation/build/libs/ae2lo-runtime-probe-mc$Generation-1.jar"
 $agent = Join-Path $taskRoot 'tools/runtime-factory-probe/background-agent/hidden-window-agent.jar'
 $versionLine = @(Get-Content -LiteralPath (Join-Path $projectRoot 'gradle.properties') | Where-Object { $_ -match '^mod_version=' })
@@ -91,7 +92,7 @@ function Assert-RuntimeMatchesProduction {
 }
 
 Assert-WorkspacePath $runMods
-Assert-WorkspacePath $evidence
+if (-not $evidence.StartsWith($resolvedEvidenceRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw 'Evidence must remain within its selected root' }
 if (Test-Path -LiteralPath $evidence) { throw "Refusing to overwrite evidence: $evidence" }
 foreach ($required in @($helper,$agent,$production)) {
     if (-not (Test-Path -LiteralPath $required -PathType Leaf)) { throw "Build the isolated artifacts before launching: $required" }
@@ -175,6 +176,13 @@ try {
     }
     if ($independentReports.ContainsKey($Chain)) {
         foreach ($file in $independentReports[$Chain]) { $null = Read-PassingFixture $file }
+    }
+    if ($Chain -eq 'template') {
+        $null = Read-PassingFixture 'dynamic-patterns-report.json'
+        $null = Read-PassingFixture 'dynamic-pattern-ui.json'
+        foreach ($frame in @('ae2lo-ripper-bottom.png','ae2lo-ripper-after-bulk.png','ae2lo-ripper-pattern-access-high-slot.png')) {
+            if (-not (Test-Path -LiteralPath (Join-Path $evidence ('screenshots/' + $frame)))) { throw "Missing dynamic native frame: $frame" }
+        }
     }
     if ($Chain -eq 'core256m') {
         if ($report.scheduleOwner -ne 'RING_TERMINAL' -or $report.bothPlannerServicesOnline -ne $true -or

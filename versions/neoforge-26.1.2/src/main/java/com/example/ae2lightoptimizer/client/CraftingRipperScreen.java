@@ -10,8 +10,10 @@ import net.minecraft.world.entity.player.Inventory;
 
 /** AE2 supplies the toolbar, priority submenu and native pattern rendering. */
 public final class CraftingRipperScreen extends PatternProviderScreen<CraftingRipperMenu> {
+    private final appeng.client.gui.widgets.Scrollbar patternScroll = new appeng.client.gui.widgets.Scrollbar(appeng.client.gui.widgets.Scrollbar.BIG);
     public CraftingRipperScreen(CraftingRipperMenu menu, Inventory inventory, Component title, ScreenStyle style) {
         super(menu, inventory, title, style);
+        widgets.add("patternScroll", patternScroll);
         var existing = (com.example.ae2lightoptimizer.mixin.WidgetContainerAccessor) widgets;
         if (!existing.ae2lightoptimizer$getWidgets().containsKey("upgrades")
                 && !existing.ae2lightoptimizer$getCompositeWidgets().containsKey("upgrades")) {
@@ -24,6 +26,12 @@ public final class CraftingRipperScreen extends PatternProviderScreen<CraftingRi
     @Override public void drawBG(GuiGraphicsExtractor graphics, int offsetX, int offsetY,
             int mouseX, int mouseY, float partialTicks) {
         super.drawBG(graphics, offsetX, offsetY, mouseX, mouseY, partialTicks);
+        // Reference the native Pattern Access Terminal track: cap, repeatable center, bottom cap.
+        // The track extends one pixel past each end of AE2's 70-pixel scrollbar bounds.
+        var track = appeng.client.gui.style.Blitter.texture(appeng.core.AppEng.makeId("textures/guis/patternaccessterminal.png"));
+        track.src(178, 17, 6, 3).dest(offsetX + 179, offsetY + 44, 6, 3).blit(graphics);
+        track.src(178, 53, 6, 1).dest(offsetX + 179, offsetY + 47, 6, 68).blit(graphics);
+        track.src(178, 106, 6, 1).dest(offsetX + 179, offsetY + 115, 6, 1).blit(graphics);
         // Generated backgrounds contain no baked slot frames. AE2's native upgrade panel
         // paints its own frames; all remaining inventory groups use AE2's slot sprite here.
         for (var semantic : java.util.List.of(SlotSemantics.ENCODED_PATTERN,
@@ -38,12 +46,32 @@ public final class CraftingRipperScreen extends PatternProviderScreen<CraftingRi
         }
     }
 
-    @Override public void drawFG(GuiGraphicsExtractor graphics, int offsetX, int offsetY, int mouseX, int mouseY) {
-        super.drawFG(graphics, offsetX, offsetY, mouseX, mouseY);
-        if (menu.loopCardInstalled) {
-            for (var slot : menu.getSlots(SlotSemantics.ENCODED_PATTERN)) {
-                graphics.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, 0x99606060);
-            }
-        }
+    @Override protected void updateBeforeRender() {
+        super.updateBeforeRender();
+        patternScroll.setRange(0, Math.max(0, menu.patternRows - 4), 1);
+        if (patternScroll.getCurrentScroll() != menu.requestedRow())
+            menu.requestPatternRow(patternScroll.getCurrentScroll());
     }
+    private boolean overPatterns(double x, double y) {
+        return x >= leftPos + 7 && x < leftPos + 170 && y >= topPos + 44 && y < topPos + 117;
+    }
+    @Override public boolean mouseScrolled(double x, double y, double dx, double dy) {
+        if (overPatterns(x, y)) {
+            boolean moved = patternScroll.onMouseWheel(new appeng.client.Point((int)x, (int)y), dy);
+            if (moved) menu.requestPatternRow(patternScroll.getCurrentScroll());
+            return moved;
+        }
+        return super.mouseScrolled(x, y, dx, dy);
+    }
+    @Override public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        if (overPatterns(event.x(), event.y())) {
+            if (patternScroll.getCurrentScroll() != menu.requestedRow()) menu.requestPatternRow(patternScroll.getCurrentScroll());
+            if (menu.isScrollPending()) return true;
+        }
+        return super.mouseClicked(event, doubleClick);
+    }
+    @Override public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+        return (menu.isScrollPending() && event.key() != org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE) || super.keyPressed(event);
+    }
+
 }

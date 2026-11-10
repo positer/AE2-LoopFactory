@@ -69,6 +69,7 @@ public final class ClientBootstrap {
         if (minecraft.level == null || minecraft.player == null || minecraft.getSingleplayerServer() == null) return;
         if (!minecraft.getSingleplayerServer().getWorldData().getLevelName().startsWith(WORLD_PREFIX)) return;
 
+        DynamicPatternClient.observePatternAccess(minecraft);
         var request = ProbeState.screenshotRequest;
         if (request != null && !CAPTURED.contains(request)) {
             if (!request.equals(pendingScreenshot)) {
@@ -95,6 +96,7 @@ public final class ClientBootstrap {
             }
             if (minecraft.screen != null && minecraft.screen.getClass().getSimpleName().equals("CraftingRipperScreen")
                     && !CAPTURED.contains(UI_SCREENSHOT) && uiDelay > 0 && --uiDelay == 0) capture(UI_SCREENSHOT);
+            if (CAPTURED.contains(UI_SCREENSHOT) && !DynamicPatternClient.tick(minecraft)) return;
             if (CAPTURED.contains(UI_SCREENSHOT) && Boolean.getBoolean("ae2lo.probe.autoExit")) {
                 advanceNormalShutdown(minecraft);
             }

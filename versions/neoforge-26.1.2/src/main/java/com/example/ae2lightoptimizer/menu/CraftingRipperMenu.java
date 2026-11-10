@@ -23,11 +23,35 @@ public final class CraftingRipperMenu extends PatternProviderMenu {
                     .buildUnregistered(Identifier.fromNamespaceAndPath(Ae2LightOptimizer.MOD_ID, "crafting_ripper")));
     private final CraftingRipperBlockEntity host;
     @GuiSync(8) public boolean loopCardInstalled;
+    @GuiSync(9) public int patternRows = 1;
+    @GuiSync(10) public int firstPatternRow;
+    @GuiSync(11) public int scrollAcknowledgement;
+    private RipperPatternViewport viewport;
+    private int requestedSequence;
+    private int requestedRow;
+    private boolean fullPatternSync;
+    public record ScrollRequest(int row, int sequence) {}
+    private static final appeng.menu.guisync.ClientActionKey<ScrollRequest> SCROLL =
+            new appeng.menu.guisync.ClientActionKey<>("ripperScroll");
+
+    /** Called by the narrow native-constructor adapter before the subclass constructor body. */
+    public appeng.api.inventories.InternalInventory createPatternViewport(appeng.helpers.patternprovider.PatternProviderLogic logic) {
+        viewport = new RipperPatternViewport((com.example.ae2lightoptimizer.block.CraftingRipperLogic)logic);
+        return viewport;
+    }
+
 
     public CraftingRipperMenu(MenuType<? extends CraftingRipperMenu> type, int id, Inventory inventory,
             CraftingRipperBlockEntity host) {
         super(type, id, inventory, host);
         this.host = host;
+        if (viewport == null) throw new IllegalStateException("Missing Ripper pattern viewport adapter");
+        if (isServerSide()) patternRows = host.getLogic().getPatternInv().size() / 9;
+        updateVisibleSlots();
+        registerClientAction(SCROLL, net.minecraft.network.codec.StreamCodec.composite(
+                net.minecraft.network.codec.ByteBufCodecs.VAR_INT, ScrollRequest::row,
+                net.minecraft.network.codec.ByteBufCodecs.VAR_INT, ScrollRequest::sequence, ScrollRequest::new), this::scroll);
+
         // Keep AE2's return inventory for compatibility, but expose no return slots on either menu side.
         for (var slot : getSlots(SlotSemantics.STORAGE)) {
             if (slot instanceof AppEngSlot aeSlot) aeSlot.setSlotEnabled(false);
@@ -43,8 +67,62 @@ public final class CraftingRipperMenu extends PatternProviderMenu {
         return host.getUpgrades();
     }
 
+    public boolean isScrollPending() { return isClientSide() && scrollAcknowledgement != requestedSequence; }
+    public int requestedRow() { return isScrollPending() ? requestedRow : firstPatternRow; }
+    public void requestPatternRow(int row) {
+        row = com.example.ae2lightoptimizer.crafting.RipperPatternLayout.clampRow(row, patternRows);
+        if (!isClientSide() || row == requestedRow()) return;
+        requestedRow = row;
+        sendClientAction(SCROLL, new ScrollRequest(row, ++requestedSequence));
+    }
+    private void scroll(ScrollRequest request) {
+        if (!isServerSide() || !stillValid(getPlayer())) return;
+        firstPatternRow = com.example.ae2lightoptimizer.crafting.RipperPatternLayout.clampRow(
+                request.row(), host.getLogic().getPatternInv().size() / 9);
+        scrollAcknowledgement = request.sequence();
+        fullPatternSync = true;
+        broadcastChanges();
+    }
+    private void updateVisibleSlots() {
+        viewport.moveTo(firstPatternRow, patternRows);
+        var patterns = getSlots(SlotSemantics.ENCODED_PATTERN);
+        for (int i = 0; i < patterns.size(); i++)
+            ((AppEngSlot)patterns.get(i)).setSlotEnabled(viewport.isVisibleSlot(i));
+    }
+    @Override public void onServerDataSync(it.unimi.dsi.fastutil.shorts.ShortSet fields) {
+        super.onServerDataSync(fields);
+        updateVisibleSlots();
+    }
     @Override public void broadcastChanges() {
-        if (isServerSide()) loopCardInstalled = host.isLoopCardInstalled();
+        if (isServerSide()) {
+            loopCardInstalled = host.isLoopCardInstalled();
+            int rows = host.getLogic().getPatternInv().size() / 9;
+            // Keep physical slot identities stable when another viewer removes the tail.
+            // The client clamps its scrollbar and requests the new window with the normal ack guard.
+            int row = firstPatternRow;
+            fullPatternSync |= rows != patternRows || row != firstPatternRow;
+            patternRows = rows;
+            firstPatternRow = row;
+            updateVisibleSlots();
+            // AEBaseMenu sends GuiSync before vanilla slot diffs. Send full contents first, then the ack.
+            if (fullPatternSync) { broadcastFullState(); fullPatternSync = false; }
+        }
         super.broadcastChanges();
+    }
+    @Override public net.minecraft.world.item.ItemStack quickMoveStack(net.minecraft.world.entity.player.Player player, int index) {
+        if (isClientSide()) return net.minecraft.world.item.ItemStack.EMPTY;
+        if (index >= 0 && index < slots.size()) {
+            var source = slots.get(index);
+            var semantic = getSlotSemantic(source);
+            if ((semantic == SlotSemantics.PLAYER_INVENTORY || semantic == SlotSemantics.PLAYER_HOTBAR)
+                    && source.mayPickup(player) && host.getLogic().acceptsPattern(source.getItem())) {
+                var offered = source.getItem().copy();
+                var remaining = host.getLogic().getPatternInv().addItems(offered.copy());
+                int moved = offered.getCount() - remaining.getCount();
+                if (moved > 0) source.remove(moved);
+                return net.minecraft.world.item.ItemStack.EMPTY;
+            }
+        }
+        return super.quickMoveStack(player, index);
     }
 }

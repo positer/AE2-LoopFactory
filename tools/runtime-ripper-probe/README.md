@@ -27,7 +27,7 @@ The client helper creates a new `AE2LO-Ripper-Probe-*` world and refuses an exis
 
 For the native Netherite Upgrade Smithing Template duplication recipe, each run requests **1,000,000 net templates** from one retained seed. Initial diamond and netherrack stocks are **3,000,000,000 each**, above signed 32-bit range. Assertions require exact seven-diamond/one-netherrack consumption per operation, survival of the one-template seed, native ring-terminal ownership, a submitted plan fitting the real CPU capacity, exactly one native CPU tick and one synchronous Ripper call, and exactly **50 AE** consumed inside that call. The probe records wall-clock execution time separately from game ticks.
 
-By default a second run removes the first delivered million templates while retaining one seed, installs the Loop Card through the real upgrade inventory, verifies disabled pattern insertion, and repeats the same order through the automatic recipe catalog. The removed first output is explicitly recorded in the report. Set `ae2lo.probe.loopCard=false` to isolate the first run.
+By default a second run removes the first delivered million templates while retaining one seed, installs the Loop Card through the real upgrade inventory, verifies that manual pattern insertion remains enabled, and repeats the same order with the automatic catalog plus the retained manual pattern override. The removed first output is explicitly recorded in the report. Set `ae2lo.probe.loopCard=false` to isolate the first run.
 
 The optional `ae2lo.probe.chain=smithing` fixture keeps the same physical CPU and native template growth recipe, adds the real vanilla Netherite Pickaxe smithing recipe and one million diamond pickaxes/netherite ingots, and requests one million final Netherite Pickaxes. It runs once and validates exact consumption against the actual native plan. An intermediate template seed may be consumed by the final smithing operation: the existing ring contract reserves the final output carrier, not every intermediate carrier after the order completes. A plan with 999,999 growth operations and one million smithing operations must therefore finish with zero templates and consume 6,999,993 diamonds and 999,999 netherrack; a plan which explicitly retains one template must account for one million growth operations instead. The probe does not add a seed or other material to repair a planning failure. It records plan missing-material results before asserting submission readiness.
 
@@ -155,3 +155,11 @@ Evidence includes `events.jsonl`, a final `report.json`, and native framebuffer 
 For `core256m`, passive test Mixins additionally write `planner-request-N.json`, `planner-resources-N.json`, `planner-result-N.json` and `planner-bridge-N.json`. These capture the actual reachable graph, key aliases, shared planner status and takeover outcome without changing any input or return value. Native `plan_received` events include unfiltered `missingAll` and `usedAll` lists so an unexpected automatic-catalog ingredient cannot be hidden by the fixture's stock projection. The first complete-catalog core attempts exposed a producer-selection failure around reversible crystal-block compression; their original failing evidence remains preserved.
 
 Compilation and launch are coordinated from outside the production Gradle source sets. Generation-specific `src/main/java` and `src/main/resources` trees belong solely to this test mod.
+
+## 2026-11-10 动态样板专项
+
+`template` 链的两轮百万模板合成结束后，继续执行 `DynamicPatternFixture` 与 `DynamicPatternClient`。单测以外的门禁包括：378 个实体样板及完整空行、组件与槽位序列化往返、旧第 35 槽数量保持、掉落列表守恒、循环卡下正常编辑、缺料不换配方、未覆盖产物自动合成、手动产物真实 CPU 消耗以及移除手动样板后恢复自动配方。
+
+样板管理终端通过真实菜单的服务端 `doAction` 回调放取尾槽，要求镜像尺寸重建、旧服务端条目标识失效；另以第 40004 槽及 379 张实体样板检查客户端真正收到分包后的完整原生镜像。这不是操作系统鼠标实测。撕裂者界面则调用产品滚轮处理器并发送原生客户端库存点击消息，检查第 377 槽哨兵、插入尾行扩容、Shift 取出收缩及 64 张批量放入，另存两张原生截图。
+
+`verify-background.ps1 -EvidenceRoot <目录>` 可将留痕写到显式指定的枢纽归档目录。每次用新的 `-EvidenceName`，失败原件保留。`template` 门禁同时要求 `dynamic-patterns-report.json`、`dynamic-pattern-ui.json` 与原生截图存在并通过；仍要求正常保存退出、运行时制品身份一致和 `run/mods` 哈希恢复。

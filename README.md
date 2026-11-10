@@ -81,9 +81,9 @@ JEI and EMI item or fluid entries can be dragged into the code area when the cor
 
 Factory patterns can carry ordinary AE2 recipe data and factory code together. When a recipe is present, the pattern exposes its normal AE2 target preview and recipe output even if factory code is absent or invalid. Factory code can refer to recipe inputs and outputs through indexed or aggregate `P` and `O` selectors.
 
-**Crafting Ripper** is a pattern-provider variant for crafting-table, smithing-table, and stonecutting patterns. It validates the complete selected recipe chain before extracting material, rechecks live recipes at execution time, accounts for components, container returns, byproducts, and cyclic seeds, then commits the result once to the originating AE2 CPU job.
+**Crafting Ripper** is a pattern-provider variant for crafting-table, smithing-table, and stonecutting patterns. Its pattern storage grows as needed, with a four-row window using AE2's native scrollbar and track, and one completely empty trailing row. It validates the complete selected recipe chain before extracting material, rechecks live recipes at execution time, accounts for components, container returns, byproducts, and cyclic seeds, then commits the result once to the originating AE2 CPU job.
 
-**Loop Card** enables automatic discovery of encodable crafting, smithing, and stonecutting recipes in the Ripper while keeping installed patterns removable. In a portable Loop Storage Cell it can convert stored FE into AE charge; when both FE and AE charge are available, the cell exposes its FE through the generation's native item-energy capability.
+**Loop Card** enables automatic discovery of encodable crafting, smithing, and stonecutting recipes in the Ripper with an expanding, scrollable pattern inventory. Manual patterns remain editable and exclusively select recipes for their exact outputs; all other encodable outputs retain automatic recipes. In a portable Loop Storage Cell it can convert stored FE into AE charge; when both FE and AE charge are available, the cell exposes its FE through the generation's native item-energy capability.
 
 **Recipe Ring Solver Terminal** handles cyclic crafting graphs. It condenses strongly connected components, reserves cyclic seeds in the selected CPU, and dispatches compressed batches in dependency order. A blocked batch cannot be skipped, and its cursor, repetitions, seed reserve, and output ownership persist across reloads.
 
@@ -230,9 +230,9 @@ AE2LF 是独立项目。AE2 是核心前置；Create、Mekanism、Applied Flux�
 
 工厂样板可以同时保存普通 AE2 配方数据和工厂代码。存在配方时，即使工厂代码缺失或非法，样板仍显示普通 AE2 合成目标预览和配方产物。工厂代码可以使用索引或聚合 `P`、`O` 选择器引用配方输入和输出。
 
-**合成撕裂者**是支持工作台、锻造台和切石机样板的样板供应器变体。它在取料前验证完整配方链，在执行时重新检查实时配方，处理组件、容器返还、副产物和循环种子，并将结果一次提交到原 AE2 CPU 任务。
+**合成撕裂者**是支持工作台、锻造台和切石机样板的样板供应器变体。样板库存按需扩容，以四行窗口和 AE2 原生滚动条／轨道浏览，末尾保留一整行空槽。它在取料前验证完整配方链，在执行时重新检查实时配方，处理组件、容器返还、副产物和循环种子，并将结果一次提交到原 AE2 CPU 任务。
 
-**循环卡**让合成撕裂者自动发现可编码的工作台、锻造台和切石机配方，同时保留已安装样板的移除能力。安装到便携循环存储磁盘后，可将存储 FE 转换为 AE 电量；当 FE 与 AE 电量同时存在时，磁盘通过对应世代的原生物品能量能力提供 FE。
+**循环卡**让合成撕裂者自动发现可编码的工作台、锻造台和切石机配方，样板库存按需扩容并支持向下滚动，末尾始终保留一整行空槽。插卡后样板仍可编辑；槽内样板指定产物只走给定样板，其他产物继续自动拉取可编码配方。安装到便携循环存储磁盘后，可将存储 FE 转换为 AE 电量；当 FE 与 AE 电量同时存在时，磁盘通过对应世代的原生物品能量能力提供 FE。
 
 **配方环解算终端**处理循环合成图，压缩强连通分量，在选定 CPU 中保留循环种子，并按依赖顺序派发压缩批次。阻塞批次不能跳过，游标、重复次数、种子储备和产物归属可跨重载保存。
 

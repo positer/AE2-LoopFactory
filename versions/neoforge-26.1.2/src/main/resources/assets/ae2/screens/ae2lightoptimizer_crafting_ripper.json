@@ -4,7 +4,7 @@
     "common/player_inventory.json"
   ],
   "generatedBackground": {
-    "width": 176,
+    "width": 194,
     "height": 210
   },
   "slots": {
@@ -58,7 +58,7 @@
   },
   "widgets": {
     "openPriority": {
-      "left": 152,
+      "left": 170,
       "top": 0,
       "width": 20,
       "height": 20
@@ -66,6 +66,12 @@
     "lockReason": {
       "left": 5,
       "top": 15
+    },
+    "patternScroll": {
+      "left": 176,
+      "top": 45,
+      "width": 12,
+      "height": 70
     }
   }
 }

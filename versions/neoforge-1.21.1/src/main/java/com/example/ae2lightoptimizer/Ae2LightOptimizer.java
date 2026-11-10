@@ -28,6 +28,7 @@ public final class Ae2LightOptimizer {
 
     public Ae2LightOptimizer(IEventBus modEventBus) {
         verifyTakeoverTargetLoads();
+        modEventBus.addListener(com.example.ae2lightoptimizer.menu.RipperPatternAccessPacket::register);
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
                 com.example.ae2lightoptimizer.block.CraftingRipperLogic::onDatapackSync);
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(

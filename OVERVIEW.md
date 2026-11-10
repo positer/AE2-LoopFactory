@@ -163,8 +163,8 @@ Loop Storage Cells have only AE2 as a mod prerequisite. Version adapters enumera
 ### Crafting Ripper and Loop Card
 
 1. `CraftingRipperBlockEntity` reuses AE2's provider host contract and exposes a channel-requiring managed grid node with 5 AE/t drain.
-2. `CraftingRipperLogic` supplies 36 physical pattern slots, validates crafting/smithing/stonecutting patterns and prevents inserting into locked slots through either local menus or the pattern access terminal. Its pattern list is refreshed on card, inventory and recipe changes.
-3. `CraftingRipperMenu` and `CraftingRipperScreen` subclass the pinned AE2 provider implementations. The compact 176×210 interface contains only four pattern rows in its main area, with native player inventory and upgrade/control panels. Native return slots are disabled on both menu sides and hidden from the screen. A native upgrade slot holds one Loop Card; synchronized card state drives the grey slot overlay.
+2. `CraftingRipperLogic` 使用稀疏动态 `RipperPatternInventory`，末尾保留完整空行并兼容原 `patterns` 存档。循环卡不限制编辑；完整目标产物键匹配的手动样板独占该产物的配方选择，其他产物继续使用自动目录。
+3. `CraftingRipperMenu` and `CraftingRipperScreen` subclass the pinned AE2 provider implementations. 界面尺寸为 194×210，使用 AE2 原生滚动条显示四行窗口，实际库存按需扩容；保留原生背包与升级控制面板。 Native return slots are disabled on both menu sides and hidden from the screen. 原生升级槽可安装一张循环卡，插卡后样板槽仍可正常编辑。
 4. `CraftingRipperPatterns` validates real recipe identity, selected input matching, assembled results and remainders. Automatic mode enumerates encodable concrete recipes; dynamic recipes without an enumerable representative are not advertised as fabricated static outputs.
    `CraftingRipperCatalog` resolves real recipe inputs, native display/placement data and observed network component keys, with per-recipe coverage diagnostics. The server recipe manager and reload events control namespace-independent recipe additions, replacements, removals and tag changes. `CatalogCraftingPattern` preserves and validates all nine component candidate lists in the pinned 26.1.2 adapter; `CatalogSmithingPattern` provides a validated persistent definition for genuinely absent optional smithing slots.
 5. `CraftingRipperExecutor` preflights the entire selected CPU job before initial stock extraction, then validates again against private CPU stock before its single 50 AE commit. `InstantCraftingBatch` performs checked, compressed resource transitions; ring schedules and seed reserves retain their existing ownership.
@@ -289,14 +289,14 @@ Each standalone project owns:
 - `block/RecipeRingSolverTerminalBlock.java` and `...BlockEntity.java`: 2 AE/t channel-required cyclic service, persistence, and active-state synchronization.
 - `block/SupercomputingCraftingOptimizerInterfaceBlock.java` and `...BlockEntity.java`: 8 AE/t channel-required acyclic service, persistence, and active-state synchronization.
 - `block/CraftingRipperBlock.java`, `CraftingRipperBlockEntity.java`, `CraftingRipperLogic.java`: network machine, provider host, card/pattern persistence and recipe advertisement.
-- `menu/CraftingRipperMenu.java`, `client/CraftingRipperScreen.java`: four-row native provider UI and synchronized grey locked-slot overlay.
+- `menu/CraftingRipperMenu.java`, `client/CraftingRipperScreen.java`: 四行可滚动原生供应器界面与带确认的服务端窗口同步。
 - `integration/CraftingRipperPatterns.java`, `CraftingRipperExecutor.java`: recipe catalogue, live legality checks and private whole-chain CPU replay/commit.
 - `integration/CraftingRipperCatalog.java`: native recipe witnesses, component candidates, namespace-independent automatic discovery and coverage diagnostics.
 - `integration/CatalogCraftingPattern.java`, `CatalogSmithingPattern.java` (26.1.2): validated persistent catalog definitions for all nine component choice lists and empty optional smithing slots.
 - `integration/RipperNativeCrafting.java`, `RipperMapSerialization.java`: original-CPU native continuation, physical output identities, one-time energy payment, strict logical-credit inputs and validated transient map-marker persistence.
 - `storage/PortableLoopEnergy.java`: generation-specific FE capability and stored-FE-to-AE charging; the portable inventory refresh boundary remains in `LoopStorageCellInventory`.
 - `mixin/CraftingTaskProgressAccessor.java`: required access to AE2 task counters for exact whole-chain completion and progress accounting.
-- `assets/ae2/screens/ae2lightoptimizer_crafting_ripper.json`: unique native ScreenStyle layout extending the provider controls to 36 pattern slots.
+- `assets/ae2/screens/ae2lightoptimizer_crafting_ripper.json`: 原生 ScreenStyle 布局，提供 36 个窗口槽与右侧滚动条。
 - `item/ModItems.java`: service-block items, Loop Crystal materials, housing, ten cores, eleven cell items, and creative-tab placement without menus.
 - `storage/LoopStorageCellItem.java`, `LoopStorageCellHandler.java`, `LoopStorageCellInventory.java`: version-native item tooltip, AE2 handler registration, dynamic-key inventory, persistence, nested-cell guard, and shared-capacity enforcement.
 - `client/Ae2LightOptimizerClient.java`: `Dist.CLIENT`-isolated registration of eleven drive models; 1.21.1 also binds AE2 cell-state tinting and explicitly registers opaque fluix variants for the factory panel PartItem, while 26.1.2 uses its native item descriptor tint.
@@ -670,3 +670,28 @@ Final native factory performance evidence is archived under `archive/2026-09-09-
 - Release assets are `ae2lf-neoforge-mc1.21.1-0.0.5.jar` (699,793 bytes, SHA-256 `1a07eb16816e15acde1910e75a8da01306ed6dcbc0dff219599d5dccaf6e7401`) and `ae2lf-neoforge-mc26.1.2-0.0.5.jar` (717,249 bytes, SHA-256 `663319c64ec9246743d64711d0d98a33ee018ac21221058badec8dfcf4a1d332`).
 - Release notes use the complete English 0.0.5 section followed by the complete Simplified Chinese section from `CHANGELOG.md`; no internal paths, hashes, commands, or deployment details appear in the public notes.
 - The release archive is [archive/2026-09-13-release-0.0.5/REPORT.md](archive/2026-09-13-release-0.0.5/REPORT.md). Historical sections retain their original test and deployment claims.
+
+### 2026-11-10 合成撕裂者动态样板结构
+
+- `shared/.../crafting/RipperPatternLayout.java`：行数、末尾空行与窗口索引计算。
+- `shared/.../crafting/RipperPatternPolicy.java`：手动样板顺序与完整产物键覆盖筛选。
+- 两代 `block/RipperPatternInventory.java`：稀疏库存、稳定索引、批处理回调与原生存档格式。
+- 两代 `menu/RipperPatternViewport.java`：每菜单独立的 36 槽窗口；服务端映射真实库存，客户端只保存窗口副本。
+- 两代 `mixin/RipperPatternMenuMixin.java`：只为撕裂者替换原生构造时的菜单库存。
+- 两代 `menu/RipperPatternTracker.java`、`mixin/RipperPatternTrackerMixin.java`、`mixin/RipperPatternAccessMixin.java`：检测样板管理终端库存尺寸改变，通过原生全量刷新重建镜像与服务端条目标识。
+- `tools/runtime-ripper-probe/*/.../DynamicPatternFixture.java`：378 样板存档往返、旧槽位数量兼容、掉落列表守恒、真实 CPU 手动与自动配方选择验收。
+- `tools/runtime-ripper-probe/*/.../DynamicPatternClient.java`：真实滚轮处理、插入尾行、Shift 取出与批量放入的客户端消息验收。
+- `docs/crafting-ripper-patterns.md`：动态库存与配方优先规则、同步边界及内存卡原生限制。
+
+- 两代 `menu/RipperPatternAccessPacket.java`、`client/RipperPatternAccessClient.java`、`mixin/AEBaseMenuPacketInvoker.java`：撕裂者专属的 128 项分包与 VarInt 槽位传输，复用原生终端显示，不改 AE2 全局协议。
+
+- `shared/src/test/java/com/example/ae2lightoptimizer/crafting/RipperPatternPolicyTest.java`：完整产物键覆盖、失效样板不自动后备，以及跨越原槽位上限的行数计算。
+- 两代 `CraftingRipperScreen` 显式采用 `Scrollbar.BIG` 与原生 `patternaccessterminal.png` 轨道；原生验收另记录控件皮肤、实际边界和 GUI 缩放，便于截图逐像素回读。
+
+### 2026-11-10 动态样板验收
+
+两代完整构建通过，分别为 267／265 项单元测试，失败、错误、跳过均为零。最终独立客户端 `ripper-dynamic-1.21.1-r6` 与 `ripper-dynamic-26.1.2-r6` 均通过：378 样板 NBT 往返及掉落列表、原第 35 槽数量兼容、缺料不换方、手动与未覆盖自动配方的真实 CPU 订单、移除手动样板后恢复自动配方、第 40004 槽的客户端镜像、终端容量变化与旧标识拒绝、滚轮快速请求、尾行放取、64 张 Shift 插入。每代两轮百万模板增长仍为一次原生 CPU tick、一次执行调用与 50 AE 附加费用。
+
+原生滚动条复核比较每代 720 个不透明滑块像素，RGB 最大误差为 0，轨道上下端点和中段一致；此前默认滑块的最大误差为 192，被同一比较拒绝。两代正常保存退出，运行时类与资源逐项匹配最终 JAR，初始 10 个运行目录文件全部按哈希恢复。NBT 验收是同进程编解码，未声称跨进程重新开档；终端尾槽放取调用原生服务端菜单，撕裂者窗口放取使用真实客户端库存消息。未部署 PCL、未推送或发布。
+
+留痕位于显式同级路径 `../Minecraft Forge Workspace/archive/20261110-103000-ae2lf-ripper-dynamic/`，最终结果为 `after/verification.json`，独立回读脚本为 `evidence/collect_results.py`。原始失败、中间功能通过与最终原生皮肤验收分开保留。

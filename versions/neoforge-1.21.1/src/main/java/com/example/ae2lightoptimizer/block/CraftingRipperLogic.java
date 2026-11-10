@@ -20,7 +20,7 @@ public final class CraftingRipperLogic extends PatternProviderLogic {
         if (event.getPlayer() != null) return;
         CraftingRipperPatterns.invalidateCatalogs();
         for (var logic : List.copyOf(LOADED)) {
-            if (!logic.host.isRemoved()) logic.updatePatterns();
+            if (!logic.host.isRemoved()) { logic.catalogDirty = true; logic.updatePatterns(); }
         }
     }
 
@@ -35,7 +35,8 @@ public final class CraftingRipperLogic extends PatternProviderLogic {
     }
 
     private final CraftingRipperBlockEntity host;
-    private final InternalInventory slots;
+    private final RipperPatternInventory slots;
+    private List<IPatternDetails> automatic = List.of();
     private List<IPatternDetails> available = List.of();
     private final java.util.Map<appeng.api.stacks.AEItemKey, ItemStack> observedInputs = new java.util.LinkedHashMap<>();
     private appeng.api.networking.IGrid observedGrid;
@@ -43,7 +44,7 @@ public final class CraftingRipperLogic extends PatternProviderLogic {
     private long nextCatalogRefresh;
 
     public CraftingRipperLogic(CraftingRipperBlockEntity host) {
-        super(host.getMainNode(), host, CraftingRipperBlockEntity.PATTERN_SLOTS);
+        super(host.getMainNode(), host, 0);
         this.host = host;
         host.getMainNode().addService(appeng.api.networking.storage.IStorageWatcherNode.class,
                 new appeng.api.networking.storage.IStorageWatcherNode() {
@@ -58,60 +59,58 @@ public final class CraftingRipperLogic extends PatternProviderLogic {
                     }
                 });
         LOADED.add(this);
-        var delegate = super.getPatternInv();
-        slots = new InternalInventory() {
-            @Override public int size() { return delegate.size(); }
-            @Override public int getSlotLimit(int slot) { return 1; }
-            @Override public ItemStack getStackInSlot(int slot) { return delegate.getStackInSlot(slot); }
-            @Override public boolean isItemValid(int slot, ItemStack stack) {
-                return !host.isLoopCardInstalled() && acceptsPattern(stack);
-            }
-            @Override public void setItemDirect(int slot, ItemStack stack) {
-                // Native swap and transaction rollback must restore retained patterns even while locked.
-                // All user insertion paths call isItemValid before this internal restore primitive.
-                delegate.setItemDirect(slot, stack);
-            }
-        };
+        slots = new RipperPatternInventory(this::acceptsPattern, () -> {
+            if (this.host.getLevel() != null && !isClientSide()) { saveChanges(); updatePatterns(); }
+        });
     }
 
-    private boolean acceptsPattern(ItemStack stack) {
+    public boolean acceptsPattern(ItemStack stack) {
         var level = host.getLevel();
         if (level == null) return false;
         return CraftingRipperPatterns.supportsPattern(PatternDetailsHelper.decodePattern(stack, level), level);
     }
 
-    @Override public InternalInventory getPatternInv() { return slots; }
+    @Override public RipperPatternInventory getPatternInv() { return slots; }
     @Override public void updatePatterns() {
         if (host == null || host.getLevel() == null || isClientSide()) return;
+        var manual = new java.util.LinkedHashSet<IPatternDetails>();
+        var coveredOutputs = new java.util.LinkedHashSet<appeng.api.stacks.AEKey>();
+        for (var stack : slots.nonEmptyStacks()) {
+            var declared = declaredOutput(stack);
+            if (!declared.isEmpty()) coveredOutputs.add(appeng.api.stacks.AEItemKey.of(declared));
+            var pattern = PatternDetailsHelper.decodePattern(stack, host.getLevel());
+            if (CraftingRipperPatterns.supportsPattern(pattern, host.getLevel())) {
+                manual.add(pattern);
+                coveredOutputs.add(pattern.getPrimaryOutput().what());
+            }
+        }
         if (host.isLoopCardInstalled()) {
             var grid = host.getMainNode().getGrid();
             if (grid != observedGrid) {
                 observedInputs.clear();
                 observedGrid = grid;
+                catalogDirty = true;
             }
-            if (grid != null) {
-                for (var entry : grid.getStorageService().getInventory().getAvailableStacks()) {
-                    if (entry.getLongValue() > 0 && entry.getKey() instanceof appeng.api.stacks.AEItemKey key) {
-                        observedInputs.putIfAbsent(key, key.toStack());
+            if (catalogDirty) {
+                if (grid != null) {
+                    for (var entry : grid.getStorageService().getInventory().getAvailableStacks()) {
+                        if (entry.getLongValue() > 0 && entry.getKey() instanceof appeng.api.stacks.AEItemKey key)
+                            observedInputs.putIfAbsent(key, key.toStack());
                     }
                 }
+                // CPU reservations must not revoke a witnessed recipe or its exact components.
+                automatic = CraftingRipperPatterns.enumerate(host.getLevel(), List.copyOf(observedInputs.values()));
+                catalogDirty = false;
+                nextCatalogRefresh = host.getLevel().getGameTime() + 20;
             }
-            // Keep witnessed keys until the card or network changes: CPU material reservation
-            // must not revoke the exact pattern of an already submitted crafting job.
-            available = CraftingRipperPatterns.enumerate(host.getLevel(), List.copyOf(observedInputs.values()));
-            catalogDirty = false;
-            nextCatalogRefresh = host.getLevel().getGameTime() + 20;
         } else {
             observedInputs.clear();
             observedGrid = null;
+            automatic = List.of();
             catalogDirty = true;
-            var result = new java.util.LinkedHashSet<IPatternDetails>();
-            for (var stack : super.getPatternInv()) {
-                var pattern = PatternDetailsHelper.decodePattern(stack, host.getLevel());
-                if (CraftingRipperPatterns.supportsPattern(pattern, host.getLevel())) result.add(pattern);
-            }
-            available = List.copyOf(result);
         }
+        available = com.example.ae2lightoptimizer.crafting.RipperPatternPolicy.select(
+                manual, automatic, coveredOutputs, pattern -> pattern.getPrimaryOutput().what());
         ICraftingProvider.requestUpdate(host.getMainNode());
     }
     @Override public List<IPatternDetails> getAvailablePatterns() { return available; }
@@ -131,10 +130,66 @@ public final class CraftingRipperLogic extends PatternProviderLogic {
         nativeLogic.ae2lightoptimizer$onStackReturnedToNetwork(pattern.getPrimaryOutput());
         saveChanges();
     }
+    /** Read the declared target even if a datapack has invalidated the selected recipe. */
+    private ItemStack declaredOutput(ItemStack stack) {
+        var crafting = stack.get(appeng.api.ids.AEComponents.ENCODED_CRAFTING_PATTERN);
+        if (crafting != null) return crafting.result();
+        var smithing = stack.get(appeng.api.ids.AEComponents.ENCODED_SMITHING_TABLE_PATTERN);
+        if (smithing != null) return smithing.resultItem();
+        var cutting = stack.get(appeng.api.ids.AEComponents.ENCODED_STONECUTTING_PATTERN);
+        return cutting == null ? ItemStack.EMPTY : cutting.output();
+    }
+
+    @Override public void addDrops(java.util.List<ItemStack> drops) {
+        super.addDrops(drops);
+        for (var stack : slots.nonEmptyStacks()) drops.add(stack.copy());
+    }
+    @Override public void clearContent() {
+        super.clearContent();
+        slots.clear();
+    }
+    @Override public void writeToNBT(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.writeToNBT(tag, registries);
+        slots.write(tag, registries);
+    }
+    @Override public void readFromNBT(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.readFromNBT(tag, registries);
+        slots.read(tag, registries);
+        catalogDirty = true;
+    }
+
+    @Override public void exportSettings(DataComponentMap.Builder settings) {
+        var contents = slots.nonEmptyStacks();
+        // A native memory-card component can encode at most 256 entries. Never truncate a library.
+        if (contents.size() <= 256)
+            settings.set(appeng.api.ids.AEComponents.EXPORTED_PATTERNS,
+                    net.minecraft.world.item.component.ItemContainerContents.fromItems(contents));
+    }
     @Override public void importSettings(DataComponentMap settings, Player player) {
-        if (!host.isLoopCardInstalled()) {
-            super.importSettings(settings, player);
-            updatePatterns();
-        }
+        var desired = settings.get(appeng.api.ids.AEComponents.EXPORTED_PATTERNS);
+        if (desired == null || player == null || player.level().isClientSide()) return;
+        var requested = net.minecraft.core.NonNullList.withSize(desired.getSlots(), ItemStack.EMPTY);
+        desired.copyInto(requested);
+        slots.batch(() -> {
+            if (!player.getAbilities().instabuild) {
+                for (var old : slots.nonEmptyStacks()) {
+                    var returned = old.is(appeng.core.definitions.AEItems.CRAFTING_PATTERN.asItem())
+                            || old.is(appeng.core.definitions.AEItems.PROCESSING_PATTERN.asItem())
+                            || old.is(appeng.core.definitions.AEItems.SMITHING_TABLE_PATTERN.asItem())
+                            || old.is(appeng.core.definitions.AEItems.STONECUTTING_PATTERN.asItem())
+                            ? appeng.core.definitions.AEItems.BLANK_PATTERN.stack(old.getCount()) : old.copy();
+                    player.getInventory().placeItemBackInInventory(returned);
+                }
+            }
+            slots.clear();
+            for (var stack : requested) {
+                if (!acceptsPattern(stack)) continue;
+                var blank = appeng.core.definitions.AEItems.BLANK_PATTERN.stack();
+                if (!player.getAbilities().instabuild && player.getInventory().countItem(blank.getItem()) == 0) continue;
+                var remaining = slots.addItems(stack.copyWithCount(1));
+                if (remaining.isEmpty() && !player.getAbilities().instabuild)
+                    new appeng.util.inv.PlayerInternalInventory(player.getInventory()).removeItems(1, blank, null);
+            }
+        });
     }
 }

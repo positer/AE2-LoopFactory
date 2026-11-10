@@ -43,7 +43,7 @@
 - Bound graph algorithms by both depth and explored states, and never report budget exhaustion as proof that no solution exists.
 - Keep material quantities and compressed plan counts in `long`; state-count limits remain `int` because they bound allocated search memory.
 - Version adapters may expose shared solver entry points, but AE2 inventory discovery, security, and crafting-job submission stay server-authoritative and version-local.
-- The ring terminal and supercomputing interface remain UI-free AE2 network service nodes. The Crafting Ripper explicitly reuses AE2's pattern-provider menu/screen and configuration controls with 36 pattern slots; no separate visual language or duplicated priority workflow is introduced.
+- The ring terminal and supercomputing interface remain UI-free AE2 network service nodes. The Crafting Ripper explicitly reuses AE2's pattern-provider menu/screen and configuration controls with a 36-slot visible window over dynamically growing pattern storage; no separate visual language or duplicated priority workflow is introduced.
 - Build reverse producer indexes before relevance traversal; never rescan the full recipe list for each newly required resource.
 - Compile graph recipes as sparse touched-resource transitions. Dense per-recipe vectors require benchmark evidence before introduction.
 - Preserve breadth-first minimum-application semantics and explicit budgets when optimizing; performance claims must name their bounded input and avoid claiming mathematical optimality for Pareto-frontier search.
@@ -95,7 +95,7 @@
 - Mod isolation is a release-blocking invariant: source, build outputs, packaged JARs, PCL instances, and GitHub assets must contain only the generation-matched AE2LF artifact and explicitly pinned runtime dependencies. Optional Create/Mekanism compatibility remains conditional data-only integration; never bundle their classes, JARs, configs, saves, or directories, and never copy or reference ImmortalStorage state.
 - Crafting Ripper execution preflights the complete selected chain against live recipe semantics and detached CPU stock before committing. Keep all repeated quantities in checked signed 64-bit arithmetic and consume compressed ring schedules without expanding repetitions; preserve remainders, cyclic seeds, cancellation and requester backpressure.
 - Charge Crafting Ripper idle and active work at 5 AE/t, plus exactly 50 AE per committed whole-chain rip. Retrying delivery must not charge or calculate again.
-- Loop Card insertion locks only pattern insertion: retain installed patterns, permit removal, show disabled grey slots and publish live recipe-backed automatic patterns. Card removal restores the physical patterns. Never advertise fabricated static outputs for input-dependent recipes.
+- 2026-11-10：循环卡不再禁用手动样板。按完整产物键（含组件）排除被手动样板覆盖的全部自动配方，缺料不得自动换方；其他产物继续发布真实配方。样板库存按最后占用行扩容并保留一整行空槽；原生菜单只同步四行窗口，翻页确认前拦截旧窗口操作。不得给动态配方编造静态产物。
 - Loop Card uses the pinned native AE2 acceleration-card PNG as the immutable shell. Change only the central emblem; preserve dimensions, alpha, cyan side contacts and red status pixels exactly. Its recipe uses the user-confirmed advanced card, not the basic card.
 - Portable FE-to-AE charging uses AE2's configured unit conversion and native charge limits. FE capability simulations are read-only; the 26.1.2 transactional adapter must commit both energy amounts and inventory components atomically. Refresh cached portable inventories after external component changes to prevent stale FE resurrection.
 
@@ -209,3 +209,5 @@ Recipe output references: O1, O2, ... select native recipe outputs in order, ind
 - 编辑页复用原生标题与背包锚点（top 6；left 8；bottom 84／26／95），避免另写偏移制造风格漂移。
 - 打开代码页沿用原生工作台图标；返回仅加工配方页使用加工图标。22px 水平页签与边框重叠 3px，并与编辑区域对齐。
 - UI 对齐需与同语言下实际打开的原版页面比较槽位和标题像素，不能只证明继承了同一个 Screen。
+
+- 2026-11-10：合成撕裂者显式使用 AE2 样板管理终端的 `Scrollbar.BIG` 皮肤与原生拖动／滚轮处理；不要将默认构造器对应的创造背包滑块误认为 AE2 专用皮肤。

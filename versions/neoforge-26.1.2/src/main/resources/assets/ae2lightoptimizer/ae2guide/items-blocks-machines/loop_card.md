@@ -23,14 +23,10 @@ The Loop Card fits a [Crafting Ripper](crafting_ripper.md) or any
 ## Crafting Ripper
 
 The card publishes automatically discovered, encodable crafting, smithing and
-stonecutting recipes. Installed patterns remain in the four grey rows and may
-be removed, but new patterns cannot be inserted until the card is removed.
-Removing the card immediately restores the retained physical patterns.
-
-Special crafting recipes are included. Component-dependent variants, such as
-written books and dyed equipment, are discovered from real network contents and
-refresh when new item keys arrive. Recipes with world postprocessing, including
-map expansion, run through the ripper's native continuation instead of instant ripping.
+stonecutting recipes. Manual patterns remain editable in the scrollable inventory.
+Installed patterns exclusively select recipes for their exact outputs, including
+components; automatic alternatives for those outputs are excluded even when
+manual ingredients are missing. Other outputs retain all encodable automatic recipes.
 
 ## Portable charging
 
