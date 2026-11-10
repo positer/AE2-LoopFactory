@@ -47,6 +47,8 @@ public final class FactoryMachine {
     private static final int INSTRUCTIONS_PER_TICK = 4096;
     private static final long RECIPE_INSTRUCTION_LIMIT = 1_000_000;
     private final FactoryProgram program;
+    // Bounded by this program; lazy decoding preserves execution-time diagnostics.
+    private final String[][] transferArguments;
     private final List<Integer> returns = new ArrayList<>();
     private int pc;
     private long delay;
@@ -59,7 +61,10 @@ public final class FactoryMachine {
     private boolean pendingTransfer;
     private long transferRemaining;
 
-    public FactoryMachine(FactoryProgram program) { this.program = program; }
+    public FactoryMachine(FactoryProgram program) {
+        this.program = program;
+        this.transferArguments = new String[program.instructions().size()][];
+    }
 
     public static FactoryMachine restore(FactoryProgram program, Snapshot snapshot) {
         var machine = new FactoryMachine(program);
@@ -106,15 +111,18 @@ public final class FactoryMachine {
         if (delay > 0 && --delay > 0) return;
         Set<ControlState> visited = new HashSet<>();
         long progress = 0;
+        List<Integer> frames = List.copyOf(returns);
         try {
             for (int steps = 0; steps < INSTRUCTIONS_PER_TICK; steps++) {
-                if (!visited.add(new ControlState(pc, List.copyOf(returns), progress)))
+                if (!visited.add(new ControlState(pc, frames, progress)))
                     throw new IllegalStateException("Loop makes no progress; use wait or redstone for at least 1 tick");
                 if(program.recipe()&&++recipeInstructions>RECIPE_INSTRUCTION_LIMIT)throw new IllegalStateException("Recipe execution exceeded its finite instruction budget");
                 var instruction = program.instructions().get(pc);
                 switch (instruction.op()) {
                     case GET, PUT -> {
-                        String[] arguments = instruction.argument().split(instruction.argument().contains("\u001f")?"\u001f":" ", -1);
+                        String[] arguments = transferArguments[pc];
+                        if (arguments == null) transferArguments[pc] = arguments = instruction.argument().split(
+                                instruction.argument().contains("\u001f") ? "\u001f" : " ", -1);
                         int channel = effectiveChannel(arguments.length > 3 ? Integer.parseInt(arguments[3].strip()) : 0);
                         if(instruction.op()==FactoryProgram.Op.GET) {
                             // Channel 0 keeps the legacy signature so existing hosts stay authoritative.
@@ -170,11 +178,13 @@ public final class FactoryMachine {
                     case CALL -> {
                         if (returns.size() >= MAX_CALL_DEPTH) throw new IllegalStateException("Function recursion exceeds 64 frames");
                         returns.add(pc + 1);
+                        frames = List.copyOf(returns);
                         pc = program.functions().get(instruction.argument());
                     }
                     case RETURN -> {
                         if (returns.isEmpty()) throw new IllegalStateException("Return outside function");
                         pc = returns.removeLast();
+                        frames = List.copyOf(returns);
                     }
                     case DONE -> { stopped = true; return; }
                 }

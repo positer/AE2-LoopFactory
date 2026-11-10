@@ -40,7 +40,8 @@ class LoopCrystalContentContractTest {
         assertTrue(create.contains("\"tag\": \"c:gems/loop_crystal\""));
         assertTrue(create.contains("ae2lightoptimizer:loop_crystal_powder"));
         String growth = Files.readString(Path.of("src/main/resources/data/ae2lightoptimizer/recipe/loop_crystal_shaped.json"));
-        assertTrue(growth.contains("\"pattern\":[\"ABA\",\"BCB\",\"ABA\"]"));
+        assertTrue(growth.contains("\"pattern\":[\"ABA\",\"B B\",\"ABA\"]"));
+        assertTrue(!growth.contains("ae2:fluix"));
         String drop = Files.readString(Path.of("src/main/resources/data/ae2/loot_table/blocks/mysterious_cube.json"));
         assertTrue(drop.contains("\"name\": \"ae2lightoptimizer:loop_crystal\""));
     }

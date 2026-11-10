@@ -26,7 +26,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-public final class RecipeRingSolverTerminalBlockEntity extends BlockEntity
+public final class RecipeRingSolverTerminalBlockEntity extends appeng.blockentity.AEBaseBlockEntity
         implements IInWorldGridNodeHost {
     private static final RecipeRingSolver SOLVER = new RecipeRingSolver();
     private static final SinglePatternBatchPlanner BATCH_PLANNER = new SinglePatternBatchPlanner();
@@ -73,14 +73,14 @@ public final class RecipeRingSolverTerminalBlockEntity extends BlockEntity
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+    public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         mainNode.saveToNBT(tag);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void loadTag(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadTag(tag, registries);
         mainNode.loadFromNBT(tag);
     }
 

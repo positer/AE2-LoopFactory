@@ -69,6 +69,7 @@ public final class RecoveryAudit {
                 place(lane.pos.east(10),FactoryContent.PROVIDER.get().defaultBlockState());lane.empty=(FactoryBlockEntity)level.getBlockEntity(lane.pos.east(10));lanes.add(lane);
             }
             preloadEntityArea(LONG_PROGRAM_POS);
+            MachineWrenchAudit.place(level);
         }catch(Throwable error){finish(error);}
     }
     private static void place(BlockPos pos,net.minecraft.world.level.block.state.BlockState state){level.setChunkForced(pos.getX()>>4,pos.getZ()>>4,true);level.setBlockAndUpdate(pos,state);}
@@ -101,6 +102,7 @@ public final class RecoveryAudit {
         if(!started||finished)return;
         try {
             if(++ticks>timeoutTicks())throw new IllegalStateException("Recovery audit timed out");if(ticks<100)return;
+            MachineWrenchAudit.verify(level,player);
             if(index==3){longProgramPreflight();return;}var l=lanes.get(index);
             if(phase==0) {
                 if(!entityAreaReady(l.pos,"before-case-"+index)||!entityAreaReady(l.empty.getBlockPos(),"before-empty-copy-"+index))return;
@@ -216,8 +218,9 @@ public final class RecoveryAudit {
                 var code=prefix+"x".repeat(FactoryCompiler.MAX_SOURCE_LENGTH-prefix.length()-5)+"\ndone";
                 check(code.length()==65536&&unique.add(code),"all_64_programs_are_different_and_exactly_65536_characters");
                 var data=new FactoryPatternData(code,host.factoryId(),ItemStack.EMPTY);
-                queued.add(new FactoryJob(host,data));
                 if(i==0){longProgramPattern=ModItems.LOOP_FACTORY_PATTERN.get().getDefaultInstance();longProgramPattern.set(FactoryPatternData.TYPE.get(),data);host.factoryPatterns().setItemDirect(0,longProgramPattern.copy());}
+                // Install the physical pattern before constructing the queue: its callback cancels old jobs.
+                queued.add(new FactoryJob(host,data));
             }
             check(queued.size()==64&&queued.stream().allMatch(j->{var s=j.save();return s.input().isEmpty()&&s.output().isEmpty()&&s.nativeRecovery().isEmpty();}),"all_64_valid_queued_programs_have_no_private_resources");
             row.put("queuedPrograms",64);row.put("charactersPerProgram",65536);row.put("totalSourceCharacters",64L*65536L);

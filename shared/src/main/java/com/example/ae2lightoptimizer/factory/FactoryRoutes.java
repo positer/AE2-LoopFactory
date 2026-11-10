@@ -40,7 +40,7 @@ public final class FactoryRoutes {
             if (allowed == 0) continue;
             long committed = mover.move(source, selector, tag, face, allowed);
             if (committed < 0 || committed > allowed) throw new IllegalStateException("Invalid routing transfer result");
-            sources.set(i, new Source(source.selector, source.tag, source.face, source.remaining - committed,source.must,source.channel));
+            if (committed > 0) sources.set(i, new Source(source.selector, source.tag, source.face, source.remaining - committed,source.must,source.channel));
             moved += committed;
         }
         return moved;

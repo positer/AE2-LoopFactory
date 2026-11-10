@@ -61,10 +61,26 @@ public final class FactoryServer {
                 .min(java.util.Comparator.<FactoryBlockEntity>comparingInt(host -> host.isProvider() ? 0 : 1)
                         .thenComparingLong(host -> host.getBlockPos().asLong())).orElse(null);
     }
+    /** One live election per query, with no topology retained between operations. */
+    private static java.util.Map<IGrid, FactoryBlockEntity> owners() {
+        var result = new java.util.IdentityHashMap<IGrid, FactoryBlockEntity>();
+        for (var host : LOADED) {
+            if (host.isRemoved() || host.kind() == FactoryBlock.Kind.CABLE || !host.isolated()
+                    || UniqueNetworkServices.disconnected(host)) continue;
+            var grid = host.factoryGrid();
+            if (grid == null) continue;
+            var current = result.get(grid);
+            if (current == null || (host.isProvider() && !current.isProvider())
+                    || (host.isProvider() == current.isProvider()
+                        && host.getBlockPos().asLong() < current.getBlockPos().asLong())) result.put(grid, host);
+        }
+        return result;
+    }
     public static java.util.List<FactoryBlockEntity> providers(IGrid grid) {
         if(grid==null)return java.util.List.of();
+        var elected = owners();
         return LOADED.stream().filter(host -> !host.isRemoved() && host.isProvider()
-            && host.getMainNode().getGrid()==grid && host.isolated() && owner(host.factoryGrid())==host)
+            && host.getMainNode().getGrid()==grid && host.isolated() && elected.get(host.factoryGrid())==host)
             .sorted(java.util.Comparator.comparingLong(host -> host.getBlockPos().asLong())).toList();
     }
     public static FactoryBlockEntity find(net.minecraft.world.level.Level level, String id) {
@@ -74,8 +90,8 @@ public final class FactoryServer {
     }
     public static FactoryBlockEntity at(net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos) {
         if (level.getBlockEntity(pos) instanceof FactoryBlockEntity host && host.isProvider()) return owner(host.factoryGrid());
-        return LOADED.stream().filter(host -> !host.isRemoved() && host.getLevel() == level
-                && owner(host.factoryGrid()) == host && contains(host.factoryGrid(), pos))
+        return owners().values().stream().filter(host -> host.getLevel() == level
+                && contains(host.factoryGrid(), pos, host))
                 .min(java.util.Comparator.comparingLong(host -> host.getBlockPos().asLong())).orElse(null);
     }
     public static boolean contains(IGrid grid, net.minecraft.core.BlockPos pos) {

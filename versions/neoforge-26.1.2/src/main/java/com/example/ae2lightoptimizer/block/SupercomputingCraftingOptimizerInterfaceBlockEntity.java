@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
-public final class SupercomputingCraftingOptimizerInterfaceBlockEntity extends BlockEntity
+public final class SupercomputingCraftingOptimizerInterfaceBlockEntity extends appeng.blockentity.AEBaseBlockEntity
         implements IInWorldGridNodeHost {
     private static final IGridNodeListener<SupercomputingCraftingOptimizerInterfaceBlockEntity> NODE_LISTENER =
             new IGridNodeListener<>() {
@@ -62,14 +62,14 @@ public final class SupercomputingCraftingOptimizerInterfaceBlockEntity extends B
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
+    public void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         mainNode.serialize(output);
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
+    public void loadTag(ValueInput input) {
+        super.loadTag(input);
         mainNode.deserialize(input);
     }
 

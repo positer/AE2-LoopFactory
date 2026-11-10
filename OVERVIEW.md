@@ -728,3 +728,15 @@ Final native factory performance evidence is archived under `archive/2026-09-09-
 每代 717／1001 个原文件中，仅 AE2LF JAR 被替换；其他 716／1000 个文件的字节、创建时间和修改时间保持一致，其中存档为 665／905 个文件。依赖、配置和旧备份保持原样；每个实例仅新增一份旧 JAR 备份，未启动游戏。本轮文档提交不改变上述代码制品或其哈希。
 
 留痕位于显式同级路径 `../Minecraft Forge Workspace/archive/20261110-190859-ae2lf-pcl-deploy/`。部署前清单、原子替换兼容性失败原件、完整恢复点核对、最终替换与独立回读分别保留。`evidence/verify-deployment.py` 可使用新输出名再次核对，不重跑已完成的部署脚本。
+
+## 2026-11-10 工厂运行与拆解验证入口
+
+- `shared/.../factory/FactoryMachine.java`：按执行实例惰性解析物流参数；调用栈只有 CALL／RETURN 时生成新快照，等待与持久化格式沿用原契约。
+- `shared/.../factory/FactoryRoutes.java`：输出实际提交量为零时沿用原声明；成功提交才更新剩余额度。
+- 两代 `factory/FactoryServer.java`：批量查询使用操作内的网络负责人映射，优先供应器、再按坐标排序，不跨查询缓存世界拓扑。
+- 两代 `block/RecipeRingSolverTerminalBlockEntity.java`、`block/SupercomputingCraftingOptimizerInterfaceBlockEntity.java`：通过 `AEBaseBlockEntity` 接入原生扳手与权限流程；现有节点存储键保持兼容，读取迁移到原生 `loadTag` 回调。
+- 两代 `data/ae2lightoptimizer/recipe/loop_crystal_shaped.json`（1.21.1）／`loop_crystal_from_grid.json`（26.1.2）：循环水晶空中心配方；对应 `LoopCrystalContentContractTest` 检查资源。
+- `tools/runtime-factory-probe/{1.21.1,26.1.2}/src/main/java/com/example/ae2lfprobe/MachineWrenchAudit.java`：六类机器的真实 AE2 钩子、工具与副手拒绝、物品放回再拆、稀疏样板与循环卡数量、原生合成输出检查；由 `RecoveryAudit` 场景调用。其长程序夹具先写样板再装载任务，避免编辑回调取消首个测试任务。
+- `tools/factory-runtime-benchmark/README.md`：微基准用途与复现命令；`FactoryPerf.java` 构造固定纯 Java 工作负载；`benchmark.py` 提取 Git 基线、编译前后版本并输出分配与耗时 JSON。
+
+归档入口为 `../Minecraft Forge Workspace/archive/20261110-193404-ae2lf-factory-wrench/`；最终制品与 Git 标签以该归档的验收记录为准。

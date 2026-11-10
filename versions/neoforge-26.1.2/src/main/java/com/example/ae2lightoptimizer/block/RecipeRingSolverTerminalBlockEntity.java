@@ -26,7 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
-public final class RecipeRingSolverTerminalBlockEntity extends BlockEntity
+public final class RecipeRingSolverTerminalBlockEntity extends appeng.blockentity.AEBaseBlockEntity
         implements IInWorldGridNodeHost {
     private static final RecipeRingSolver SOLVER = new RecipeRingSolver();
     private static final SinglePatternBatchPlanner BATCH_PLANNER = new SinglePatternBatchPlanner();
@@ -73,14 +73,14 @@ public final class RecipeRingSolverTerminalBlockEntity extends BlockEntity
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
+    public void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         mainNode.serialize(output);
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
+    public void loadTag(ValueInput input) {
+        super.loadTag(input);
         mainNode.deserialize(input);
     }
 

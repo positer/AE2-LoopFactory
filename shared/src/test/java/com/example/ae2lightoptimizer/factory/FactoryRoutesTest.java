@@ -4,6 +4,24 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FactoryRoutesTest {
+    @Test void blockedPollingKeepsTheSameDeclarationUntilAnActualCommit() {
+        var routes = new FactoryRoutes();
+        routes.declare("minecraft:iron_ingot", "A", "north", 64, true, 7);
+        var original = routes.snapshot().getFirst();
+        for (int i = 0; i < 10_000; i++) {
+            assertEquals(0, routes.output("*", "B", "south", 64, (s, f, t, side, n) -> 0));
+            assertSame(original, routes.snapshot().getFirst());
+        }
+        assertThrows(IllegalStateException.class, () -> routes.output("*", "B", "south", 64,
+                (s, f, t, side, n) -> n + 1));
+        assertSame(original, routes.snapshot().getFirst());
+        assertEquals(3, routes.output("*", "B", "south", 64, (s, f, t, side, n) -> 3));
+        var committed = routes.snapshot().getFirst();
+        assertEquals(61, committed.remaining());
+        assertEquals(7, committed.channel());
+        assertTrue(committed.must());
+        assertEquals(routes.snapshot(), FactoryRoutes.restore(routes.snapshot()).snapshot());
+    }
     @Test void mandatoryDeclarationSurvivesRestoreBeforeFirstOutput() {
         var routes=new FactoryRoutes();
         routes.declare("minecraft:iron_ingot","A","",64,true);
