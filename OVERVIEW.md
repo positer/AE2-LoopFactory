@@ -719,3 +719,12 @@ Final native factory performance evidence is archived under `archive/2026-09-09-
 两代完整构建和 270／268 项单测通过，最终原生场景为 `ripper-capacity-1.21.1-r2` 与 `ripper-capacity-26.1.2-r2`。验证原生 32 上限恢复、单面 40 个真实托管负载上线、六面 64 容量、无控制器总计 16 通过与 17 拒绝、已有 X2 倍率与无限模式、60 tick 重复终端稳定、拆装与拆分／合并、旁边独立网络不变。无环 CPU 计划仍由 `OPTIMIZER_INTERFACE` 接管，百万循环订单仍由环终端负责并保持一次 tick 与 50 AE。动态样板与原生滚动条回归通过，两代正常保存退出、运行时类／资源与最终 JAR 逐项一致，初始 10 个运行目录文件恢复。
 
 留痕：`../Minecraft Forge Workspace/archive/20261110-170305-ae2lf-channel-capacity/`。负载为原生 AE2 托管节点，不是同等数量的实体机器；实际区块卸载和跨 JVM 重新开档未单独运行，卸载撤销依赖同一原生移除节点生命周期。未推送、发布或部署 PCL。
+
+
+## 2026-11-10 19:08 PCL 最新制品部署
+
+用户授权后，将代码提交 `eea25677abbe296132cf65b58a91cca578b710c3` 的两代最终验收 JAR 部署至已有 `AE2-lightoptimizer-1.21.1` 与 `AE2-lightoptimizer-26.1.2` 实例。旧包分别备份在实例 `_superseded/20261110-190859-ae2lf-pcl-deploy/`；安装 SHA-256 与频道扩容原生验收一致。
+
+每代 717／1001 个原文件中，仅 AE2LF JAR 被替换；其他 716／1000 个文件的字节、创建时间和修改时间保持一致，其中存档为 665／905 个文件。依赖、配置和旧备份保持原样；每个实例仅新增一份旧 JAR 备份，未启动游戏。本轮文档提交不改变上述代码制品或其哈希。
+
+留痕位于显式同级路径 `../Minecraft Forge Workspace/archive/20261110-190859-ae2lf-pcl-deploy/`。部署前清单、原子替换兼容性失败原件、完整恢复点核对、最终替换与独立回读分别保留。`evidence/verify-deployment.py` 可使用新输出名再次核对，不重跑已完成的部署脚本。

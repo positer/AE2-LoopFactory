@@ -114,7 +114,7 @@ AE2LF keeps version-specific code in separate adapters and shares loader-indepen
 
 ## Installation
 
-Download the artifact for the target Minecraft generation from [GitHub Releases](https://github.com/positer/AE2-LoopFactory/releases). Put it in the instance's `mods/` directory with the matching AE2 and NeoForge files. Keep generation-specific artifacts in separate instances; never install two generations together.
+Download the artifact for the target Minecraft generation from [GitHub Releases](https://github.com/positer/AE2-LoopFactory/releases). Put it in the instance's `mods/` directory with the matching AE2 and NeoForge files. Keep generation-specific artifacts in separate instances; never install two generations together. For updates, back up the old AE2LF JAR, close the game, and replace only that addon; retain saves, configuration, and other mods.
 
 Create, Mekanism, Applied Flux, JEI, EMI, and other integrations are optional. When an integration is absent, its recipes and viewer hooks are unavailable while the core factory, storage, and AE2 services remain loadable.
 
@@ -263,7 +263,7 @@ AE2LF 将版本相关代码放在独立适配层，只共享与加载器无关�
 
 ## 安装
 
-从 [GitHub Releases](https://github.com/positer/AE2-LoopFactory/releases) 下载目标 Minecraft 世代的文件，将其放入实例的 `mods/` 目录，并同时放入匹配的 AE2 与 NeoForge 文件。不同世代必须使用不同实例，不要在同一实例中安装两个世代的 AE2LF。
+从 [GitHub Releases](https://github.com/positer/AE2-LoopFactory/releases) 下载目标 Minecraft 世代的文件，将其放入实例的 `mods/` 目录，并同时放入匹配的 AE2 与 NeoForge 文件。不同世代必须使用不同实例，不要在同一实例中安装两个世代的 AE2LF。 更新已有实例时，先正常退出游戏并备份旧 AE2LF JAR，只替换本模组，保留存档、配置和其他模组。
 
 Create、Mekanism、Applied Flux、JEI、EMI 及其他联动均为可选。缺少联动时，对应配方和查看器入口不可用，但核心工厂、存储和 AE2 服务仍可加载。
 
