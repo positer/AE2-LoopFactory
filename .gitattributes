@@ -1,0 +1,2 @@
+# GuideME 页面保持 LF，确保资源与文档门禁跨平台一致。
+versions/neoforge-*/src/main/resources/assets/ae2lightoptimizer/ae2guide/** text eol=lf

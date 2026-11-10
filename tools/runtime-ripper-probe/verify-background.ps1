@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory=$true)][ValidateSet('1.21.1','26.1.2')][string]$Generation,
-    [Parameter(Mandatory=$true)][ValidateSet('template','smithing','layered','core256m','catalog_audit','native_catalog','exact_components','pack_catalog','tool_components')][string]$Chain,
+    [Parameter(Mandatory=$true)][ValidateSet('template','channel_capacity','smithing','layered','core256m','catalog_audit','native_catalog','exact_components','pack_catalog','tool_components')][string]$Chain,
     [Parameter(Mandatory=$true)][ValidatePattern('^ripper-[A-Za-z0-9_.-]+$')][string]$EvidenceName,
     [string]$EvidenceRoot,
     [switch]$PrepareOnly
@@ -167,7 +167,7 @@ try {
 
     $report = Read-PassingFixture 'report.json'
     if ($report.minecraft -ne $Generation -or $report.world -ne $world) { throw 'Report generation/world is not this run' }
-    $chainNames = @{template='template_growth';smithing='template_growth_then_netherite_pickaxe_smithing';layered='logs_planks_sticks_tool_and_template_growth_then_smithing';core256m='all_ten_core_tiers_crystal_growth_and_netherite_ingots';native_catalog='native_catalog_map_extension';exact_components='exact_components';catalog_audit='catalog_audit';pack_catalog='pack_catalog';tool_components='tool_components'}
+    $chainNames = @{channel_capacity='channel_capacity';template='template_growth';smithing='template_growth_then_netherite_pickaxe_smithing';layered='logs_planks_sticks_tool_and_template_growth_then_smithing';core256m='all_ten_core_tiers_crystal_growth_and_netherite_ingots';native_catalog='native_catalog_map_extension';exact_components='exact_components';catalog_audit='catalog_audit';pack_catalog='pack_catalog';tool_components='tool_components'}
     if ($report.chain -ne $chainNames[$Chain]) { throw 'The requested chain is not the completed fixture' }
     if ($report.ripperConfiguredIdleAEPerTick -ne 5) { throw 'Ripper idle drain did not remain 5 AE/t' }
     $independentReports = @{
@@ -177,12 +177,21 @@ try {
     if ($independentReports.ContainsKey($Chain)) {
         foreach ($file in $independentReports[$Chain]) { $null = Read-PassingFixture $file }
     }
-    if ($Chain -eq 'template') {
+    if ($Chain -eq 'template' -or $Chain -eq 'channel_capacity') {
         $null = Read-PassingFixture 'dynamic-patterns-report.json'
         $null = Read-PassingFixture 'dynamic-pattern-ui.json'
         foreach ($frame in @('ae2lo-ripper-bottom.png','ae2lo-ripper-after-bulk.png','ae2lo-ripper-pattern-access-high-slot.png')) {
             if (-not (Test-Path -LiteralPath (Join-Path $evidence ('screenshots/' + $frame)))) { throw "Missing dynamic native frame: $frame" }
         }
+    }
+    if ($Chain -eq 'channel_capacity') {
+        $capacity = Read-PassingFixture 'channel-capacity-report.json'
+        $requiredCapacityChecks=@('baseline_dense_32_active','baseline_adhoc_15_rejected','dense_40_active_over_old_face_limit','adhoc_16_including_optimizer_active','all_six_faces_verified','native_smart_visual_normalizes_40_of_64_to_20_of_32','adhoc_17_rejected_without_boost_oscillation','adhoc_recovers_after_excess_load_removed','configured_x2_mode_is_doubled_not_replaced','infinite_mode_unchanged','duplicate_optimizers_do_not_stack','removing_optimizer_restores_face_and_dense_limits','removing_optimizer_restores_adhoc_limit','reinstalling_optimizer_repaths_both_networks','split_load_grids_do_not_keep_stale_capacity','merged_network_restores_capacity')
+        foreach ($check in $requiredCapacityChecks) { if ($capacity.$check -ne $true) {throw "Missing native capacity check: $check"} }
+        foreach ($index in 0..5) {if ($capacity.("controller_face_${index}_64") -ne $true) {throw 'Not all six controller faces passed'}}
+        foreach ($index in @(1,2,7,8,12)) {if ($capacity.("independent_grid_unchanged_phase_$index") -ne $true) {throw 'Independent network isolation failed'}}
+        $crafting=Read-PassingFixture 'dynamic-patterns-report.json'
+        if ($capacity.duplicateStableServerTicks -lt 60 -or $crafting.originalOptimizerCpuOwnership -ne $true -or $report.channelOptimizerOnline -ne $true) {throw 'Stable duplicate election or original optimizer CPU ownership failed'}
     }
     if ($Chain -eq 'core256m') {
         if ($report.scheduleOwner -ne 'RING_TERMINAL' -or $report.bothPlannerServicesOnline -ne $true -or

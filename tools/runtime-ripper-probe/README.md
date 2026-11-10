@@ -163,3 +163,12 @@ Compilation and launch are coordinated from outside the production Gradle source
 样板管理终端通过真实菜单的服务端 `doAction` 回调放取尾槽，要求镜像尺寸重建、旧服务端条目标识失效；另以第 40004 槽及 379 张实体样板检查客户端真正收到分包后的完整原生镜像。这不是操作系统鼠标实测。撕裂者界面则调用产品滚轮处理器并发送原生客户端库存点击消息，检查第 377 槽哨兵、插入尾行扩容、Shift 取出收缩及 64 张批量放入，另存两张原生截图。
 
 `verify-background.ps1 -EvidenceRoot <目录>` 可将留痕写到显式指定的枢纽归档目录。每次用新的 `-EvidenceName`，失败原件保留。`template` 门禁同时要求 `dynamic-patterns-report.json`、`dynamic-pattern-ui.json` 与原生截图存在并通过；仍要求正常保存退出、运行时制品身份一致和 `run/mods` 哈希恢复。
+
+
+## 2026-11-10 超算频道扩容验收
+
+新增 `-Chain channel_capacity`，入口仍为独立新世界与最终制品身份校验。主网络从开始就接入超算接口，保留两轮百万模板增长与原生环终端所有权；后续无环订单要求 `OPTIMIZER_INTERFACE` 所有权。
+
+`ChannelCapacityFixture` 使用物理控制器、普通／致密智能线缆和三块各一次充入 1,000,000 AE 的有限能量单元。40／15／9 个负载是通过真实 `GridHelper` 连接的托管节点，分别用于控制器单面、无控制器网络与独立反例；它们不是同等数量的实体机器。各测试网络显式采用自己的 DEFAULT／X2／INFINITE 模式，不修改用户全局配置。
+
+门禁包括：原 32 容量与新单面 40 个上线负载、六面 64 容量、无控制器 16 总频道（含接口）通过与 17 拒绝、智能线缆原生灯条比例、已有倍率组合、无限保持、重复接口连续 60 个服务端 tick 稳定、拆除恢复、重装、拆分、合并与独立网络隔离。完整结果保存为 `channel-capacity-report.json`。包装器要求所有关键检查存在，保留最终运行时字节匹配、正常退出和原目录恢复门禁。

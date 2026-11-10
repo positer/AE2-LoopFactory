@@ -94,6 +94,11 @@ public final class DynamicPatternFixture {
     }
     private static void submit(ICraftingPlan plan) {
         require(!plan.simulation() && plan.missingItems().isEmpty(),"Unexpected missing materials");
+        if (ChannelCapacityFixture.ENABLED) {
+            var schedule=((com.example.ae2lightoptimizer.integration.ScheduledCraftingPlan)plan).ae2lightoptimizer$getSchedule();
+            require(schedule!=null && schedule.owner()==com.example.ae2lightoptimizer.integration.CraftingExecutionSchedule.Owner.OPTIMIZER_INTERFACE,"Original acyclic optimizer no longer owns the native plan");
+            checks.put("originalOptimizerCpuOwnership",true);
+        }
         require(grid.getCraftingService().submitJob(plan,null,cpu,false,new MachineSource(grid::getPivot)).successful(),"Native CPU submission rejected");
     }
     public static boolean tick() throws Exception {

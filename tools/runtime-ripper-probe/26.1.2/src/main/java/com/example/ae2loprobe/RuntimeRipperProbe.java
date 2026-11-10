@@ -146,7 +146,7 @@ public final class RuntimeRipperProbe {
                     : CatalogAuditFixture.ENABLED ? "catalog_audit"
                     : Core256MFixture.ENABLED ? "all_ten_core_tiers_crystal_growth_and_netherite_ingots"
                     : LAYERED_CHAIN ? "logs_planks_sticks_tool_and_template_growth_then_smithing"
-                    : SMITHING_CHAIN ? "template_growth_then_netherite_pickaxe_smithing" : "template_growth");
+                    : SMITHING_CHAIN ? "template_growth_then_netherite_pickaxe_smithing" : ChannelCapacityFixture.ENABLED ? "channel_capacity" : "template_growth");
             if (!ToolComponentFixture.ENABLED && !ExactComponentFixture.ENABLED && !NativeCatalogFixture.ENABLED && !CatalogAuditFixture.ENABLED && !PackRecipeReloadFixture.ENABLED) report.put("initialRawStockPerKey", RAW);
             report.put("cpuStorageBlocks", CPU_BLOCKS);
             report.put("capacityOverride", false);
@@ -167,7 +167,7 @@ public final class RuntimeRipperProbe {
             }
             level.setBlockAndUpdate(RIPPER, ModBlocks.CRAFTING_RIPPER.get().defaultBlockState());
             level.setBlockAndUpdate(RING, ModBlocks.RECIPE_RING_SOLVER_TERMINAL.get().defaultBlockState());
-            if (Core256MFixture.ENABLED) level.setBlockAndUpdate(OPTIMIZER,
+            if (Core256MFixture.ENABLED || ChannelCapacityFixture.ENABLED) level.setBlockAndUpdate(OPTIMIZER,
                     ModBlocks.SUPERCOMPUTING_CRAFTING_OPTIMIZER_INTERFACE.get().defaultBlockState());
             var drive = (DriveBlockEntity) level.getBlockEntity(DRIVE);
             drive.getInternalInventory().setItemDirect(0, ModItems.INFINITE_LOOP_STORAGE_CELL.get().getDefaultInstance());
@@ -187,7 +187,7 @@ public final class RuntimeRipperProbe {
     private static void onTick(ServerTickEvent.Post event) {
         if (level == null || ProbeState.finished) return;
         try {
-            if (tick() - startedTick > 2400) throw new IllegalStateException("Probe timeout in " + ProbeState.phase);
+            if (tick() - startedTick > (ChannelCapacityFixture.ENABLED ? 5000 : 2400)) throw new IllegalStateException("Probe timeout in " + ProbeState.phase);
             switch (ProbeState.phase) {
                 case "network_boot" -> bootNetwork();
                 case "tool_components" -> {
@@ -267,6 +267,13 @@ public final class RuntimeRipperProbe {
                     if (player == null || "ae2lo-ripper-before.png".equals(ProbeState.screenshotCompleted)
                             || tick() - stateTick > 160) beginRun(1);
                 }
+                case "channel_capacity" -> {
+                    if (ChannelCapacityFixture.tick()) {
+                        report.put("channelCapacity",true);
+                        DynamicPatternFixture.start(level,player,grid,cpu,ripper,output);
+                        phase("dynamic_patterns");
+                    }
+                }
                 case "dynamic_patterns" -> {
                     if (DynamicPatternFixture.tick()) {
                         report.put("dynamicPatterns", true);
@@ -322,6 +329,10 @@ public final class RuntimeRipperProbe {
                 || grid.getActiveMachines(RecipeRingSolverTerminalBlockEntity.class).isEmpty()) return;
         if (cpu.getGrid() != grid || ripper.getMainNode().getGrid() != grid) {
             throw new IllegalStateException("Machines are not on the same physical grid");
+        }
+        if (ChannelCapacityFixture.ENABLED) {
+            if (grid.getActiveMachines(SupercomputingCraftingOptimizerInterfaceBlockEntity.class).isEmpty()) return;
+            report.put("channelOptimizerOnline",true);
         }
         if (Core256MFixture.ENABLED) {
             var optimizer = (SupercomputingCraftingOptimizerInterfaceBlockEntity) level.getBlockEntity(OPTIMIZER);
@@ -607,8 +618,11 @@ public final class RuntimeRipperProbe {
             phase("second_settling");
         } else {
             if (!SMITHING_CHAIN && !Core256MFixture.ENABLED) {
-                DynamicPatternFixture.start(level, player, grid, cpu, ripper, output);
-                phase("dynamic_patterns");
+                if (ChannelCapacityFixture.ENABLED) {
+                    ChannelCapacityFixture.start(level,player,output);phase("channel_capacity");
+                } else {
+                    DynamicPatternFixture.start(level, player, grid, cpu, ripper, output);phase("dynamic_patterns");
+                }
                 return;
             }
             report.put("passed", true);

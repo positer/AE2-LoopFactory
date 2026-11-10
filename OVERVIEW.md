@@ -695,3 +695,27 @@ Final native factory performance evidence is archived under `archive/2026-09-09-
 原生滚动条复核比较每代 720 个不透明滑块像素，RGB 最大误差为 0，轨道上下端点和中段一致；此前默认滑块的最大误差为 192，被同一比较拒绝。两代正常保存退出，运行时类与资源逐项匹配最终 JAR，初始 10 个运行目录文件全部按哈希恢复。NBT 验收是同进程编解码，未声称跨进程重新开档；终端尾槽放取调用原生服务端菜单，撕裂者窗口放取使用真实客户端库存消息。未部署 PCL、未推送或发布。
 
 留痕位于显式同级路径 `../Minecraft Forge Workspace/archive/20261110-103000-ae2lf-ripper-dynamic/`，最终结果为 `after/verification.json`，独立回读脚本为 `evidence/collect_results.py`。原始失败、中间功能通过与最终原生皮肤验收分开保留。
+
+
+## 2026-11-10 超算接口频道扩容结构
+
+- `docs/optimizer-channel-capacity.md`：接入即生效的容量规则、原有计算加速条件、模式组合、网络生命周期与验收边界。
+- `shared/src/main/java/com/example/ae2lightoptimizer/network/ChannelCapacityPolicy.java`：不依赖游戏 API 的有限容量乘二、零容量与无限值保持、溢出饱和。
+- `shared/src/test/java/com/example/ae2lightoptimizer/network/ChannelCapacityPolicyTest.java`：默认／已有倍率、未接入、禁载、无限与溢出边界。
+- 两代 `integration/OptimizerChannelCapacity.java`：查询当前路径服务的接入状态，供节点与连接容量读取。
+- 两代 `mixin/OptimizerChannelPathingMixin.java`：按原生节点加入／移除维护本网络超算节点集合，并扩大无控制器网络的总频道限制。
+- 两代 `mixin/OptimizerChannelNodeMixin.java`：原生节点／线缆容量按当前网络乘二，保持零和无限值。
+- 两代 `mixin/OptimizerChannelConnectionMixin.java`：扩大原生连接容量，涵盖控制器各面，继续使用 AE2 的寻路与频道分配。
+- 两代 `factory/UniqueNetworkServices.java`：唯一服务选举通过 AE2 节点宿主能力识别原生线缆；保留直接宿主回退以及先断开失选者再接入胜者的顺序。
+- 两代游戏指南 `ae2guide/items-blocks-machines/supercomputing_crafting_optimizer_interface.md` 与 `ae2guide/_zh_cn/items-blocks-machines/supercomputing_crafting_optimizer_interface.md`：中英文容量效果、占用、自身功耗与非叠加说明。
+- `tools/runtime-ripper-probe/*/.../ChannelCapacityFixture.java`：物理控制器、普通／致密智能线缆、有限能量单元与真实 AE2 托管负载，检查容量边界、六面、拆装、拆分合并、独立网络和持续选举稳定。
+- `RuntimeRipperProbe.java`、`DynamicPatternFixture.java`：`channel_capacity` 链保持原生循环 CPU 执行，并核对无环计划的 `OPTIMIZER_INTERFACE` 所有权。
+- `tools/runtime-ripper-probe/verify-background.ps1 -Chain channel_capacity`：要求完整覆盖、60 tick 稳定区间、原有计算所有权、制品身份、正常退出和运行目录恢复。
+
+- 根目录 `.gitattributes`：仅固定 GuideME 页面为 LF，避免 Windows 检出改变指南资源行尾及已有文档门禁。
+
+### 频道扩容验收结果
+
+两代完整构建和 270／268 项单测通过，最终原生场景为 `ripper-capacity-1.21.1-r2` 与 `ripper-capacity-26.1.2-r2`。验证原生 32 上限恢复、单面 40 个真实托管负载上线、六面 64 容量、无控制器总计 16 通过与 17 拒绝、已有 X2 倍率与无限模式、60 tick 重复终端稳定、拆装与拆分／合并、旁边独立网络不变。无环 CPU 计划仍由 `OPTIMIZER_INTERFACE` 接管，百万循环订单仍由环终端负责并保持一次 tick 与 50 AE。动态样板与原生滚动条回归通过，两代正常保存退出、运行时类／资源与最终 JAR 逐项一致，初始 10 个运行目录文件恢复。
+
+留痕：`../Minecraft Forge Workspace/archive/20261110-170305-ae2lf-channel-capacity/`。负载为原生 AE2 托管节点，不是同等数量的实体机器；实际区块卸载和跨 JVM 重新开档未单独运行，卸载撤销依赖同一原生移除节点生命周期。未推送、发布或部署 PCL。

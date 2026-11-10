@@ -23,7 +23,10 @@
     "RipperPatternMenuMixin",
     "RipperPatternTrackerMixin",
     "RipperPatternAccessMixin",
-    "AEBaseMenuPacketInvoker"
+    "AEBaseMenuPacketInvoker",
+    "OptimizerChannelPathingMixin",
+    "OptimizerChannelNodeMixin",
+    "OptimizerChannelConnectionMixin"
   ],
   "injectors": {
     "defaultRequire": 1

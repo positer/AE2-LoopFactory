@@ -87,7 +87,7 @@ Factory patterns can carry ordinary AE2 recipe data and factory code together. W
 
 **Recipe Ring Solver Terminal** handles cyclic crafting graphs. It condenses strongly connected components, reserves cyclic seeds in the selected CPU, and dispatches compressed batches in dependency order. A blocked batch cannot be skipped, and its cursor, repetitions, seed reserve, and output ownership persist across reloads.
 
-**Supercomputing Crafting Optimizer Interface** accelerates ordinary acyclic graphs. It discovers reachable producers, combines routes, models byproducts and container remainders, and declines before mutation when overflow or a valid integer plan cannot be proven, allowing AE2 to retain control.
+**Supercomputing Crafting Optimizer Interface** accelerates ordinary acyclic graphs. It discovers reachable producers, combines routes, models byproducts and container remainders, and declines before mutation when overflow or a valid integer plan cannot be proven, allowing AE2 to retain control. While attached, it also doubles its ME network's cable and per-face channel capacities: ordinary cables 8→16, dense cables and controller faces 32→64 in the default mode. The controller-free limit becomes 16, including the interface itself; the bonus does not stack.
 
 ### Loop Storage Cells
 
@@ -236,7 +236,7 @@ AE2LF 是独立项目。AE2 是核心前置；Create、Mekanism、Applied Flux�
 
 **配方环解算终端**处理循环合成图，压缩强连通分量，在选定 CPU 中保留循环种子，并按依赖顺序派发压缩批次。阻塞批次不能跳过，游标、重复次数、种子储备和产物归属可跨重载保存。
 
-**超算合成优化接口**加速普通无环合成图，发现可达供应器、合并物流路线、建模副产物和容器返还；若无法证明无溢出或有效整数计划，则在修改前放弃，让 AE2 接管。
+**超算合成优化接口**加速普通无环合成图，发现可达供应器、合并物流路线、建模副产物和容器返还；若无法证明无溢出或有效整数计划，则在修改前放弃，让 AE2 接管。接入后还会让所在 ME 网络的线缆与每面频道容量翻倍：默认普通线缆 8→16、致密线缆与控制器每面 32→64；无控制器网络上限增至 16（含接口自身），多个接口不叠加。
 
 ### 循环存储磁盘
 

@@ -33,7 +33,10 @@ public final class UniqueNetworkServices {
                 for(var side:Direction.values()) {
                     var pos=s.host.getBlockPos().relative(side);
                     if(!s.host.getLevel().hasChunkAt(pos))continue;
-                    if(s.host.getLevel().getBlockEntity(pos) instanceof IInWorldGridNodeHost neighbor) {
+                    // Native cable buses expose their node host through AE2's capability, not the BE class.
+                    var neighbor=s.host.getLevel().getCapability(appeng.api.AECapabilities.IN_WORLD_GRID_NODE_HOST,pos);
+                    if(neighbor==null && s.host.getLevel().getBlockEntity(pos) instanceof IInWorldGridNodeHost direct) neighbor=direct;
+                    if(neighbor!=null) {
                         var node=neighbor.getGridNode(side.getOpposite());
                         if(node!=null)union(parent,s,node.getGrid());
                     }
