@@ -74,10 +74,11 @@ public final class FactoryUploadScreen extends Screen {
                 clicked -> minecraft.setScreen(parent)));
     }
 
-    @Override public void render(net.minecraft.client.gui.GuiGraphics g, int mx, int my, float delta) {
+    @Override public void renderBackground(net.minecraft.client.gui.GuiGraphics g, int mx, int my, float delta) {
+        // 1.21.1 Screen.render blurs through renderBackground before drawing its widgets.
+        super.renderBackground(g, mx, my, delta);
         BackgroundGenerator.draw(panelWidth, panelHeight, g, left, top);
         g.drawString(font, title, left + 8, top + 8, 0xff404040, false);
-        super.render(g, mx, my, delta);
     }
 
     @Override public void onClose() { minecraft.setScreen(parent); }

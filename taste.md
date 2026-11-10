@@ -199,3 +199,5 @@ Recipe output references: O1, O2, ... select native recipe outputs in order, ind
 - 面板运行时直接组合 AE2 外壳／状态层；Blockbench 源文件必须反映其真实 12px 外壳和 8px 后部连接结构，不再以单片方盒冒充完整模型。
 - 既有资源生成或 Blockbench 导出后运行 `tools/align_ae2_visuals.py` 收口，重复生成必须一致；不得让旧的 SFM 外观覆盖新的 AE2 外壳。
 - 上传页使用 `BackgroundGenerator` 与 `AE2Button`，配方切换用横向 `TabButton`；保留服务器列表、UUID、原生编辑器与完整名称提示。
+
+- 1.21.1 的 `Screen.render` 会先执行背景模糊；自定义窗口与标题必须放在 `renderBackground` 的原生背景之后。渲染通过与视觉清晰是两项验收，保留模糊反例并比较原生边框像素。
