@@ -249,6 +249,8 @@
                 loop_factory_pattern_encoding_panel_dark: ringCoreMask(ringCore)
             },'panel',assets);
         }
+        // Finalize with each generation's pinned AE2 housing and accurate multipart source.
+        require('child_process').execFileSync('python', [root+'/tools/align_ae2_visuals.py'], {cwd:root, windowsHide:true});
         json(root+'/design/loop_factory/blockbench-export.json',report);
         Blockbench.showMessageBox({title:'AE2LF export complete',message:'Both generations exported. Panel rendering uses only AE2 native display_base/item models with the Loop Factory core masks.'});
     }

@@ -23,7 +23,10 @@ public final class FactoryEditorScreen extends AEBaseScreen<FactoryEditorMenu> {
     public FactoryEditorScreen(FactoryEditorMenu menu, Inventory inventory, Component title, ScreenStyle style) {
         super(menu, inventory, title, style);
         if(menu.isPanel()) {
-            widgets.add("recipePage", new FactoryIconButton(appeng.client.gui.Icon.TAB_CRAFTING, "gui.ae2lightoptimizer.factory.recipe_page", menu::recipePage));
+            var recipeTab = new appeng.client.gui.widgets.TabButton(appeng.client.gui.Icon.TAB_CRAFTING,
+                    Component.translatable("gui.ae2lightoptimizer.factory.recipe_page"), button -> menu.recipePage());
+            recipeTab.setStyle(appeng.client.gui.widgets.TabButton.Style.HORIZONTAL);
+            widgets.add("recipePage", recipeTab);
             widgets.add("upload", uploadButton = new FactoryIconButton(appeng.client.gui.Icon.ARROW_UP, "gui.ae2lightoptimizer.factory.upload", () -> {
                 if(editor!=null) menu.saveCode(editor.getValue());
                 minecraft.setScreen(new FactoryUploadScreen(this,menu));
@@ -42,7 +45,7 @@ public final class FactoryEditorScreen extends AEBaseScreen<FactoryEditorMenu> {
         editor.setCharacterLimit(FactoryCompiler.MAX_SOURCE_LENGTH);
         editor.setValue(previous);
         addRenderableWidget(editor);
-        statusHover=new net.minecraft.client.gui.components.AbstractWidget(leftPos+8,topPos+128,260,14,Component.empty()) {
+        statusHover=new net.minecraft.client.gui.components.AbstractWidget(leftPos+8,topPos+128,344,14,Component.empty()) {
             @Override protected void renderWidget(net.minecraft.client.gui.GuiGraphics graphics,int mouseX,int mouseY,float delta) {}
             @Override protected void updateWidgetNarration(net.minecraft.client.gui.narration.NarrationElementOutput output){defaultButtonNarrationText(output);}
         };
@@ -60,10 +63,11 @@ public final class FactoryEditorScreen extends AEBaseScreen<FactoryEditorMenu> {
         if(uploadButton!=null) uploadButton.active = menu.hasRecipePattern();
         setTextContent("dialog_title", Component.translatable(menu.titleKey));
         var fullStatus=FactoryMessages.status(menu.displayStatus());
-        String text=fullStatus.getString();String shown=font.plainSubstrByWidth(text,250);
-        if(!shown.equals(text))shown=font.plainSubstrByWidth(text,240)+"...";
+        int statusWidth = 344 - font.width(FactoryCompiler.MAX_SOURCE_LENGTH + "/" + FactoryCompiler.MAX_SOURCE_LENGTH) - 12;
+        String text=fullStatus.getString();String shown=font.plainSubstrByWidth(text,statusWidth);
+        if(!shown.equals(text))shown=font.plainSubstrByWidth(text,statusWidth-font.width("..."))+"...";
         setTextContent("status",Component.literal(shown).withStyle(menu.displayStatus().startsWith("Line ")?net.minecraft.ChatFormatting.RED:net.minecraft.ChatFormatting.DARK_GRAY));
-        if(statusHover!=null){statusHover.setMessage(fullStatus);statusHover.setTooltip(text.isEmpty()?null:net.minecraft.client.gui.components.Tooltip.create(fullStatus));}
+        if(statusHover!=null){statusHover.setWidth(statusWidth);statusHover.setMessage(fullStatus);statusHover.setTooltip(text.isEmpty()?null:net.minecraft.client.gui.components.Tooltip.create(fullStatus));}
     }
 
     @Override public boolean keyPressed(int keyCode, int scanCode, int modifiers) {

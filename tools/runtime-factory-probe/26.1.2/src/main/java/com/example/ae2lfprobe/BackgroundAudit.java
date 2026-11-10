@@ -59,6 +59,8 @@ public final class BackgroundAudit {
         } catch(ReflectiveOperationException|java.io.IOException failure){throw new RuntimeException(failure);}
     }
     private static Screen uploadParent;
+    private static String styleOriginalProviders;
+    private static int styleOriginalProviderPages;
     private static volatile String serverError = "";
     private static final String VALID = "import input,output\nname \"Background QA\"\nwait 1 tick\ndone";
     private static void add(String id, Runnable start, String screen, BooleanSupplier check) {
@@ -316,6 +318,37 @@ public final class BackgroundAudit {
             uploadParent=mc.screen;
             mc.setScreen(new com.example.ae2lightoptimizer.client.FactoryUploadScreen(uploadParent,(FactoryEditorMenu)mc.player.containerMenu));
         },"FactoryUploadScreen",()->true);
+        if (Boolean.getBoolean("ae2lf.probe.styleOnly")) {
+            // Synthetic display-only lists exercise layout boundaries; never submit these UUID rows.
+            add("style-upload-empty", () -> {
+                var menu = (FactoryEditorMenu) mc.player.containerMenu;
+                styleOriginalProviders = menu.providers; styleOriginalProviderPages = menu.providerPages;
+                menu.providers = ""; menu.providerPages = 1;
+                mc.setScreen(new com.example.ae2lightoptimizer.client.FactoryUploadScreen(uploadParent, menu));
+            }, "FactoryUploadScreen", () -> mc.screen.children().stream().anyMatch(widget ->
+                    widget instanceof appeng.client.gui.widgets.AE2Button button && !button.active
+                    && button.getMessage().getString().equals(Component.translatable("gui.ae2lightoptimizer.factory.no_providers").getString())));
+            add("style-upload-many", () -> {
+                var menu = (FactoryEditorMenu) mc.player.containerMenu;
+                var rows = new java.util.ArrayList<String>();
+                for (int i = 1; i <= 40; i++) rows.add("synthetic-"+i+"|LINE-"+String.format("%02d",i)
+                        +" Very long production line name for layout verification|100, 64, 100|north");
+                menu.providers = String.join("\n", rows);
+                mc.setScreen(new com.example.ae2lightoptimizer.client.FactoryUploadScreen(uploadParent, menu));
+            }, "FactoryUploadScreen", () -> mc.screen.children().stream().filter(widget ->
+                    widget instanceof appeng.client.gui.widgets.AE2Button).count() == Math.max(1, (Math.min(240, mc.screen.height - 16) - 58) / 22) + 2);
+            add("style-upload-next-page", () -> mc.screen.children().stream().filter(widget ->
+                    widget instanceof appeng.client.gui.widgets.AE2Button button && button.getMessage().getString()
+                    .equals(Component.translatable("gui.ae2lightoptimizer.factory.next").getString()))
+                    .map(widget -> (appeng.client.gui.widgets.AE2Button)widget).findFirst().orElseThrow().onPress(new net.minecraft.client.input.MouseButtonInfo(0, 0)),
+                    "FactoryUploadScreen", () -> mc.screen.children().stream().anyMatch(widget ->
+                    widget instanceof appeng.client.gui.widgets.AE2Button button && button.getMessage().getString().contains("LINE-" + String.format("%02d", Math.max(1, (Math.min(240, mc.screen.height - 16) - 58) / 22) + 1))));
+            add("style-upload-restore", () -> {
+                var menu = (FactoryEditorMenu) mc.player.containerMenu;
+                menu.providers = styleOriginalProviders; menu.providerPages = styleOriginalProviderPages;
+                mc.setScreen(new com.example.ae2lightoptimizer.client.FactoryUploadScreen(uploadParent, menu));
+            }, "FactoryUploadScreen", () -> ((FactoryEditorMenu)mc.player.containerMenu).providers.equals(styleOriginalProviders));
+        }
         add("ui-factory-panel-upload",()->{
             mc.setScreen(uploadParent);
             var menu=(FactoryEditorMenu)mc.player.containerMenu;
@@ -553,6 +586,12 @@ public final class BackgroundAudit {
         if(Boolean.getBoolean("ae2lf.probe.chunkOnly"))steps.removeIf(step->!step.id.equals("chunk-lifecycle-logistics"));
         if(Boolean.getBoolean("ae2lf.probe.extremeOnly"))steps.removeIf(step->!java.util.Set.of("huge-quantity-logistics","huge-recovery-logistics","factory-pattern-preview-normal","factory-pattern-preview-shift","factory-pattern-preview-cleared").contains(step.id));
         if(Boolean.getBoolean("ae2lf.probe.idInsertionOnly"))steps.removeIf(step->!step.id.equals("code-id-insertion"));
+        // Keep setup/check steps: a visual scene may depend on an earlier server fixture.
+        if(Boolean.getBoolean("ae2lf.probe.styleOnly")) steps.removeIf(step ->
+                step.id.startsWith("ui-guide-") || java.util.Set.of("multi-tag-machine-groups",
+                "stress-world-transfers", "topology-service-uniqueness", "terminal-runtime-sfm",
+                "induction-card-cache", "compatibility-registry", "complex-factory-flows",
+                "parallel-native-orders", "native-transaction-capabilities").contains(step.id));
         started=true;
     }
     public static void tick(Minecraft client) {

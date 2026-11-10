@@ -1,0 +1,58 @@
+# AE2LF 方块与界面视觉规范
+
+## 对照依据
+
+两代分别读取自身固定依赖：1.21.1 对照 AE2 `19.2.17`，26.1.2 对照 AE2 `26.1.10-beta`。
+依据为依赖 JAR 内的实际资源及类接口，不使用其他模组的机器外观替代 AE2 风格。
+
+| 对照资源 / 接口 | 用途 |
+| --- | --- |
+| `assets/ae2/textures/block/interface.png` | 三层金属边框、灰紫钢板、内侧暗边与像素明暗关系 |
+| `assets/ae2/models/part/display_base.json` | 面板 12×12×2 的前部外壳与 8×8×1 的后部连接结构 |
+| `assets/ae2/models/item/display_base.json` | 物品栏面板模型与原生显示变换 |
+| `BackgroundGenerator.draw`、`AE2Button` | 上传页窗口边框、按钮常态／悬停／禁用状态 |
+| `TabButton.Style.HORIZONTAL` | 编辑页与配方页之间的原生 22×22 页签 |
+
+AE2 资源归原项目所有；依赖的许可证声明为 `See GitHub repository for details`。
+此规范只记录参考来源，不能改变上游资源的授权。
+
+## 方块与不完整方块
+
+- **接口线缆必须是完整立方体**。保持原有 blockstate、物品模型、碰撞和网络逻辑，只统一材质。
+- 环解算、超算接口、合成撕裂者的三像素外框使用对应世代的 AE2 金属边框；内部 10×10 像素保持原有图形。离线与在线的几何及外框相同，状态只改变核心亮度。
+- 网络终端正面为代码显示区，其他面为灰色设备外壳，避免四侧重复显示屏。保留全部历史 `facing` 状态；新放置方向仍由既有代码处理。
+- 编码面板继续直接引用 AE2 的薄型外壳，叠加既有透明核心遮罩。物品模型、世界模型、染色索引、亮度和状态灯沿用原生合同。
+- 不重绘或重新编码存储核心、存储元件／便携元件、晶体素材和现有面板遮罩。
+
+## 界面
+
+- 合成撕裂者继续继承原生样板供应器页面；便携元件继续使用原生存储终端。
+- 编辑页使用原生背景、槽位、图标按钮与横向页签；状态文字按编辑区可用宽度截断，为原生字数计数器预留空间，并保留完整悬停提示。
+- 上传页使用原生背景生成器与 `AE2Button`，按可见窗口尺寸和实际条目数居中布局；未命名供应器显示本地化机器名称，UUID 只用于提交。长名称使用按钮原生文字处理并提供完整提示；空列表禁用行，只有一个页面时禁用翻页。
+- 保留服务端提供者列表、UUID 上传、原生文本框、光标、选择、高亮和拖入 ID 的既有行为。
+
+## 生成与验证
+
+从仓库根目录执行，先运行需要的既有生成器，最后收口：
+
+```powershell
+python tools/align_ae2_visuals.py
+python tools/verify_ae2_visual_style.py --baseline 34e94a4 --report ../"Minecraft Forge Workspace"/archive/<本次目录>/after/static-verification.json
+powershell -NoProfile -ExecutionPolicy Bypass -File build-1.21.1.ps1 --offline
+powershell -NoProfile -ExecutionPolicy Bypass -File build-26.1.2.ps1 --offline
+```
+
+`align_ae2_visuals.py` 同步两代 PNG、终端模型与三类 Blockbench 文件；重复生成必须字节一致。
+Blockbench 插件导出后自动运行该收口步骤，防止旧外壳重新覆盖产品资源。
+
+客户端使用 `tools/runtime-factory-probe/verify-background.ps1 -StyleOnly`：检查真实物品渲染、世界方块／面板及现有 UI 场景，保留逐场景截图、资源身份与正常退出证据。
+`-EvidenceRoot` 可将结果直接写入枢纽归档。原生夹具中的菜单操作是自动化回调／数据包，不等同于人工鼠标验收。
+
+## 本轮验收（2026-11-10）
+
+- 1.21.1：262 项单测、172 项真实客户端专项通过。
+- 26.1.2：260 项单测、172 项真实客户端专项通过。
+- 两代均通过逐场景覆盖、真实 framebuffer、资源／类与最终 JAR 一致性、正常退出及独立证据回读。
+- 空列表与多条长名称列表是明确标注的客户端显示夹具；恢复真实服务器列表后再验证实际上传。
+- 10 个开发 `run/mods` 原有文件已恢复并逐一回读哈希。本轮未部署 PCL、未推送或发布。
+- 结果与截图：`../Minecraft Forge Workspace/archive/20261110-090500-ae2lf-visual-style/`。

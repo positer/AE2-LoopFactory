@@ -1,13 +1,13 @@
 {
-  "credit": "Made with Blockbench",
+  "parent": "minecraft:block/block",
   "textures": {
-    "0": "ae2lightoptimizer:block/loop_factory_terminal",
-    "1": "ae2lightoptimizer:block/loop_factory_terminal_top",
-    "particle": "ae2lightoptimizer:block/loop_factory_terminal"
+    "front": "ae2lightoptimizer:block/loop_factory_terminal",
+    "case": "ae2lightoptimizer:block/loop_factory_terminal_top",
+    "particle": "ae2lightoptimizer:block/loop_factory_terminal_top"
   },
   "elements": [
     {
-      "name": "loop_factory_network_terminal",
+      "name": "AE2 terminal housing",
       "from": [
         0,
         0,
@@ -19,62 +19,61 @@
         16
       ],
       "faces": {
-        "north": {
+        "down": {
+          "texture": "#case",
           "uv": [
             0,
             0,
             16,
             16
-          ],
-          "texture": "#0"
-        },
-        "east": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#0"
-        },
-        "south": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#0"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#0"
+          ]
         },
         "up": {
+          "texture": "#case",
           "uv": [
             0,
             0,
             16,
             16
-          ],
-          "texture": "#1"
+          ]
         },
-        "down": {
+        "north": {
+          "texture": "#front",
           "uv": [
             0,
             0,
             16,
             16
-          ],
-          "texture": "#1"
+          ]
+        },
+        "south": {
+          "texture": "#case",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#case",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#case",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         }
       }
     }
-  ],
-  "parent": "minecraft:block/block"
+  ]
 }

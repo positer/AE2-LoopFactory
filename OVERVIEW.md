@@ -1,5 +1,17 @@
 # AE2-LoopFactory (AE2LF) Project Overview
 
+## 2026-11-10 AE2 原生视觉资源
+
+- `docs/ae2-visual-style.md`：固定 AE2 参考版本、资源来源、方块／面板保护边界与界面约定。
+- `tools/align_ae2_visuals.py`：读取各版本自身 AE2 依赖，生成三类机器外框、终端和完整立方体线缆材质，同步三类 Blockbench 源文件；插件导出后自动收口。
+- `tools/verify_ae2_visual_style.py`：按显式 Git 基线检查存储／面板受保护素材、核心像素、完整线缆模型、依赖贴图与重复生成一致性。
+- `design/loop_factory/<generation>/`：线缆保持完整立方体，终端区分正面／外壳，面板源文件包含原生外壳、后部连接结构及三层遮罩。
+- 两代 `client/FactoryUploadScreen.java`：居中的原生 AE2 背景与按钮列表；`FactoryEditorScreen.java` 和 screen JSON：原生页签与为字数计数器预留宽度的状态栏。
+- `tools/runtime-factory-probe/verify-background.ps1`：新增 `-StyleOnly` 聚焦真实 UI／物品／方块／面板场景，`-EvidenceRoot` 允许直接写入枢纽留痕；原有模式与验收要求继续保留。
+- 本轮证据位于 `../Minecraft Forge Workspace/archive/20261110-090500-ae2lf-visual-style/`。开发制品与公开的 `0.0.5` 发布分开记录。
+- 最终验证：两代 262／260 项单测及各 172 项客户端专项通过，独立回读通过；测试助手恢复原状，未部署或发布。
+
+
 ## 2026-09-12 editor scroll coordinate correction
 
 Both `FactoryEditorHighlightMixin.java` adapters now draw in the native parent's content coordinates and inherit its viewport scissor. Previously they subtracted scroll twice and established another clip inside an already translated pose, producing blank space below prematurely hidden text. Visibility checks retain the exact native scroll value; the caret uses the native cursor-line index.

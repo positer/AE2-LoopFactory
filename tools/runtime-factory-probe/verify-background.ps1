@@ -1,6 +1,7 @@
 param(
     [Parameter(Mandatory=$true)][ValidateSet('1.21.1','26.1.2')][string]$Generation,
     [Parameter(Mandatory=$true)][ValidatePattern('^[A-Za-z0-9_.-]+$')][string]$EvidenceName,
+    [string]$EvidenceRoot,
     [switch]$ValidateExisting,
     [ValidatePattern('^[A-Za-z0-9][A-Za-z0-9_.-]*$')][string]$ValidationName,
     [switch]$VisualOnly,
@@ -8,6 +9,7 @@ param(
     [switch]$GroupOnly,
     [switch]$GuideOnly,
     [switch]$UiOnly,
+    [switch]$StyleOnly,
     [switch]$MekOnly,
     [switch]$NativeOnly,
     [switch]$ParserOnly,
@@ -36,7 +38,7 @@ param(
     [ValidateRange(20,100)][int]$TickRate=20
 )
 $ErrorActionPreference='Stop'
-$exclusiveModes=@($VisualOnly,$PanelVisualOnly,$GroupOnly,$GuideOnly,$UiOnly,$MekOnly,$NativeOnly,$ParserOnly,$AddonCompat,$ChannelOnly,$RecipeSetOnly,$DispatchOnly,$HugeOnly,$RecoveryOnly,$ExtremeOnly,$ChunkOnly,$IdInsertionOnly) | Where-Object { $_ }
+$exclusiveModes=@($VisualOnly,$StyleOnly,$PanelVisualOnly,$GroupOnly,$GuideOnly,$UiOnly,$MekOnly,$NativeOnly,$ParserOnly,$AddonCompat,$ChannelOnly,$RecipeSetOnly,$DispatchOnly,$HugeOnly,$RecoveryOnly,$ExtremeOnly,$ChunkOnly,$IdInsertionOnly) | Where-Object { $_ }
 if(@($exclusiveModes).Count -gt 1){throw 'Choose only one exclusive audit mode; combined filters can silently remove required steps'}
 if($ChunkLifecycle -and @($exclusiveModes).Count -gt 0 -and -not $ChunkOnly){throw 'ChunkLifecycle augments the full audit; use ChunkOnly for the independent chunk lifecycle scene'}
 if(($MekOnly -or $AddonCompat) -and $Generation -ne '1.21.1'){throw 'MEK and addon fixtures are isolated to 1.21.1'}
@@ -45,6 +47,7 @@ if($IdInsertionViewer -eq 'emi' -and $Generation -ne '1.21.1'){throw 'No verifie
 if($NativeOnly -and $Generation -ne '26.1.2'){throw 'Modern native/channel-only fixtures are isolated to 26.1.2'}
 $taskRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $reportPath=[IO.Path]::GetFullPath((Join-Path $taskRoot "archive/2026-09-08-background-full-audit/$EvidenceName"))
+if($EvidenceRoot){$reportPath=[IO.Path]::GetFullPath((Join-Path $EvidenceRoot $EvidenceName))}
 $requestedScale=[ordered]@{stressCycles=$StressCycles;blockingRounds=$BlockingRounds;parallelRounds=$ParallelRounds;parallelBatches=$ParallelBatches;mekBatches=$MekBatches;tickRate=$TickRate}
 $runMods=Join-Path $taskRoot "versions/neoforge-$Generation/run/mods"
 $helperSource=Join-Path $PSScriptRoot "$Generation/build/libs/ae2lf-runtime-probe-mc$Generation-1.jar"
@@ -117,6 +120,7 @@ function Invoke-ExistingValidation {
             recovery=([bool]$HugeQuantities -or [bool]$RecoveryOnly -or [bool]$ExtremeOnly);recoveryOnly=[bool]$RecoveryOnly;extremeOnly=[bool]$ExtremeOnly
             chunkLifecycle=([bool]$ChunkLifecycle -or [bool]$ChunkOnly);chunkOnly=[bool]$ChunkOnly;idInsertionOnly=[bool]$IdInsertionOnly
         }
+        if($StyleOnly){$modeValues.styleOnly=$true}
         foreach($entry in $modeValues.GetEnumerator()) {
             if($originalAudit.probeProperties.('ae2lf.probe.'+$entry.Key) -cne ([string]$entry.Value).ToLowerInvariant()){throw "Original runtime mode differs from supplied flags: $($entry.Key)"}
         }
@@ -195,6 +199,16 @@ function Assert-GameplayEvidence {
     if($planned.Count -eq 0 -or @($planned | Select-Object -Unique).Count -ne $planned.Count -or $observed.Count -ne $planned.Count -or @($observed | Select-Object -Unique).Count -ne $observed.Count -or @(Compare-Object $planned $observed).Count -ne 0){throw 'Planned gameplay scenes were not each executed exactly once; completed alone is insufficient'}
     foreach($entry in $requestedScale.GetEnumerator()){if($audit.probeProperties.('ae2lf.probe.'+$entry.Key) -ne [string]$entry.Value){throw "Runtime scale differs from request: $($entry.Key); helper or launch parameters are stale"}}
     if($audit.status -ne 'completed' -or @($audit.results).Count -eq 0 -or @($audit.results | Where-Object { -not $_.passed -or $_.windowVisible -ne 0 }).Count -gt 0) { throw 'Background audit did not pass every step invisibly' }
+    if($StyleOnly){
+        foreach($requiredScene in @('ui-factory-editor','ui-crafting-ripper','ui-factory-panel-recipe',
+                'ui-factory-panel-code-zh-cn','ui-factory-panel-upload-chooser','ui-factory-panel-upload',
+                'prepare-handheld-encoder','ui-handheld-encoder','prepare-encoder-network',
+                'style-upload-empty','style-upload-many','style-upload-next-page','style-upload-restore',
+                'model-loop_factory_interface_cable','model-loop_factory_network_terminal',
+                'model-loop_factory_pattern_encoding_panel','part-factory-panel-blue','part-factory-panel-red')){
+            if($planned -notcontains $requiredScene){throw "Style audit omitted a required scene: $requiredScene"}
+        }
+    }
     if(Test-Path -LiteralPath (Join-Path $reportPath 'shutdown-timeout.txt')){throw 'Shutdown timed out; bounded or forced exit cannot pass normal shutdown'}
     if(-not (Test-Path -LiteralPath (Join-Path $reportPath 'normal-shutdown.txt'))){throw 'Missing normal shutdown evidence'}
     if($IdInsertionOnly){
@@ -340,7 +354,7 @@ function Assert-GameplayEvidence {
         Assert-PreviewPixels
     }
     if($ExtremeOnly -and ($planned.Count -ne 5 -or @(Compare-Object $planned @('huge-quantity-logistics','huge-recovery-logistics','factory-pattern-preview-normal','factory-pattern-preview-shift','factory-pattern-preview-cleared')).Count -ne 0)){throw 'ExtremeOnly did not run all quantity, recovery, and preview scenes'}
-    if(-not $ChunkOnly -and -not $ExtremeOnly -and -not $RecoveryOnly -and -not $HugeOnly -and -not $ParserOnly -and -not $NativeOnly -and -not $MekOnly -and -not $AddonCompat -and -not $ChannelOnly -and -not $RecipeSetOnly -and -not $DispatchOnly -and -not $VisualOnly -and -not $PanelVisualOnly -and -not $UiOnly -and -not $GroupOnly -and -not $GuideOnly -and -not $IdInsertionOnly) {
+    if(-not $ChunkOnly -and -not $ExtremeOnly -and -not $RecoveryOnly -and -not $HugeOnly -and -not $ParserOnly -and -not $NativeOnly -and -not $MekOnly -and -not $AddonCompat -and -not $ChannelOnly -and -not $RecipeSetOnly -and -not $DispatchOnly -and -not $VisualOnly -and -not $PanelVisualOnly -and -not $UiOnly -and -not $StyleOnly -and -not $GroupOnly -and -not $GuideOnly -and -not $IdInsertionOnly) {
         foreach($requiredReport in @('factory-report.json','native-cpu-report.json','compatibility-audit.json','topology-report.json','terminal-report.json','induction-report.json','multi-tag-report.json','complex-flow-report.json')) {
             $result=Get-Content -Raw -LiteralPath (Join-Path $reportPath $requiredReport) | ConvertFrom-Json
             if($result.status -ne 'passed') { throw "Failed independent report: $requiredReport" }
@@ -415,6 +429,7 @@ try {
     if($VisualOnly){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.visualOnly=true"}
     if($GuideOnly){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.guideOnly=true"}
     if($GroupOnly){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.groupOnly=true"}
+    if($StyleOnly){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.styleOnly=true"}
     if($UiOnly){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.uiOnly=true"}
     if($SfmCpu){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.sfmCpu=true"}
     if($SelectorCpu){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.selectorCpu=true"}

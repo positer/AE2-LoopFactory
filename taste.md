@@ -190,3 +190,12 @@ Recipe output references: O1, O2, ... select native recipe outputs in order, ind
 - Keep the public README a current product and implementation description, not a chronological dump of every development run. Put detailed measurements, failed attempts, hashes and raw observations in dated archive reports and link them from the README.
 - Always distinguish the public GitHub release from local PCL development builds. A verified local JAR is not a release claim.
 - Keep English and Simplified Chinese sections behaviorally aligned, including supported versions, installation, compatibility boundaries, and known saved-world corrections.
+
+
+## 2026-11-10 AE2 视觉对齐
+
+- 接口线缆按用户裁定始终为完整立方体；视觉优化不得擅自改成细线缆、连接臂或改变碰撞与网络连接。
+- 使用各世代固定 AE2 依赖中的实际外壳与原生 UI 控件。机器核心图案及状态辨识保留；存储核心和面板透明遮罩保持原始字节。
+- 面板运行时直接组合 AE2 外壳／状态层；Blockbench 源文件必须反映其真实 12px 外壳和 8px 后部连接结构，不再以单片方盒冒充完整模型。
+- 既有资源生成或 Blockbench 导出后运行 `tools/align_ae2_visuals.py` 收口，重复生成必须一致；不得让旧的 SFM 外观覆盖新的 AE2 外壳。
+- 上传页使用 `BackgroundGenerator` 与 `AE2Button`，配方切换用横向 `TabButton`；保留服务器列表、UUID、原生编辑器与完整名称提示。
