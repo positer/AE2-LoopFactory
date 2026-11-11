@@ -136,6 +136,7 @@ public final class RuntimeRipperProbe {
             output = Path.of(System.getProperty("ae2lo.probe.reportDir",
                     System.getProperty("ae2lo.probe.output", "ae2lo-probe-evidence"))).toAbsolutePath();
             Files.createDirectories(output);
+            if (OmniProbe.ENABLED) { OmniProbe.start(server, player, output); return; }
             report.put("probe", "real-serverlevel-ae2-grid-ring-whole-job-ripper");
             report.put("minecraft", "1.21.1");
             report.put("orderPerRun", ToolComponentFixture.ENABLED ? 12 : ExactComponentFixture.ENABLED ? 3000 : NativeCatalogFixture.ENABLED ? 3 : CatalogAuditFixture.ENABLED || PackRecipeReloadFixture.ENABLED ? 0 : ORDER);
@@ -186,6 +187,7 @@ public final class RuntimeRipperProbe {
 
     private static void onTick(ServerTickEvent.Post event) {
         if (level == null || ProbeState.finished) return;
+        if (OmniProbe.ENABLED) { OmniProbe.tick(); return; }
         try {
             if (tick() - startedTick > (ChannelCapacityFixture.ENABLED ? 5000 : 2400)) throw new IllegalStateException("Probe timeout in " + ProbeState.phase);
             switch (ProbeState.phase) {

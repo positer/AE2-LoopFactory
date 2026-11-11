@@ -1,5 +1,17 @@
 # AE2-LoopFactory (AE2LF) Project Overview
 
+## 2026-11-11 全向连接器
+
+- 最终验收：274／272 项单测、双代原生连接与粒子检查、各 178 项 UI 场景、20 张人工视觉复核及制品冻结后的只读回验通过；开发 mods 恢复初始十文件哈希清单。最终轮次为 `pulse-r2`。
+- `docs/omni-connector.md`：行为边界、逐文件职责、原生校验含义与操作说明。
+- `shared/.../network/OmniLinkDirectory.java`：命名频道的稳定标识、规范化与分页排序缓存；`OmniWhitePalette.java`：保留透明度及明暗的全白色板。
+- 两代 `omni/`：方块与实体、全服存档频道目录、每个频道唯一的原生虚拟枢纽、原生菜单与内容注册。生命周期移除虚拟边，不新增区块票据。
+- 两代 `client/OmniPulseParticle.java`、`particles/omni_pulse.json`：原生白色精灵与单块范围慢速外扩；服务端派生 `online` 状态控制启停。
+- 两代 `client/OmniConnectorScreen.java` 与 `OmniWhiteSprite.java`：原生 AE2 配置页与依赖材质运行时白光适配；`mixin/Omni*EnergyMixin.java`：仅免除连接器节点与虚拟连接的频道能耗。
+- 两代新增 blockstate、原生父模型引用、atlas 源、三材料无序配方、掉落表、双语名称与 GuideME 页面；`tools/generate_omni_connector_resources.py` 可重新生成资源，`verify_omni_resources.py` 只读对照原生状态与模型。
+- `tools/runtime-ripper-probe/{generation}/.../Omni*`：独立的原生网络、实际机器中继、卸载重连、配方拆放与双语 UI 校验助手，随 `-Chain omni` 运行，不打入产品。
+- 验收证据归属枢纽 `../Minecraft Forge Workspace/archive/20261110-205415-ae2lf-omni-connector/`；最终状态以该目录完成记录为准。
+
 ## 2026-11-10 编码面板 UI 专项
 
 - 两代 `assets/ae2/screens/ae2lightoptimizer_factory_panel_recipe.json`：直接继承原版共用“样板编码”标题；保留现有加工限定与附加代码页签。

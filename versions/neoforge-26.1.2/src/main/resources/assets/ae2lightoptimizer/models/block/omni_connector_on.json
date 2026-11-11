@@ -1,0 +1,7 @@
+{
+  "parent": "ae2:block/wireless_access_point_on",
+  "textures": {
+    "torch": "ae2lightoptimizer:block/omni_white",
+    "0": "ae2lightoptimizer:block/omni_white"
+  }
+}

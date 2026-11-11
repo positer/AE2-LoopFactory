@@ -1,0 +1,95 @@
+{
+  "includes": [
+    "common/common.json"
+  ],
+  "generatedBackground": {
+    "width": 246,
+    "height": 224
+  },
+  "text": {
+    "dialog_title": {
+      "text": {
+        "translate": "block.ae2lightoptimizer.omnidirectional_connector"
+      },
+      "position": {
+        "left": 8,
+        "top": 6
+      }
+    },
+    "selected": {
+      "position": {
+        "left": 8,
+        "top": 22
+      }
+    },
+    "links": {
+      "text": {
+        "translate": "gui.ae2lightoptimizer.omni.links"
+      },
+      "position": {
+        "left": 8,
+        "top": 62
+      }
+    },
+    "page": {
+      "position": {
+        "left": 50,
+        "top": 204
+      }
+    }
+  },
+  "widgets": {
+    "createLink": {
+      "left": 224,
+      "top": 40
+    },
+    "previous": {
+      "left": 8,
+      "top": 200
+    },
+    "next": {
+      "left": 28,
+      "top": 200
+    },
+    "unlink": {
+      "left": 224,
+      "top": 200
+    },
+    "channel0": {
+      "left": 8,
+      "top": 74,
+      "width": 230,
+      "height": 18
+    },
+    "channel1": {
+      "left": 8,
+      "top": 94,
+      "width": 230,
+      "height": 18
+    },
+    "channel2": {
+      "left": 8,
+      "top": 114,
+      "width": 230,
+      "height": 18
+    },
+    "channel3": {
+      "left": 8,
+      "top": 134,
+      "width": 230,
+      "height": 18
+    },
+    "channel4": {
+      "left": 8,
+      "top": 154,
+      "width": 230,
+      "height": 18
+    },
+    "channel5": {
+      "left": 8,
+      "top": 174,
+      "width": 230,
+      "height": 18
+    }
+  }
+}

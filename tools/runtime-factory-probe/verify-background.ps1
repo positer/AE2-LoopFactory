@@ -204,7 +204,7 @@ function Assert-GameplayEvidence {
     if($StyleOnly){
         foreach($requiredScene in @('ui-factory-editor','ui-crafting-ripper','ui-factory-panel-recipe',
                 'ui-factory-panel-code-zh-cn','ui-factory-panel-upload-chooser','ui-factory-panel-upload',
-                'prepare-handheld-encoder','ui-handheld-encoder','prepare-encoder-network',
+                'prepare-handheld-encoder','ui-handheld-encoder','prepare-encoder-network','prepare-portable-loop-1k','ui-portable-loop-1k','prepare-portable-loop-infinite','ui-portable-loop-infinite',
                 'style-upload-empty','style-upload-many','style-upload-next-page','style-upload-restore',
                 'model-loop_factory_interface_cable','model-loop_factory_network_terminal',
                 'model-loop_factory_pattern_encoding_panel','part-factory-panel-blue','part-factory-panel-red')){

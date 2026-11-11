@@ -1,8 +1,16 @@
 # AE2-LoopFactory (AE2LF)
 
+2026-11-11 开发更新：全向连接器、完整白色外观与单方块内缓慢外扩粒子已完成。双代 274／272 项单测、原生网络与粒子检查、各 178 项 UI 回归及只读回验通过。本地标签 `v0.0.5-omni.20261111`；[完整验收留痕](../Minecraft%20Forge%20Workspace/archive/20261110-205415-ae2lf-omni-connector/README.md)。本轮为本地开发制品，PCL 未更新。
+
 AE2-LoopFactory is a NeoForge addon for Applied Energistics 2 (AE2). It provides programmable logistics, high-capacity universal storage, recipe-aware crafting services, and tools for writing, previewing, and executing factory programs. Each supported Minecraft generation has an isolated adapter, while language and planning contracts remain shared and loader-independent.
 
 AE2LF is a standalone project. AE2 is the required platform. Create, Mekanism, Applied Flux, JEI, EMI, and other addon mods are optional integrations; AE2LF never bundles or requires them.
+
+## 全向连接器
+
+全向连接器使用 AE2 无线访问点的原生几何、放置方向与外壳，所有紫色细节改为白色。右键在 AE2 原生样式的配置页创建或选择命名频道，同频道的已加载端点通过一个原生 AE2 节点跨维度连接，并参与原生频道分配。连接器不消耗 AE 能量，不强制加载区块；接入超算的网络按既有规则将频道容量翻倍一次。
+
+无线访问点、循环水晶与缠绕态奇点无序合成，每次得到 4 个。扳手拆卸返回的物品保留所选连接频道。连接频道保存在当前存档内，不跨存档共享。在线且已连接频道时，会显示局限在自身方块内、缓慢向外扩散的白色粒子；离线或解绑后停止，特效不增加耗能。
 
 ## Features
 

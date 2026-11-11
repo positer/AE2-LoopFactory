@@ -178,5 +178,17 @@
   "gui.ae2lightoptimizer.ripper.import.close": "关闭界面将停止后续导入。",
   "gui.ae2lightoptimizer.ripper.import.offline": "网络未连接或电力不足。",
   "gui.ae2lightoptimizer.ripper.import.running": "正在导入：已转移 %s 张样板",
-  "gui.ae2lightoptimizer.ripper.import.result": "已转移 %s 张样板"
+  "gui.ae2lightoptimizer.ripper.import.result": "已转移 %s 张样板",
+  "block.ae2lightoptimizer.omnidirectional_connector": "AE2 全向连接器",
+  "gui.ae2lightoptimizer.omni.title": "AE2 全向连接器",
+  "gui.ae2lightoptimizer.omni.create": "创建或加入同名连接频道",
+  "gui.ae2lightoptimizer.omni.previous": "上一页",
+  "gui.ae2lightoptimizer.omni.next": "下一页",
+  "gui.ae2lightoptimizer.omni.unlink": "断开此连接器",
+  "gui.ae2lightoptimizer.omni.name": "连接频道名称",
+  "gui.ae2lightoptimizer.omni.none": "未连接",
+  "gui.ae2lightoptimizer.omni.selected": "当前：%s",
+  "gui.ae2lightoptimizer.omni.page": "第 %s / %s 页",
+  "gui.ae2lightoptimizer.omni.invalid": "名称须为 1–48 个可显示字符",
+  "gui.ae2lightoptimizer.omni.links": "全服连接频道（括号内为已加载端点数）"
 }

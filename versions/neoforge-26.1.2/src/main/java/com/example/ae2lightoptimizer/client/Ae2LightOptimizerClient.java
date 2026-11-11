@@ -13,6 +13,7 @@ import net.neoforged.neoforge.client.event.InitializeClientRegistriesEvent;
 @Mod(value = Ae2LightOptimizer.MOD_ID, dist = Dist.CLIENT)
 public final class Ae2LightOptimizerClient {
     private static void registerScreens(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent event) {
+        appeng.client.InitScreens.register(event, com.example.ae2lightoptimizer.omni.OmniConnectorMenu.TYPE.get(), OmniConnectorScreen::new, "/screens/ae2lightoptimizer_omni_connector.json");
         appeng.client.InitScreens.register(event, com.example.ae2lightoptimizer.factory.FactoryPanelRecipeMenu.TYPE.get(), FactoryPanelRecipeScreen::new, "/screens/ae2lightoptimizer_factory_panel_recipe.json");
         appeng.client.InitScreens.register(event,
                 com.example.ae2lightoptimizer.factory.FactoryEditorMenu.TYPE.get(),
@@ -23,6 +24,8 @@ public final class Ae2LightOptimizerClient {
     }
 
     public Ae2LightOptimizerClient(IEventBus modEventBus) {
+        modEventBus.addListener(OmniWhiteSprite::register);
+        modEventBus.addListener(OmniPulseParticle::register);
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(FactoryEncoderClient::scroll);
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(FactoryEncoderClient::use);
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(FactoryEncoderClient::render);

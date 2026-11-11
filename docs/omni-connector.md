@@ -1,0 +1,47 @@
+# 全向连接器实现与验收边界
+
+## 行为
+
+同一存档的命名频道以随机 UUID 为稳定标识，名称做 NFC 规范化和不区分大小写的重复匹配。创建同名频道即加入已有频道。名称最多 48 个 Unicode 码点，不解释成命令或路径。配置页每页六条，显示已加载端点数；断开按钮只解绑当前连接器，不删除频道。
+
+每个有已加载端点的频道仅有一个 `DENSE_CAPACITY` 原生虚拟枢纽。所有已加载端点通过 `GridHelper.createConnection` 连接该枢纽，跨维度连接同样由 AE2 的 Grid、PathingService 和频道寻路完成。没有第二套频道分配器，也不绕过控制器冲突规则。默认致密节点容量为 32，接入超算后为 64；普通机器中继为 8／16。它们仍受所在线路的其他瓶颈限制，多个超算不叠加。
+
+连接器和枢纽的待机功耗为零，不需要设备频道。频道能耗适配只排除这些节点和它们之间的虚拟边，普通机器与物理线路保留原生能耗。网络本身仍需要为其他设备供电。端点卸载或拆除会立即移除虚拟边，最后一个端点离开时销毁枢纽；生产代码不创建区块强载票据。
+
+在线并绑定频道时，原生客户端显示白色小粒子：速度每 tick 0.006–0.008 格、最长 48 tick，向外移动并淡出。渲染轨迹在单块边界内结束，解绑、离线或区块卸载时停止。在线状态直接同步 AE2 节点状态，不以特效新增电量或频道门槛。
+
+## 文件分工
+
+| 文件 | 构造与作用 |
+| --- | --- |
+| `shared/.../network/OmniLinkDirectory.java` | 纯 Java 频道目录、名称验证、稳定标识和排序缓存 |
+| `shared/.../network/OmniWhitePalette.java` | 按原坐标将全部色彩换为白色，保留 alpha、灰度与明暗 |
+| 两代 `omni/OmniNetworkNode.java` | 连接器／虚拟枢纽的专用标记 |
+| `omni/OmniLinkSavedData.java` | 存档内全服频道目录；两代分别适配自身 SavedData API |
+| `omni/OmniNetworks.java` | 每频道唯一原生枢纽、端点加入／离开、停服清理 |
+| `omni/OmniConnectorBlock.java` | 复用原生放置、朝向、形状、水浸与属性，右键打开配置页 |
+| `omni/OmniConnectorBlockEntity.java` | 后面接线、零待机功耗、绑定持久化、原生扳手携带设置 |
+| `omni/OmniConnectorMenu.java` | 权限与距离检查、创建／选择／解绑／翻页和原生客户端动作 |
+| `omni/OmniContent.java` | 方块、物品、实体、菜单与粒子注册 |
+| `client/OmniConnectorScreen.java` | AEBaseScreen、原生 AE2 按钮、图标与文本输入，双语布局 |
+| `client/OmniPulseParticle.java` | 客户端原生动画粒子，保留原版精灵、限制单块范围并随在线状态终止 |
+| `client/OmniWhiteSprite.java` | 从本代 AE2 依赖／资源包读取原图，运行时生成同尺寸全白 atlas sprite |
+| `mixin/OmniNodeEnergyMixin.java` | 只免除专用节点的频道传输能耗返回值，不改实际分配量 |
+| `mixin/OmniConnectionEnergyMixin.java` | 只免除两端都是专用节点的虚拟边能耗 |
+| `mixin/OmniAdHocEnergyMixin.java` | 无控制器网络的能耗计数排除专用节点，准入规则仍归原生 |
+| `tools/generate_omni_connector_resources.py` | 生成原生父模型引用、状态旋转、atlas 源、双语 UI 和配方 |
+| `tools/verify_omni_resources.py` | 只读比较原生状态／旋转／模型引用与三材料四产出配方 |
+| `tools/verify_omni_saved_data.py` | 正常退出后独立解析磁盘压缩 NBT，核对中文名、客户端创建和唯一 ID |
+| `tools/runtime-ripper-probe/.../Omni*` | 隔离原生校验，不进入产品 JAR |
+
+## 验收说明
+
+原生测试中的 40 个远端消费者和 12 个机器下游消费者是 AE2 托管节点夹具；中继本身是真正的样板供应器。其结果证明机器节点的传递上限确实翻倍，不将夹具数量称为实体机器数量。
+
+区块卸载检查要求旧实体被移除、旧节点销毁、虚拟端点数减少，然后实际重载并恢复原绑定。磁盘回读另行读取正常停服后的 NBT；这与单独调用对象的 save／load 不同。截图只在原生资源重载结束且画面稳定后采集；失效镜头与失败轮次保留，不纳入最终视觉通过项。
+
+原生 UI 清单包括工厂编辑器、编码页、上传页、供应器／优先级、撕裂者、便携元件和新增全向连接器。便携元件直接复用 MEStorageScreen；超算与环终端本身无配置 UI。具体双代运行轮次、制品哈希、实际截图与正常停服证据见枢纽 `archive/20261110-205415-ae2lf-omni-connector/README.md`。
+
+## 配方与使用
+
+一个无线访问点、一个循环水晶和一个缠绕态奇点无序合成四个连接器。方块与物品通过父模型引用 AE2 依赖，保持原生 UV 和几何；不复制或重新绘制外壳。原生扳手拆卸后的物品保留绑定，只在当前存档内解析对应频道。

@@ -1,0 +1,7 @@
+{
+  "parent": "ae2:item/wireless_access_point",
+  "textures": {
+    "base": "ae2lightoptimizer:block/omni_white",
+    "particle": "ae2lightoptimizer:block/omni_white"
+  }
+}

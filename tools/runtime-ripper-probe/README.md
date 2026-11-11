@@ -172,3 +172,14 @@ Compilation and launch are coordinated from outside the production Gradle source
 `ChannelCapacityFixture` 使用物理控制器、普通／致密智能线缆和三块各一次充入 1,000,000 AE 的有限能量单元。40／15／9 个负载是通过真实 `GridHelper` 连接的托管节点，分别用于控制器单面、无控制器网络与独立反例；它们不是同等数量的实体机器。各测试网络显式采用自己的 DEFAULT／X2／INFINITE 模式，不修改用户全局配置。
 
 门禁包括：原 32 容量与新单面 40 个上线负载、六面 64 容量、无控制器 16 总频道（含接口）通过与 17 拒绝、智能线缆原生灯条比例、已有倍率组合、无限保持、重复接口连续 60 个服务端 tick 稳定、拆除恢复、重装、拆分、合并与独立网络隔离。完整结果保存为 `channel-capacity-report.json`。包装器要求所有关键检查存在，保留最终运行时字节匹配、正常退出和原目录恢复门禁。
+
+## 全向连接器原生校验
+
+`-Chain omni` 创建四个跨三维度的端点，以独立消费者夹具驱动 AE2 原生分配；真实样板供应器负责机器中继。检查单中心、分网合网、32/64 传输、8/16 机器中继、能耗、实际区块卸载重连、六向水浸/碰撞、实际配方、原生扳手拆放，以及客户端真实按钮和双语 1×/2× 截图。消费者是托管节点，不将其称作实体机器。校验助手不打入产品，也不触碰 PCL。
+
+```powershell
+powershell -NoProfile -File build-1.21.1.ps1 --offline --init-script ../../tools/runtime-ripper-probe/probe.init.gradle ripperProbeJar
+powershell -NoProfile -File tools/runtime-ripper-probe/verify-background.ps1 -Generation 1.21.1 -Chain omni -EvidenceName ripper-omni-local -EvidenceRoot '<证据绝对路径>'
+```
+
+26.1.2 使用对应版本参数。完成门禁还直接读取正常退出后的压缩 NBT，核对中文频道名及客户端新建频道。`-ValidateExisting -ValidationName <唯一名字>` 只读重验已有本轮证据；保留原失败轮次，不用补写报告取代真实运行。

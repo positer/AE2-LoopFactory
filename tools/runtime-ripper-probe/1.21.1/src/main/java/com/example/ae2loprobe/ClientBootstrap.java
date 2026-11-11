@@ -81,6 +81,10 @@ public final class ClientBootstrap {
         if (minecraft.level == null || minecraft.player == null || minecraft.getSingleplayerServer() == null) return;
         if (!minecraft.getSingleplayerServer().getWorldData().getLevelName().startsWith(WORLD_PREFIX)) return;
 
+        if (OmniProbe.ENABLED) {
+            if (OmniClient.tick(minecraft)) advanceNormalShutdown(minecraft);
+            return;
+        }
         DynamicPatternClient.observePatternAccess(minecraft);
         var request = ProbeState.screenshotRequest;
         if (request != null && !CAPTURED.contains(request)) {

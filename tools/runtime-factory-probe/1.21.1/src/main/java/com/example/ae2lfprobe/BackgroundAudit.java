@@ -175,6 +175,19 @@ public final class BackgroundAudit {
         add("ui-factory-provider-nonblocking",()->server(p->factory(p,new BlockPos(0,100,0)).getLogic().getConfigManager().putSetting(appeng.api.config.Settings.BLOCKING_MODE,appeng.api.config.YesNo.NO)),"PatternProviderScreen",()->true);
         add("ui-provider-priority",()->server(p->{var host=factory(p,new BlockPos(0,100,0));
             appeng.menu.MenuOpener.open(appeng.menu.implementations.PriorityMenu.TYPE,p,appeng.menu.locator.MenuLocators.forBlockEntity(host));}),"PriorityScreen",()->true);
+        for (var portable : java.util.List.of(ModItems.PORTABLE_LOOP_STORAGE_CELL_1K, ModItems.PORTABLE_INFINITE_LOOP_STORAGE_CELL)) {
+            String tier = portable == ModItems.PORTABLE_LOOP_STORAGE_CELL_1K ? "1k" : "infinite";
+            add("prepare-portable-loop-" + tier, () -> server(p -> {
+                p.closeContainer(); p.setShiftKeyDown(false);
+                var item = portable.get(); var stack = item.getDefaultInstance();
+                item.injectAEPower(stack, item.getAEMaxPower(stack), appeng.api.config.Actionable.MODULATE);
+                p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, stack);
+                p.inventoryMenu.broadcastChanges();
+            }), "world", () -> mc.player.getMainHandItem().is(portable.get()));
+            add("ui-portable-loop-" + tier, () -> server(p -> {
+                portable.get().use(p.serverLevel(), p, net.minecraft.world.InteractionHand.MAIN_HAND);
+            }), "MEStorageScreen", () -> mc.player.containerMenu instanceof appeng.menu.me.common.MEStorageMenu);
+        }
         add("ui-native-recipe-crafting",()->server(p->{
             p.closeContainer();p.connection.teleport(3.5,101,2.5,180,20);
             var part=(appeng.parts.encoding.PatternEncodingTerminalPart)appeng.api.parts.PartHelper.getPart(p.serverLevel(),new BlockPos(3,100,0),net.minecraft.core.Direction.SOUTH);

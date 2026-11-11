@@ -24,10 +24,11 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 public final class Ae2LightOptimizer {
     public static final String MOD_ID = "ae2lightoptimizer";
     public static final DeferredRegister<CreativeModeTab> CREATIVE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
-    public static final net.neoforged.neoforge.registries.DeferredHolder<CreativeModeTab, CreativeModeTab> AE2_LIGHTOPTIMIZER_TAB = CREATIVE_TABS.register("ae2_lightoptimizer", () -> CreativeModeTab.builder().title(net.minecraft.network.chat.Component.translatable("itemGroup.ae2lightoptimizer")).icon(() -> ModItems.LOOP_CRYSTAL.get().getDefaultInstance()).displayItems((p, o) -> { o.accept(ModItems.CRAFTING_RIPPER.get()); o.accept(ModItems.LOOP_CARD.get()); o.accept(ModItems.LOOP_FACTORY_PATTERN.get()); com.example.ae2lightoptimizer.factory.FactoryContent.ITEMS.getEntries().forEach(item -> o.accept(item.get())); o.accept(ModItems.RECIPE_RING_SOLVER_TERMINAL.get()); o.accept(ModItems.SUPERCOMPUTING_CRAFTING_OPTIMIZER_INTERFACE.get()); o.accept(ModItems.LOOP_CRYSTAL.get()); o.accept(ModItems.LOOP_CRYSTAL_FRAGMENT.get()); o.accept(ModItems.LOOP_CRYSTAL_BLOCK.get()); o.accept(ModItems.LOOP_CRYSTAL_POWDER.get()); ModItems.LOOP_STORAGE_CONTENT.forEach(item -> o.accept(item.get())); ModItems.PORTABLE_LOOP_STORAGE_CELLS.forEach(item -> item.get().emptyAndFullStacks().forEach(o::accept)); }).build());
+    public static final net.neoforged.neoforge.registries.DeferredHolder<CreativeModeTab, CreativeModeTab> AE2_LIGHTOPTIMIZER_TAB = CREATIVE_TABS.register("ae2_lightoptimizer", () -> CreativeModeTab.builder().title(net.minecraft.network.chat.Component.translatable("itemGroup.ae2lightoptimizer")).icon(() -> ModItems.LOOP_CRYSTAL.get().getDefaultInstance()).displayItems((p, o) -> { o.accept(com.example.ae2lightoptimizer.omni.OmniContent.ITEM.get()); o.accept(ModItems.CRAFTING_RIPPER.get()); o.accept(ModItems.LOOP_CARD.get()); o.accept(ModItems.LOOP_FACTORY_PATTERN.get()); com.example.ae2lightoptimizer.factory.FactoryContent.ITEMS.getEntries().forEach(item -> o.accept(item.get())); o.accept(ModItems.RECIPE_RING_SOLVER_TERMINAL.get()); o.accept(ModItems.SUPERCOMPUTING_CRAFTING_OPTIMIZER_INTERFACE.get()); o.accept(ModItems.LOOP_CRYSTAL.get()); o.accept(ModItems.LOOP_CRYSTAL_FRAGMENT.get()); o.accept(ModItems.LOOP_CRYSTAL_BLOCK.get()); o.accept(ModItems.LOOP_CRYSTAL_POWDER.get()); ModItems.LOOP_STORAGE_CONTENT.forEach(item -> o.accept(item.get())); ModItems.PORTABLE_LOOP_STORAGE_CELLS.forEach(item -> item.get().emptyAndFullStacks().forEach(o::accept)); }).build());
 
     public Ae2LightOptimizer(IEventBus modEventBus) {
         verifyTakeoverTargetLoads();
+        com.example.ae2lightoptimizer.omni.OmniContent.register(modEventBus);
         modEventBus.addListener(com.example.ae2lightoptimizer.menu.RipperPatternAccessPacket::register);
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
                 com.example.ae2lightoptimizer.block.CraftingRipperLogic::onDatapackSync);
@@ -63,6 +64,7 @@ public final class Ae2LightOptimizer {
     }
 
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
+        event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, com.example.ae2lightoptimizer.omni.OmniContent.ENTITY.get(), (host, context) -> host);
         com.example.ae2lightoptimizer.storage.PortableLoopEnergy.registerCapabilities(event);
         event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, com.example.ae2lightoptimizer.factory.FactoryContent.ENTITY.get(), (host, side) -> host);
         event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST,
@@ -79,6 +81,7 @@ public final class Ae2LightOptimizer {
 
     private static void addCreativeTabContents(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
+            event.accept(com.example.ae2lightoptimizer.omni.OmniContent.ITEM.get());
             event.accept(ModItems.CRAFTING_RIPPER.get());
             event.accept(ModItems.LOOP_CARD.get());
             event.accept(ModItems.LOOP_FACTORY_PATTERN.get());
@@ -99,6 +102,7 @@ public final class Ae2LightOptimizer {
         // so this registration observes the completed AE key-type and storage registries.
         event.enqueueWork(() -> {
             com.example.ae2lightoptimizer.factory.FactoryContent.setup();
+            com.example.ae2lightoptimizer.omni.OmniContent.setup();
             ModBlocks.CRAFTING_RIPPER.get().setBlockEntity(
                     com.example.ae2lightoptimizer.block.CraftingRipperBlockEntity.class,
                     ModBlockEntities.CRAFTING_RIPPER.get(), null, null);

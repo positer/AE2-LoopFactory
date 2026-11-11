@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "ae2:wireless_access_point"
+    },
+    {
+      "item": "ae2lightoptimizer:loop_crystal"
+    },
+    {
+      "item": "ae2:quantum_entangled_singularity"
+    }
+  ],
+  "result": {
+    "id": "ae2lightoptimizer:omnidirectional_connector",
+    "count": 4
+  }
+}

@@ -178,5 +178,17 @@
   "gui.ae2lightoptimizer.ripper.import.close": "Closing this screen stops further imports.",
   "gui.ae2lightoptimizer.ripper.import.offline": "Network offline or insufficient power.",
   "gui.ae2lightoptimizer.ripper.import.running": "Importing: %s patterns moved",
-  "gui.ae2lightoptimizer.ripper.import.result": "%s patterns moved"
+  "gui.ae2lightoptimizer.ripper.import.result": "%s patterns moved",
+  "block.ae2lightoptimizer.omnidirectional_connector": "AE2 Omnidirectional Connector",
+  "gui.ae2lightoptimizer.omni.title": "AE2 Omnidirectional Connector",
+  "gui.ae2lightoptimizer.omni.create": "Create or join a named link",
+  "gui.ae2lightoptimizer.omni.previous": "Previous page",
+  "gui.ae2lightoptimizer.omni.next": "Next page",
+  "gui.ae2lightoptimizer.omni.unlink": "Unlink this connector",
+  "gui.ae2lightoptimizer.omni.name": "Link name",
+  "gui.ae2lightoptimizer.omni.none": "Not linked",
+  "gui.ae2lightoptimizer.omni.selected": "Current: %s",
+  "gui.ae2lightoptimizer.omni.page": "Page %s / %s",
+  "gui.ae2lightoptimizer.omni.invalid": "Use 1–48 visible characters",
+  "gui.ae2lightoptimizer.omni.links": "Server links (loaded endpoints in brackets)"
 }

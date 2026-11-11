@@ -25,7 +25,10 @@
     "AEBaseMenuPacketInvoker",
     "OptimizerChannelPathingMixin",
     "OptimizerChannelNodeMixin",
-    "OptimizerChannelConnectionMixin"
+    "OptimizerChannelConnectionMixin",
+    "OmniNodeEnergyMixin",
+    "OmniConnectionEnergyMixin",
+    "OmniAdHocEnergyMixin"
   ],
   "injectors": {
     "defaultRequire": 1
