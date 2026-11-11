@@ -1,5 +1,7 @@
 # AE2-LoopFactory (AE2LF)
 
+2026-11-11 部署更新：最终全向连接器／全白材质／在线单方块粒子制品已安装到 PCL 的 `AE2-lightoptimizer-1.21.1` 与 `AE2-lightoptimizer-26.1.2`。两处安装哈希与代码标签 `v0.0.5-omni.20261111` 的最终验收一致，旧包已备份；存档、配置和依赖保留，未启动游戏。见[部署与独立回读](../Minecraft%20Forge%20Workspace/archive/20261111-163146-ae2lf-pcl-omni-deploy/README.md)。
+
 2026-11-11 开发更新：全向连接器、完整白色外观与单方块内缓慢外扩粒子已完成。双代 274／272 项单测、原生网络与粒子检查、各 178 项 UI 回归及只读回验通过。本地标签 `v0.0.5-omni.20261111`；[完整验收留痕](../Minecraft%20Forge%20Workspace/archive/20261110-205415-ae2lf-omni-connector/README.md)。本轮为本地开发制品，PCL 未更新。
 
 AE2-LoopFactory is a NeoForge addon for Applied Energistics 2 (AE2). It provides programmable logistics, high-capacity universal storage, recipe-aware crafting services, and tools for writing, previewing, and executing factory programs. Each supported Minecraft generation has an isolated adapter, while language and planning contracts remain shared and loader-independent.
