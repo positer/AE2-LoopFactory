@@ -1,5 +1,11 @@
 # AE2-LoopFactory (AE2LF) Project Overview
 
+## 2026-11-11 低色差线缆版 PCL 部署
+
+- 已安装代码：`655a4287baf850eaf428b22a29a4945b4fcbce7c`／`v0.0.5-cable-restore.20261111`，两代对应实例均回读一致。
+- `../Minecraft Forge Workspace/archive/20261111-205934-ae2lf-pcl-cable-deploy/` 保存最终制品约束、全部原文件清单、旧包备份位置及独立安装回验。
+- 本次只修改部署文档，没有重新构建或启动游戏。
+
 ## 2026-11-11 工厂网络线缆材质还原
 
 - `design/loop_factory/references/loop_factory_cable_original.png`：0.0.5 发布提交 `1ea5964` 的原始低色差贴图，双代共用的唯一还原来源。
