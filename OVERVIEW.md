@@ -1,5 +1,12 @@
 # AE2-LoopFactory (AE2LF) Project Overview
 
+## 2026-11-11 工厂网络线缆材质还原
+
+- `design/loop_factory/references/loop_factory_cable_original.png`：0.0.5 发布提交 `1ea5964` 的原始低色差贴图，双代共用的唯一还原来源。
+- 两代 `textures/block/loop_factory_cable.png` 与 `design/loop_factory/<版本>/loop_factory_interface_cable.bbmodel`：运行图和编辑源内嵌图同步；完整立方体、UV、物品模型与 blockstate 不变。
+- `tools/align_ae2_visuals.py --only-cable`：只恢复线缆；完整生成与 `tools/blockbench/ae2lf_assets.js` 导出也使用原始图，避免高对比网格重新覆盖。
+- `tools/runtime-factory-probe/verify-background.ps1 -CableOnly`：仅运行原生物品／世界两场景，支持不可覆盖的只读回验。两代 274／272 单测、视觉和包内差异检查通过；产品 JAR 仅一张贴图发生变化。
+
 ## 2026-11-11 全向连接器 PCL 部署
 
 - 最终两代制品已安装至对应 PCL 专用实例，代码提交 `be4d0fd451a890e68806617a6d447ba5b54ae29c`。

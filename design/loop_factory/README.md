@@ -16,3 +16,5 @@ Provider correction: the editable cube is oriented upward, with arrow textures o
 Panel correction: AE2's native mask union supplies the 100-pixel colored face footprint. The `bright` layer carries that union as an opaque background, the `medium` layer is transparent, and the `dark` layer overlays the 32-pixel Recipe Ring Solver core with alpha 96/160/255. The item model is the native `ae2:item/display_base` pattern-terminal structure, substituting only `front_bright`, `front_medium`, and `front_dark`; there is no custom item base, empty texture, or GUI lighting override. 1.21.1 explicitly registers the panel's fluix variants with opaque alpha, and 26.1.2 uses AE2's native tint descriptor.
 
 The code-page switch uses AE2's native `TabButton` (`Style.HORIZONTAL`, `TAB_CRAFTING`, 22×22) at the original crafting tab coordinate, parallel to the retained processing tab.
+
+2026-11-11：工厂网络线缆恢复 `1ea5964` 发布时的低色差贴图，完整立方体不变。`references/loop_factory_cable_original.png` 是唯一还原来源；两代 `.bbmodel` 与产品 PNG 同步，导出后收口不会再生成高对比网格。

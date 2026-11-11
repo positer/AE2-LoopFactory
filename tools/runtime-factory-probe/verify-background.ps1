@@ -4,6 +4,7 @@ param(
     [string]$EvidenceRoot,
     [switch]$ValidateExisting,
     [ValidatePattern('^[A-Za-z0-9][A-Za-z0-9_.-]*$')][string]$ValidationName,
+    [switch]$CableOnly,
     [switch]$VisualOnly,
     [switch]$PanelVisualOnly,
     [switch]$PanelUiOnly,
@@ -39,7 +40,7 @@ param(
     [ValidateRange(20,100)][int]$TickRate=20
 )
 $ErrorActionPreference='Stop'
-$exclusiveModes=@($VisualOnly,$StyleOnly,$PanelUiOnly,$PanelVisualOnly,$GroupOnly,$GuideOnly,$UiOnly,$MekOnly,$NativeOnly,$ParserOnly,$AddonCompat,$ChannelOnly,$RecipeSetOnly,$DispatchOnly,$HugeOnly,$RecoveryOnly,$ExtremeOnly,$ChunkOnly,$IdInsertionOnly) | Where-Object { $_ }
+$exclusiveModes=@($CableOnly,$VisualOnly,$StyleOnly,$PanelUiOnly,$PanelVisualOnly,$GroupOnly,$GuideOnly,$UiOnly,$MekOnly,$NativeOnly,$ParserOnly,$AddonCompat,$ChannelOnly,$RecipeSetOnly,$DispatchOnly,$HugeOnly,$RecoveryOnly,$ExtremeOnly,$ChunkOnly,$IdInsertionOnly) | Where-Object { $_ }
 if(@($exclusiveModes).Count -gt 1){throw 'Choose only one exclusive audit mode; combined filters can silently remove required steps'}
 if($ChunkLifecycle -and @($exclusiveModes).Count -gt 0 -and -not $ChunkOnly){throw 'ChunkLifecycle augments the full audit; use ChunkOnly for the independent chunk lifecycle scene'}
 if(($MekOnly -or $AddonCompat) -and $Generation -ne '1.21.1'){throw 'MEK and addon fixtures are isolated to 1.21.1'}
@@ -121,6 +122,7 @@ function Invoke-ExistingValidation {
             recovery=([bool]$HugeQuantities -or [bool]$RecoveryOnly -or [bool]$ExtremeOnly);recoveryOnly=[bool]$RecoveryOnly;extremeOnly=[bool]$ExtremeOnly
             chunkLifecycle=([bool]$ChunkLifecycle -or [bool]$ChunkOnly);chunkOnly=[bool]$ChunkOnly;idInsertionOnly=[bool]$IdInsertionOnly
         }
+        if($CableOnly){$modeValues.cableOnly=$true}
         if($StyleOnly){$modeValues.styleOnly=$true}
         if($PanelUiOnly){$modeValues.panelUiOnly=$true}
         foreach($entry in $modeValues.GetEnumerator()) {
@@ -201,6 +203,7 @@ function Assert-GameplayEvidence {
     if($planned.Count -eq 0 -or @($planned | Select-Object -Unique).Count -ne $planned.Count -or $observed.Count -ne $planned.Count -or @($observed | Select-Object -Unique).Count -ne $observed.Count -or @(Compare-Object $planned $observed).Count -ne 0){throw 'Planned gameplay scenes were not each executed exactly once; completed alone is insufficient'}
     foreach($entry in $requestedScale.GetEnumerator()){if($audit.probeProperties.('ae2lf.probe.'+$entry.Key) -ne [string]$entry.Value){throw "Runtime scale differs from request: $($entry.Key); helper or launch parameters are stale"}}
     if($audit.status -ne 'completed' -or @($audit.results).Count -eq 0 -or @($audit.results | Where-Object { -not $_.passed -or $_.windowVisible -ne 0 }).Count -gt 0) { throw 'Background audit did not pass every step invisibly' }
+    if($CableOnly -and ($planned.Count -ne 2 -or @(Compare-Object $planned @('model-loop_factory_interface_cable','block-loop_factory_interface_cable')).Count -ne 0)) { throw 'CableOnly omitted its required native item/world scenes' }
     if($StyleOnly){
         foreach($requiredScene in @('ui-factory-editor','ui-crafting-ripper','ui-factory-panel-recipe',
                 'ui-factory-panel-code-zh-cn','ui-factory-panel-upload-chooser','ui-factory-panel-upload',
@@ -363,7 +366,7 @@ function Assert-GameplayEvidence {
         Assert-PreviewPixels
     }
     if($ExtremeOnly -and ($planned.Count -ne 5 -or @(Compare-Object $planned @('huge-quantity-logistics','huge-recovery-logistics','factory-pattern-preview-normal','factory-pattern-preview-shift','factory-pattern-preview-cleared')).Count -ne 0)){throw 'ExtremeOnly did not run all quantity, recovery, and preview scenes'}
-    if(-not $ChunkOnly -and -not $ExtremeOnly -and -not $RecoveryOnly -and -not $HugeOnly -and -not $ParserOnly -and -not $NativeOnly -and -not $MekOnly -and -not $AddonCompat -and -not $ChannelOnly -and -not $RecipeSetOnly -and -not $DispatchOnly -and -not $VisualOnly -and -not $PanelVisualOnly -and -not $PanelUiOnly -and -not $UiOnly -and -not $StyleOnly -and -not $GroupOnly -and -not $GuideOnly -and -not $IdInsertionOnly) {
+    if(-not $CableOnly -and -not $ChunkOnly -and -not $ExtremeOnly -and -not $RecoveryOnly -and -not $HugeOnly -and -not $ParserOnly -and -not $NativeOnly -and -not $MekOnly -and -not $AddonCompat -and -not $ChannelOnly -and -not $RecipeSetOnly -and -not $DispatchOnly -and -not $VisualOnly -and -not $PanelVisualOnly -and -not $PanelUiOnly -and -not $UiOnly -and -not $StyleOnly -and -not $GroupOnly -and -not $GuideOnly -and -not $IdInsertionOnly) {
         foreach($requiredReport in @('factory-report.json','native-cpu-report.json','compatibility-audit.json','topology-report.json','terminal-report.json','induction-report.json','multi-tag-report.json','complex-flow-report.json')) {
             $result=Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $reportPath $requiredReport) | ConvertFrom-Json
             if($result.status -ne 'passed') { throw "Failed independent report: $requiredReport" }
@@ -439,6 +442,7 @@ try {
     if($VisualOnly){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.visualOnly=true"}
     if($GuideOnly){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.guideOnly=true"}
     if($GroupOnly){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.groupOnly=true"}
+    if($CableOnly){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.cableOnly=true"}
     if($StyleOnly){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.styleOnly=true"}
     if($UiOnly){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.uiOnly=true"}
     if($SfmCpu){$env:JAVA_TOOL_OPTIONS += " -Dae2lf.probe.sfmCpu=true"}

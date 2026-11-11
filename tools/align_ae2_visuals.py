@@ -64,11 +64,24 @@ def blockbench(gen, name, model, resources, ae):
         outliner=[e['uuid'] for e in elements], textures=textures))
 
 
-def generate(gen, version):
+def restore_cable(gen, resources, ae):
+    # Exact low-contrast texture from the project's 0.0.5 release, not a newly recolored image.
+    assets = resources/f'assets/{MOD}'
+    original = ROOT/'design/loop_factory/references/loop_factory_cable_original.png'
+    (assets/'textures/block/loop_factory_cable.png').write_bytes(original.read_bytes())
+    model = json.loads((assets/'models/block/loop_factory_interface_cable.json').read_bytes())
+    blockbench(gen, 'loop_factory_interface_cable', model, resources, ae)
+
+
+def generate(gen, version, only_cable=False):
     resources = ROOT/f'versions/neoforge-{gen}/src/main/resources'
     assets = resources/f'assets/{MOD}'
     jar = next((ROOT/f'.gradle-user-home/{gen}/caches/modules-2/files-2.1/org.appliedenergistics/appliedenergistics2/{version}').rglob(f'appliedenergistics2-{version}.jar'))
     with ZipFile(jar) as ae:
+        if only_cable:
+            restore_cable(gen, resources, ae)
+            print(f'{gen}: restored original low-contrast full-cube cable')
+            return
         shell = Image.open(io.BytesIO(ae.read('assets/ae2/textures/block/interface.png'))).convert('RGBA')
         # Native bevel, violet-grey steel and dark gasket; never change protected core pixels.
         for name in ('recipe_ring_solver_terminal', 'supercomputing_crafting_optimizer_interface', 'crafting_ripper'):
@@ -106,18 +119,7 @@ def generate(gen, version):
         write_json(assets/'models/block/loop_factory_network_terminal.json', model)
         blockbench(gen, 'loop_factory_network_terminal', model, resources, ae)
 
-        # The interface cable is intentionally a full block (user contract).
-        # Match AE2 quartz glass's metal frame without changing its geometry.
-        cable = top.copy()
-        d = ImageDraw.Draw(cable)
-        d.rectangle((3, 3, 12, 12), fill='#494959')
-        for coordinate in (5, 10):
-            d.line((coordinate, 3, coordinate, 12), fill='#a7a7b9')
-            d.line((3, coordinate, 12, coordinate), fill='#a7a7b9')
-        d.rectangle((6, 6, 9, 9), fill='#818195')
-        cable.save(assets/'textures/block/loop_factory_cable.png')
-        model = json.loads((assets/'models/block/loop_factory_interface_cable.json').read_text())
-        blockbench(gen, 'loop_factory_interface_cable', model, resources, ae)
+        restore_cable(gen, resources, ae)
         # The editable panel must show the same 12px housing and 8px neck as the real part.
         # Production continues to reference AE2 directly, including dye and status rendering.
         panel = json.loads(ae.read('assets/ae2/models/part/display_base.json'))
@@ -130,5 +132,9 @@ def generate(gen, version):
 
 
 if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--only-cable', action='store_true')
+    args = parser.parse_args()
     for gen, version in (('1.21.1', '19.2.17'), ('26.1.2', '26.1.10-beta')):
-        generate(gen, version)
+        generate(gen, version, args.only_cable)

@@ -585,6 +585,7 @@ public final class BackgroundAudit {
             add("chunk-lifecycle-logistics",()->{mc.setScreen(null);cameraX=0;cameraY=104;cameraZ=0;cameraYaw=145;cameraPitch=30;server(p->{p.closeContainer();p.connection.teleport(cameraX,cameraY,cameraZ,cameraYaw,cameraPitch);ChunkLifecycleAudit.begin(p.level(),p);});},"world",()->ChunkLifecycleAudit.finished && ChunkLifecycleAudit.passed);
         if(Boolean.getBoolean("ae2lf.probe.idInsertionOnly"))
             add("code-id-insertion",()->ItemIdInsertionAudit.begin(mc),"",()->ItemIdInsertionAudit.finished && ItemIdInsertionAudit.passed);
+        if(Boolean.getBoolean("ae2lf.probe.cableOnly")) steps.removeIf(step -> !java.util.Set.of("model-loop_factory_interface_cable", "block-loop_factory_interface_cable").contains(step.id));
         if(Boolean.getBoolean("ae2lf.probe.visualOnly")) steps.removeIf(step->!step.id.startsWith("arrows-") && !step.id.equals("model-loop_factory_pattern_provider") && !step.id.equals("block-loop_factory_pattern_provider"));
         if(Boolean.getBoolean("ae2lf.probe.nativeOnly"))steps.removeIf(step->!java.util.Set.of("native-transaction-capabilities","parallel-native-orders","compatibility-registry").contains(step.id));
         if(Boolean.getBoolean("ae2lf.probe.groupOnly"))steps.removeIf(step->!step.id.equals("multi-tag-machine-groups"));

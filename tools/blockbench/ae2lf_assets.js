@@ -233,7 +233,7 @@
                 loop_factory_terminal_top:await read(common+'/sfm_manager_top.png')
             },'block',assets);
             await project(gen,'loop_factory_interface_cable',{
-                loop_factory_cable:recolor(await read(common+'/sfm_cable.png'),(r,g,b)=>[r,g,b].map(v=>Math.min(244,Math.round(156+v*1.2))))
+                loop_factory_cable:await read(common+'/loop_factory_cable_original.png')
             },'block',assets);
             await project(gen,'loop_factory_pattern',{loop_factory_pattern:recolor(await read(ref+'/blank_pattern.png'),darkerPattern)},'item',assets);
             await project(gen,'handheld_loop_factory_encoder',{handheld_loop_factory_encoder:phone()},'item',assets);
