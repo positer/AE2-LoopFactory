@@ -236,3 +236,10 @@ Recipe output references: O1, O2, ... select native recipe outputs in order, ind
 - 全向连接器粒子只在客户端渲染，沿用服务端同步的 AE2 原生在线状态与频道绑定状态；不新增耗能门槛。轨迹与粒子尺寸必须在自身方块内，越界前移除，解绑／离线／卸载时终止。
 
 - 工厂网络线缆保持完整立方体；按用户最新修正，使用 0.0.5 初版低色差浅灰纹理，禁止风格收口或 Blockbench 导出重新覆盖为高对比金属网格。原始 PNG、运行贴图与编辑源内嵌纹理必须一致。
+
+## 2026-11-12 全向连接器拆除与状态写回
+
+- 方块实体被移除时，坐标上的方块已经变成空气；凡是“由实体派生方块状态”的函数（本模组的 `updateBlockStateFromBlockEntity`），必须先在方块仍位于该坐标时才计算，否则 AE2 的 `markForUpdate` 会在拆除过程中把空气写回连接器，表现为首次破坏被挡回、频道丢失。
+- 这类缺陷只能在真实服务端复现：`detach → GridConnection.destroy → validateGrid → Grid.create → setGrid → notifyStatusChange(POWER)` 是同步链，静态阅读看不出；诊断要先抓完整堆栈再改代码。
+- 反向对照是必需证据：新增的“一次性破坏”断言必须用回退修复的制品跑一次并确认失败，再用通过版跑一次；两代各自留档。
+- 方块实体的移除路径（`setRemoved`／`onChunkUnloaded`）不得写方块状态；区块卸载/重载与拆除共用该路径，改动要在两代同时验证。

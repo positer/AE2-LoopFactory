@@ -16,6 +16,7 @@
 - Improved large logistics with compressed batches, checked signed-64-bit quantities, independent job backpressure, and recoverable partial transfers.
 - Improved crafting services with persistent cyclic schedules, recipe-aware acyclic planning, container returns, byproducts, and safe fallback when a plan cannot be proven.
 - Added the complete Loop Storage Cell and portable-cell families with AE2-compatible upgrades and optional Create/Mekanism recipe integrations.
+- Fixed the omnidirectional connector being placed back after a single break when its linked channel isolates it from a powered network hub: the break now leaves air, and the virtual edge is removed as before.
 
 ### 简体中文
 
@@ -31,6 +32,7 @@
 - 改进大宗物流，使用压缩批次、带检查的有符号 64 位数量、独立任务背压和可恢复的部分转运。
 - 改进合成服务，支持持久化循环调度、配方感知无环规划、容器返还、副产物，以及无法证明计划时安全交回 AE2。
 - 完善循环存储磁盘和便携磁盘系列，兼容 AE2 升级卡，并提供可选 Create/Mekanism 配方联动。
+- 修正全向连接器在已连接频道、且拆除会使其脱离带电网络枢纽时被挡回原位的问题：现在一次破坏即留下空气，虚拟边照常移除。
 
 ## 0.0.4
 

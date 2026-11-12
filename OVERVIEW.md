@@ -1,5 +1,12 @@
 # AE2-LoopFactory (AE2LF) Project Overview
 
+## 2026-11-12 全向连接器一次性破坏
+
+- 两代 `omni/OmniConnectorBlock.java`：`updateBlockStateFromBlockEntity` 增加“方块已不在该坐标时返回当前状态”的守卫，避免拆除过程中 AE2 的 `markForUpdate` 把空气写回连接器；其余行为与资源不变。
+- 两代 `tools/runtime-ripper-probe/.../OmniProbe.java`：新增 `case 9/10` 单端带电频道一次性破坏场景（真实 `player.gameMode.destroyBlock`），原 `case 9..11` 顺延为 `11..13`；`tools/runtime-ripper-probe/verify-background.ps1` 的 `-Chain omni` 必需项加入四条新检查。
+- 验收：1.21.1／26.1.2 各 274／272 项单测零失败；`-Chain omni` 原生链两代通过，且用“回退两行守卫”的制品做过反向对照（`linked_connector_breaks_in_one_hit` 失败）。制品 785,621 B `BA29A0D7…`（1.21.1）与 804,271 B `5A85A33D…`（26.1.2）。
+- 证据归属枢纽 `../Minecraft Forge Workspace/archive/20261112-123226-ae2lf-omni-one-hit-break/`；未部署 PCL。
+
 ## 2026-11-11 低色差线缆版 PCL 部署
 
 - 已安装代码：`655a4287baf850eaf428b22a29a4945b4fcbce7c`／`v0.0.5-cable-restore.20261111`，两代对应实例均回读一致。

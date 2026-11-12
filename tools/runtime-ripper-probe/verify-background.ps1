@@ -107,6 +107,7 @@ function Assert-GameplayEvidence([string]$world) {
                 'cross_dimension_40_channels_active','machine_relay_12_consumers_active',
                 'removed_supercomputer_restores_32','removed_supercomputer_restores_machine_limit',
                 'destroy_endpoint_removes_virtual_edge','replaced_endpoint_rejoins','omni_nodes_idle_zero',
+                'break_test_pair_linked','linked_connector_breaks_in_one_hit','linked_connector_block_entity_removed','break_test_removes_virtual_edge',
                 'omni_nodes_and_virtual_edges_no_channel_energy','native_shapeless_recipe_produces_four',
                 'native_wrench_dismantles','wrench_returns_connector_item','wrench_item_replacement_preserves_link',
                 'white_sprite_loaded','white_sprite_no_colored_pixels','unloaded_endpoint_old_node_destroyed','actual_chunk_unload_detaches',

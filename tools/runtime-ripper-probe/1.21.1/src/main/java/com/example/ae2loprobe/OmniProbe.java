@@ -19,7 +19,7 @@ public final class OmniProbe {
  public static final boolean ENABLED="omni".equals(System.getProperty("ae2lo.probe.chain"));
  static MinecraftServer server; static ServerPlayer player; static Path output;
  static ServerLevel level; static OmniConnectorBlockEntity a,b,c,e;
- static String link; static int phase; static long since; static volatile boolean ready;
+ static String link; static String solo; static int phase; static long since; static volatile boolean ready;
  static final BlockPos A=new BlockPos(0,100,0),B=new BlockPos(4,100,0),R=new BlockPos(1600,80,0), P=new BlockPos(-3,100,2),OPT=new BlockPos(-2,100,-1);
  static final List<IManagedGridNode> loads=new ArrayList<>(),relayLoads=new ArrayList<>();
  static final Map<String,Object> report=new LinkedHashMap<>();
@@ -60,7 +60,9 @@ public final class OmniProbe {
  case 6->{var provider=(appeng.blockentity.crafting.PatternProviderBlockEntity)level.getBlockEntity(P);check(cap(node(a))==64,"supercomputer_connector_capacity_64");check(cap(provider.getMainNode().getNode())==16,"supercomputer_machine_relay_capacity_16");check(level.getBlockState(A).getValue(OmniConnectorBlock.ONLINE),"powered_connected_connector_online");check(active(loads)==40,"cross_dimension_40_channels_active");check(active(relayLoads)==12,"machine_relay_12_consumers_active");level.removeBlock(OPT,false);advance();}
  case 7->{check(cap(node(a))==32,"removed_supercomputer_restores_32");check(active(relayLoads)<12,"removed_supercomputer_restores_machine_limit");level.removeBlock(B,false);advance();}
  case 8->{check(OmniNetworks.get(server).count(link)==3,"destroy_endpoint_removes_virtual_edge");b=place(level,B);b.selectLink(link);advance();}
- case 9->{check(OmniNetworks.get(server).count(link)==4,"replaced_endpoint_rejoins");server.saveEverything(false,true,true);energyAudit();OmniPlacementAudit.run(level,player);
+ case 9->{solo=OmniLinkSavedData.get(server).create("单端拆除").id();var cellPos=new BlockPos(7,100,4);level.setBlockAndUpdate(cellPos,AEBlocks.DENSE_ENERGY_CELL.block().defaultBlockState());((EnergyCellBlockEntity)level.getBlockEntity(cellPos)).injectAEPower(1_000_000,Actionable.MODULATE);place(level,new BlockPos(8,100,4)).selectLink(solo);place(level,new BlockPos(12,100,4)).selectLink(solo);advance();}
+ case 10->{check(OmniNetworks.get(server).count(solo)==2,"break_test_pair_linked");player.gameMode.destroyBlock(new BlockPos(12,100,4));check(level.getBlockState(new BlockPos(12,100,4)).isAir(),"linked_connector_breaks_in_one_hit");check(level.getBlockEntity(new BlockPos(12,100,4))==null,"linked_connector_block_entity_removed");check(OmniNetworks.get(server).count(solo)==1,"break_test_removes_virtual_edge");level.removeBlock(new BlockPos(8,100,4),false);level.removeBlock(new BlockPos(7,100,4),false);advance();}
+ case 11->{check(OmniNetworks.get(server).count(link)==4,"replaced_endpoint_rejoins");server.saveEverything(false,true,true);energyAudit();OmniPlacementAudit.run(level,player);
  report.put("registryEntries",OmniLinkSavedData.get(server).directory().size());
  for(Direction direction:Direction.values()){
  var nativeState=AEBlocks.WIRELESS_ACCESS_POINT.block().defaultBlockState().setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING,direction);
@@ -69,14 +71,14 @@ public final class OmniProbe {
  }
  report.put("spriteWidth",com.example.ae2lightoptimizer.client.OmniWhiteSprite.sourceWidth);report.put("spriteHeight",com.example.ae2lightoptimizer.client.OmniWhiteSprite.sourceHeight);check(com.example.ae2lightoptimizer.client.OmniWhiteSprite.changedPixels>0,"white_sprite_loaded");
  server.getLevel(Level.NETHER).setChunkForced(R.getX()>>4,R.getZ()>>4,false);advance();}
- case 10->{
+ case 12->{
   if(server.getLevel(Level.NETHER).getChunkSource().hasChunk(R.getX()>>4,R.getZ()>>4)||OmniNetworks.get(server).count(link)!=3){
    if(level.getGameTime()-since>1200)throw new IllegalStateException("Real nether chunk unload timeout");return;
   }
   check(c.isRemoved() && c.getMainNode().getNode()==null,"unloaded_endpoint_old_node_destroyed");
   check(OmniNetworks.get(server).count(link)==3,"actual_chunk_unload_detaches");
   server.getLevel(Level.NETHER).setChunkForced(R.getX()>>4,R.getZ()>>4,true);advance();}
- case 11->{c=(OmniConnectorBlockEntity)server.getLevel(Level.NETHER).getBlockEntity(R);check(c!=null && c.linkId().equals(link),"chunk_reload_preserves_binding");check(OmniNetworks.get(server).count(link)==4,"chunk_reload_rejoins_star");
+ case 13->{c=(OmniConnectorBlockEntity)server.getLevel(Level.NETHER).getBlockEntity(R);check(c!=null && c.linkId().equals(link),"chunk_reload_preserves_binding");check(OmniNetworks.get(server).count(link)==4,"chunk_reload_rejoins_star");
   check(com.example.ae2lightoptimizer.client.OmniWhiteSprite.coloredPixelsRemaining==0,"white_sprite_no_colored_pixels");
   a.open(player);ready=true;save();}
  }

@@ -56,6 +56,8 @@ public final class OmniConnectorBlock extends AEBaseEntityBlock<OmniConnectorBlo
         return super.updateShape(state, level, ticks, pos, side, neighborPos, neighbor, random);
     }
     @Override protected BlockState updateBlockStateFromBlockEntity(BlockState current, OmniConnectorBlockEntity endpoint) {
+        // A broken block is already air while its block entity is being removed; deriving a state there would write the block back.
+        if (endpoint.getLevel() == null || !endpoint.getLevel().getBlockState(endpoint.getBlockPos()).is(this)) return current;
         if (endpoint.getLevel().isClientSide()) return current;
         return current.setValue(ONLINE, endpoint.linked() && endpoint.getMainNode().isActive()).setValue(WirelessAccessPointBlock.STATE, endpoint.linked() ? WirelessAccessPointBlock.State.HAS_CHANNEL
                 : endpoint.linkId().isEmpty() ? WirelessAccessPointBlock.State.OFF : WirelessAccessPointBlock.State.ON);

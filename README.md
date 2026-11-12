@@ -1,5 +1,7 @@
 # AE2-LoopFactory (AE2LF)
 
+2026-11-12 修复：全向连接器在已连接频道、且拆除会使其脱离带电枢纽时不再被挡回原位，一次破坏即移除方块；双代 274／272 项单测与 `-Chain omni` 原生验收（含新增一次性破坏回归与反向对照）通过，制品仅两行状态派生守卫。见[一次性破坏修复留痕](../Minecraft%20Forge%20Workspace/archive/20261112-123226-ae2lf-omni-one-hit-break/README.md)。
+
 2026-11-11 部署更新：低色差工厂网络线缆还原版已安装到 PCL 的 `AE2-lightoptimizer-1.21.1` 与 `AE2-lightoptimizer-26.1.2`，两处安装哈希均与 `v0.0.5-cable-restore.20261111` 验收制品一致。旧包已备份，存档、配置和依赖保留，未启动游戏。见[部署与回读](../Minecraft%20Forge%20Workspace/archive/20261111-205934-ae2lf-pcl-cable-deploy/README.md)。
 
 2026-11-11 外观修正：工厂网络线缆恢复 0.0.5 初版浅灰、低色差材质，保留完整立方体、UV 与网络功能。两代构建、各两项原生物品／世界视觉检查与只读回验通过；本轮未更新 PCL。见[还原记录](../Minecraft%20Forge%20Workspace/archive/20261111-194619-ae2lf-cable-restore/README.md)。
