@@ -1,5 +1,12 @@
 # AE2-LoopFactory (AE2LF) Project Overview
 
+## 2026-11-12 全向连接器一次性破坏版 PCL 部署
+
+- 已安装代码：`80db0cf93ad7bf1cc29ee1591172a2068be16ee2`／`v0.0.5-omni-one-hit.20261112`，两代对应实例均回读一致（1.21.1 785,621 B `BA29A0D7…`，26.1.2 804,271 B `5A85A33D…`）。
+- 旧包保存在各实例 `_superseded/20261112-130407-ae2lf-pcl-omni-one-hit-deploy/`，以 `.jar.bak` 结尾；每个实例仍只有一个活动 AE2LF JAR。
+- 部署与独立回读证据位于 `../Minecraft Forge Workspace/archive/20261112-130407-ae2lf-pcl-omni-one-hit-deploy/`，含 720／1007 个原文件清单、1,571 个存档文件保持字节与时间戳、安装与备份哈希。
+- 本次只更新部署文档，没有重新构建、没有启动游戏，也没有改动配置与依赖。
+
 ## 2026-11-12 全向连接器一次性破坏
 
 - 两代 `omni/OmniConnectorBlock.java`：`updateBlockStateFromBlockEntity` 增加“方块已不在该坐标时返回当前状态”的守卫，避免拆除过程中 AE2 的 `markForUpdate` 把空气写回连接器；其余行为与资源不变。
