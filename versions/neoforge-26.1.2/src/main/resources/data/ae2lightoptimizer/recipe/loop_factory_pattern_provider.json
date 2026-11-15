@@ -1,14 +1,17 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    "ae2:pattern_provider",
-    "ae2lightoptimizer:4m_loop_storage_core",
-    "ae2lightoptimizer:loop_crystal",
-    "ae2lightoptimizer:loop_crystal",
-    "ae2:engineering_processor",
-    "ae2:engineering_processor"
+  "pattern": [
+    "E E",
+    "LPL",
+    " C "
   ],
+  "key": {
+    "E": "ae2:engineering_processor",
+    "L": "ae2lightoptimizer:loop_crystal",
+    "P": "ae2:pattern_provider",
+    "C": "ae2lightoptimizer:4m_loop_storage_core"
+  },
   "result": {
     "id": "ae2lightoptimizer:loop_factory_pattern_provider",
     "count": 1

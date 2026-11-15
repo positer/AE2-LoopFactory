@@ -9,6 +9,7 @@
 - Removed the crafting ripper's own idle power draw; it behaves like a native pattern provider and only needs a channel.
 - Made the ripper's pattern slots safe for pattern upload and migration by other AE2 addons: a slot index past a shrunk tail row now grows the library back instead of failing, and unsupported patterns are returned instead of being stored.
 - Changed the Crafting Ripper recipe to use a 256M Loop Storage Core instead of the 4M core, and aligned its guide page with the zero-idle-power contract.
+- Fixed four Loop Factory machine recipes that were registered shapeless although they are ordered recipes: the network terminal, pattern provider, pattern encoding panel and handheld encoder now use shaped layouts with exactly the same materials.
 - Applied the supercomputer's single channel doubling to AE2 Lightning Tech overloaded controllers: Thunderbolt's max-flow network receives twice its per-controller supply, and the bridge stays inert when that mod is absent.
 
 ### 简体中文
@@ -18,6 +19,7 @@
 - 合成撕裂者取消自身待机耗电，行为与原生样板供应器一致，只需频道即可工作。
 - 撕裂者样板槽位对其它 AE2 附属的样板上传与迁移安全：收缩后的尾部槽位索引会重新生长，不再触发越界失败；不支持的样板原样返回而非写入。
 - 合成撕裂者配方由 4M 循环存储核心改为 256M 循环存储核心，指南页同步为零待机耗电合同。
+- 修正四个被错误登记为无序的循环工厂机器配方（网络终端、样板供应器、样板编码面板、手持编码器）：改为有序配方，材料与数量完全不变。
 - 超算的单次频道翻倍接入 AE2 闪电科技的过载控制器：闪电科技的最大流网络获得双倍的单控制器供给；该模组不存在时桥接不生效。
 
 ## 0.0.5

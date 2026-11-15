@@ -1,14 +1,18 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    "ae2:quartz_glass",
-    "ae2:calculation_processor",
-    "ae2lightoptimizer:loop_crystal",
-    "minecraft:iron_ingot",
-    "minecraft:iron_ingot",
-    "minecraft:redstone"
+  "pattern": [
+    "I I",
+    "KCQ",
+    " R "
   ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "K": "ae2:calculation_processor",
+    "C": "ae2lightoptimizer:loop_crystal",
+    "Q": "ae2:quartz_glass",
+    "R": "minecraft:redstone"
+  },
   "result": {
     "id": "ae2lightoptimizer:handheld_loop_factory_encoder",
     "count": 1
