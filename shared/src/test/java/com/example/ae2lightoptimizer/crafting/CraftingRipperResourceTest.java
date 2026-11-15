@@ -28,7 +28,7 @@ class CraftingRipperResourceTest {
         assertEquals("minecraft:iron_ingot", ingredient(key.get("I")));
         assertEquals("ae2:quantum_entangled_singularity", ingredient(key.get("S")));
         assertEquals("ae2:formation_core", ingredient(key.get("F")));
-        assertEquals("ae2lightoptimizer:4m_loop_storage_core", ingredient(key.get("C")));
+        assertEquals("ae2lightoptimizer:256m_loop_storage_core", ingredient(key.get("C")));
         assertEquals("ae2:annihilation_core", ingredient(key.get("D")));
         assertEquals("ae2lightoptimizer:crafting_ripper", ripper.getAsJsonObject("result").get("id").getAsString());
         JsonObject card = json("data/ae2lightoptimizer/recipe/loop_card.json");
