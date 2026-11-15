@@ -4,7 +4,8 @@
 
 - 版本 0.0.6 已构建并打标签 `v0.0.6`：两代制品 1.21.1 794,553 B `84af9216…36ab`、26.1.2 813,220 B `a47d131e…72c7`；单测 281／279 全通过；1.21.1 `-Chain template` 原生链通过（零合成费、一次 tick 整链、材料精确）。
 - 发布内容：连接器私有／公开频道与原生锁形开关、撕裂者零待机耗电／零整链费用／无限并行、第三方样板槽位兼容、超算翻倍接入闪电科技、撕裂者 256M 配方、四个工厂机器配方恢复有序，以及连接器语言文件与导入按钮的两处修复。
-- 发布留痕归属枢纽 `../Minecraft Forge Workspace/archive/20261115-191500-ae2lf-omni-access-ripper-ae2lt/`；`main` 与 `v0.0.6` 已推送到 `origin`，并创建 GitHub Release `AE2LF 0.0.6`（两代 JAR 为发布附件）；未部署 PCL。
+- 发布留痕归属枢纽 `../Minecraft Forge Workspace/archive/20261115-191500-ae2lf-omni-access-ripper-ae2lt/`；`main` 与 `v0.0.6` 已推送到 `origin`，并创建 GitHub Release `AE2LF 0.0.6`（两代 JAR 为发布附件）。
+- 部署：0.0.6 已装入 PCL `AE2-lightoptimizer-26.1.2`（原 0.0.5 备份），实机启动到主菜单并正常关闭；1.21.1 实例仍是上一版。全量检查：1.21.1 `omni_access`／`ae2lt_capacity`／`template` 与 26.1.2 `template` 全通过，单测 281／279。
 
 ## 2026-11-15 频道私有/公开、撕裂者零自身耗电与闪电科技兼容
 
