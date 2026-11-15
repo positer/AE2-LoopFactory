@@ -12,6 +12,14 @@
 
 在线并绑定频道时，原生客户端显示白色小粒子：速度每 tick 0.006–0.008 格、最长 48 tick，向外移动并淡出。渲染轨迹在单块边界内结束，解绑、离线或区块卸载时停止。在线状态直接同步 AE2 节点状态，不以特效新增电量或频道门槛。
 
+### 频道可见性
+
+创建频道时选择「公开」或「私有」，界面右侧的原生 AE2 锁形开关就是该选择：解锁为公开，锁定为私有。公开频道对所有玩家可见、可加入；私有频道只对创建者可见、可加入，其他玩家既看不到它，也不能通过频道 ID 绑定。
+
+名称索引按可见性分命名空间：公开频道共用一套全局名称，私有频道按创建者分开，因此两名玩家可以各自拥有同名的私有频道而互不影响。旧存档里的频道没有可见性与所有者字段，加载为公开频道，不会因为升级而失去访问。
+
+菜单在服务端二次校验：列表、翻页、当前频道行与「加入」动作都只接受 visibleTo(当前玩家) 的频道；即使客户端伪造频道 ID，服务端也不会绑定。频道记录随存档保存所有者 UUID 与可见性；扳手拆卸携带的仍是频道 ID，重新放置后按放置者权限解析。
+
 ## 文件分工
 
 | 文件 | 构造与作用 |
@@ -25,7 +33,7 @@
 | `omni/OmniConnectorBlockEntity.java` | 后面接线、零待机功耗、绑定持久化、原生扳手携带设置 |
 | `omni/OmniConnectorMenu.java` | 权限与距离检查、创建／选择／解绑／翻页和原生客户端动作 |
 | `omni/OmniContent.java` | 方块、物品、实体、菜单与粒子注册 |
-| `client/OmniConnectorScreen.java` | AEBaseScreen、原生 AE2 按钮、图标与文本输入，双语布局 |
+| `client/OmniConnectorScreen.java` | AEBaseScreen、原生 AE2 按钮与锁形可见性开关、文本输入，双语布局 |
 | `client/OmniPulseParticle.java` | 客户端原生动画粒子，保留原版精灵、限制单块范围并随在线状态终止 |
 | `client/OmniWhiteSprite.java` | 从本代 AE2 依赖／资源包读取原图，运行时生成同尺寸全白 atlas sprite |
 | `mixin/OmniNodeEnergyMixin.java` | 只免除专用节点的频道传输能耗返回值，不改实际分配量 |
@@ -35,6 +43,7 @@
 | `tools/verify_omni_resources.py` | 只读比较原生状态／旋转／模型引用与三材料四产出配方 |
 | `tools/verify_omni_saved_data.py` | 正常退出后独立解析磁盘压缩 NBT，核对中文名、客户端创建和唯一 ID |
 | `tools/runtime-ripper-probe/.../Omni*` | 隔离原生校验，不进入产品 JAR |
+| `tools/runtime-ripper-probe/.../OmniAccess*` | 私有／公开可见性与原生界面截图的隔离验收 |
 
 ## 验收说明
 

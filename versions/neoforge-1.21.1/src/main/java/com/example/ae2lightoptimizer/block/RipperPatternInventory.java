@@ -23,7 +23,19 @@ public final class RipperPatternInventory extends BaseInternalInventory {
     @Override public int getSlotLimit(int slot) { return 1; }
     @Override public ItemStack getStackInSlot(int slot) { return stacks.getOrDefault(slot, ItemStack.EMPTY); }
     @Override public boolean isItemValid(int slot, ItemStack stack) {
-        return slot >= 0 && slot < size() && !stack.isEmpty() && accepts.test(stack);
+        return slot >= 0 && !stack.isEmpty() && accepts.test(stack);
+    }
+    /**
+     * Pattern upload and migration from other AE2 addons keep the physical slot index they read. The tail
+     * row shrinks when its last pattern leaves, so that index can sit past the current logical size; grow
+     * it back instead of failing the platform's range check, and never drop a pattern the ripper accepts.
+     */
+    @Override public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+        if (stack.isEmpty() || slot < 0 || !accepts.test(stack)) return stack;
+        if (!getStackInSlot(slot).isEmpty()) return stack;
+        if (simulate) return stack.getCount() <= 1 ? ItemStack.EMPTY : stack.copyWithCount(stack.getCount() - 1);
+        batch(() -> setItemDirect(slot, stack.copyWithCount(1)));
+        return stack.getCount() <= 1 ? ItemStack.EMPTY : stack.copyWithCount(stack.getCount() - 1);
     }
     @Override public void setItemDirect(int slot, ItemStack stack) {
         // Rollback can restore a tail slot after removal has shrunk the logical capacity.

@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.example.ae2lightoptimizer.mixin.compat",
+  "compatibilityLevel": "JAVA_21",
+  "plugin": "com.example.ae2lightoptimizer.compat.OptionalCompatMixinPlugin",
+  "mixins": [
+    "ThunderboltBorrowedCapacityMixin",
+    "ThunderboltSupplyMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

@@ -190,5 +190,8 @@
   "gui.ae2lightoptimizer.omni.selected": "当前：%s",
   "gui.ae2lightoptimizer.omni.page": "第 %s / %s 页",
   "gui.ae2lightoptimizer.omni.invalid": "名称须为 1–48 个可显示字符",
-  "gui.ae2lightoptimizer.omni.links": "全服连接频道（括号内为已加载端点数）"
+  "gui.ae2lightoptimizer.omni.links": "可见频道（括号内为端点数）",
+  "gui.ae2lightoptimizer.omni.private": "私有",
+  "gui.ae2lightoptimizer.omni.visibility": "频道可见性",
+  "gui.ae2lightoptimizer.omni.visibility.hint": "锁定：仅你可查看与加入该频道"
 }

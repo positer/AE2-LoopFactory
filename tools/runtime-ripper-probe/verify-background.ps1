@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory=$true)][ValidateSet('1.21.1','26.1.2')][string]$Generation,
-    [Parameter(Mandatory=$true)][ValidateSet('omni','template','channel_capacity','smithing','layered','core256m','catalog_audit','native_catalog','exact_components','pack_catalog','tool_components')][string]$Chain,
+    [Parameter(Mandatory=$true)][ValidateSet('omni','omni_access','ae2lt_capacity','template','channel_capacity','smithing','layered','core256m','catalog_audit','native_catalog','exact_components','pack_catalog','tool_components')][string]$Chain,
     [Parameter(Mandatory=$true)][ValidatePattern('^ripper-[A-Za-z0-9_.-]+$')][string]$EvidenceName,
     [string]$EvidenceRoot,
     [switch]$PrepareOnly,
@@ -96,9 +96,11 @@ function Assert-RuntimeMatchesProduction {
 function Assert-GameplayEvidence([string]$world) {
     $report = Read-PassingFixture 'report.json'
     if ($report.minecraft -ne $Generation -or $report.world -ne $world) { throw 'Report generation/world is not this run' }
-    $chainNames = @{omni='omni_connector';channel_capacity='channel_capacity';template='template_growth';smithing='template_growth_then_netherite_pickaxe_smithing';layered='logs_planks_sticks_tool_and_template_growth_then_smithing';core256m='all_ten_core_tiers_crystal_growth_and_netherite_ingots';native_catalog='native_catalog_map_extension';exact_components='exact_components';catalog_audit='catalog_audit';pack_catalog='pack_catalog';tool_components='tool_components'}
+    $chainNames = @{omni='omni_connector';omni_access='omni_access';ae2lt_capacity='ae2lt_capacity';channel_capacity='channel_capacity';template='template_growth';smithing='template_growth_then_netherite_pickaxe_smithing';layered='logs_planks_sticks_tool_and_template_growth_then_smithing';core256m='all_ten_core_tiers_crystal_growth_and_netherite_ingots';native_catalog='native_catalog_map_extension';exact_components='exact_components';catalog_audit='catalog_audit';pack_catalog='pack_catalog';tool_components='tool_components'}
     if ($report.chain -ne $chainNames[$Chain]) { throw 'The requested chain is not the completed fixture' }
-    if ($Chain -ne 'omni' -and $report.ripperConfiguredIdleAEPerTick -ne 5) { throw 'Ripper idle drain did not remain 5 AE/t' }
+    # 0.0.6 removed the ripper's own idle drain; older evidence keeps its recorded 5 AE/t.
+    if ($Chain -notin @('omni','omni_access','ae2lt_capacity') -and $report.ripperConfiguredIdleAEPerTick -ne 5) { throw 'Ripper idle drain did not remain 5 AE/t' }
+    if ($Chain -eq 'omni_access' -and $report.ripperIdlePower -ne 0) { throw 'Ripper idle drain is no longer zero' }
     if ($Chain -eq 'omni') {
         foreach ($check in @('four_loaded_endpoints','one_star_hub','connected_without_power','connectors_require_no_channels',
                 'different_links_isolated','old_link_membership_removed','reselect_merges_native_grids',
@@ -128,6 +130,22 @@ function Assert-GameplayEvidence([string]$world) {
         }
         foreach ($frame in @('ui','invalid','created','page2','unlinked','restored','zh-1x','zh-2x','en-2x','world','particles-online','particles-offline')) {
             if (-not (Test-Path -LiteralPath (Join-Path $evidence "screenshots/ae2lo-ripper-omni-$frame.png"))) { throw "Missing native connector frame: $frame" }
+        }
+        $diskResult = & python (Join-Path $taskRoot 'tools/verify_omni_saved_data.py') $evidence --generation $Generation
+        if ($LASTEXITCODE -ne 0) { throw 'Connector disk NBT readback failed' }
+        $null = Read-PassingFixture 'saved-data-readback.json'
+    }
+    if ($Chain -eq 'omni_access') {
+        foreach ($check in @('public_and_private_ids_differ','same_private_name_is_per_owner','owner_sees_public_and_own_private',
+                'other_sees_public_and_their_private','private_link_invisible_to_other_player','public_link_visible_to_other_player',
+                'other_owner_sees_own_private_link','private_link_binds_owner_connector','owner_second_endpoint_joins_private_link',
+                'private_link_is_one_native_grid','connector_menu_opened','menu_refuses_invisible_private_link','menu_refuses_other_private_link',
+                'menu_accepts_public_link','menu_restores_own_private_link','menu_creates_private_link','created_private_link_owner_is_player',
+                'created_private_link_invisible_to_other','public_name_join_is_idempotent','ripper_placed','ripper_node_ready',
+                'ripper_has_no_idle_power','ripper_online_without_own_power','probe_pattern_is_supported','third_party_insert_accepted',
+                'third_party_insert_landed_in_requested_slot','insert_grew_the_pattern_tail','inserted_pattern_is_advertised',
+                'unsupported_item_returned_not_dropped','unsupported_item_not_stored')) {
+            if ($report.$check -ne $true) { throw "Missing channel visibility/ripper contract: $check" }
         }
         $diskResult = & python (Join-Path $taskRoot 'tools/verify_omni_saved_data.py') $evidence --generation $Generation
         if ($LASTEXITCODE -ne 0) { throw 'Connector disk NBT readback failed' }
@@ -195,7 +213,11 @@ function Assert-GameplayEvidence([string]$world) {
             throw 'Native map identities, CPU persistence or one-time fee contract failed'
         }
     }
-    foreach ($frame in $(if ($Chain -eq 'omni') { @('ae2lo-ripper-omni-ui.png','ae2lo-ripper-omni-world.png') } else { @('ae2lo-ripper-after.png','ae2lo-ripper-ui.png') })) {
+    $requiredFrames = if ($Chain -eq 'omni') { @('ae2lo-ripper-omni-ui.png','ae2lo-ripper-omni-world.png') }
+        elseif ($Chain -eq 'omni_access') { @('ae2lo-ripper-omni-access-ui.png','ae2lo-ripper-omni-access-private-toggle.png','ae2lo-ripper-omni-access-private-created.png','ae2lo-ripper-omni-access-zh-2x.png','ae2lo-ripper-omni-access-en-2x.png') }
+        elseif ($Chain -eq 'ae2lt_capacity') { @() }
+        else { @('ae2lo-ripper-after.png','ae2lo-ripper-ui.png') }
+    foreach ($frame in $requiredFrames) {
         $framePath = Join-Path $evidence ('screenshots/' + $frame)
         if (-not (Test-Path -LiteralPath $framePath -PathType Leaf) -or (Get-Item -LiteralPath $framePath).Length -le 8) { throw "Missing native framebuffer: $frame" }
     }

@@ -190,5 +190,8 @@
   "gui.ae2lightoptimizer.omni.selected": "Current: %s",
   "gui.ae2lightoptimizer.omni.page": "Page %s / %s",
   "gui.ae2lightoptimizer.omni.invalid": "Use 1–48 visible characters",
-  "gui.ae2lightoptimizer.omni.links": "Server links (loaded endpoints in brackets)"
+  "gui.ae2lightoptimizer.omni.links": "Visible channels (endpoints)",
+  "gui.ae2lightoptimizer.omni.private": "Private",
+  "gui.ae2lightoptimizer.omni.visibility": "Channel visibility",
+  "gui.ae2lightoptimizer.omni.visibility.hint": "Locked: only you can see and join this channel"
 }

@@ -30,9 +30,26 @@ def parse(path):
 files=[f for f in root.rglob('*omni*dat') if f.is_file()]
 assert len(files)==1,files
 nbt=parse(files[0]);links=nbt['data']['links'];names={x['name'] for x in links}
-assert {'跨维度物流','备用链路','Client created link'}<=names,names
+chain=report.get('chain','omni_connector')
 assert len({x['id'] for x in links})==len(links)
-result={'passed':True,'generation':a.generation,'savedDataFile':str(files[0]),'entries':len(links),'unicodeNamesAndClientCreatedLinkOnDisk':True,'uniqueStableIds':True}
+if chain=='omni_access':
+ assert {'Open access','Secret plan','Other private','Fresh private','Client private'}<=names,names
+ public=[x for x in links if x.get('visibility','public')=='public']
+ private=[x for x in links if x.get('visibility')=='private']
+ assert len(public)==1 and public[0]['name']=='Open access',public
+ assert {x['name'] for x in private}=={'Secret plan','Other private','Fresh private','Client private'},private
+ assert len(private)==5,[(x['name'],x.get('visibility')) for x in links]
+ owners={x['name']:x.get('owner','') for x in private}
+ assert all(owners.values()),owners
+ assert len({x['owner'] for x in private if x['name']=='Secret plan'})==2,private
+ import uuid
+ for owner in owners.values(): uuid.UUID(owner)
+ result={'passed':True,'generation':a.generation,'chain':chain,'savedDataFile':str(files[0]),'entries':len(links),
+         'publicLinks':len(public),'privateLinks':len(private),'privateOwnersOnDisk':sorted(set(owners.values())),
+         'samePrivateNameDifferentOwners':True,'uniqueStableIds':True}
+else:
+ assert {'跨维度物流','备用链路','Client created link'}<=names,names
+ result={'passed':True,'generation':a.generation,'chain':chain,'savedDataFile':str(files[0]),'entries':len(links),'unicodeNamesAndClientCreatedLinkOnDisk':True,'uniqueStableIds':True}
 target=e/'saved-data-readback.json'
 if target.exists():
  assert json.loads(target.read_text(encoding='utf-8'))==result, 'Existing disk readback differs'

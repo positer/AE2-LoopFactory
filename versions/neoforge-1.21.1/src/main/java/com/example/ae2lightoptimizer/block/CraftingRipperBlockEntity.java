@@ -34,7 +34,8 @@ public final class CraftingRipperBlockEntity extends AENetworkedBlockEntity
 
     public CraftingRipperBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CRAFTING_RIPPER.get(), pos, state);
-        getMainNode().setIdlePowerUsage(5.0);
+        // The ripper is a network pattern target: it draws no idle power of its own (like a native provider).
+        getMainNode().setIdlePowerUsage(0);
         this.logic = new CraftingRipperLogic(this);
         this.upgrades = UpgradeInventories.forMachine(ModBlocks.CRAFTING_RIPPER.get(), 1, this::upgradesChanged);
     }
