@@ -4,25 +4,27 @@
 
 ### English
 
-- Added private and public omnidirectional connector channels: a private channel is visible only to the player who created it, public channels stay visible to everyone, and existing saved channels load as public.
-- Added a native AE2 visibility toggle to the connector screen; the channel list, its paging and the selected-channel line only show channels the current player can use.
-- Removed the crafting ripper's own idle power draw; it behaves like a native pattern provider and only needs a channel.
-- Made the ripper's pattern slots safe for pattern upload and migration by other AE2 addons: a slot index past a shrunk tail row now grows the library back instead of failing, and unsupported patterns are returned instead of being stored.
-- Changed the Crafting Ripper recipe to use a 256M Loop Storage Core instead of the 4M core, and aligned its guide page with the zero-idle-power contract.
-- Fixed four Loop Factory machine recipes that were registered shapeless although they are ordered recipes: the network terminal, pattern provider, pattern encoding panel and handheld encoder now use shaped layouts with exactly the same materials.
-- Removed the Crafting Ripper's 50 AE chain fee: a whole-chain rip now costs no AE of its own, and the ripper is treated as infinite parallel crafting, so a chain is no longer throttled by the CPU's co-processors.
-- Applied the supercomputer's single channel doubling to AE2 Lightning Tech overloaded controllers: Thunderbolt's max-flow network receives twice its per-controller supply, and the bridge stays inert when that mod is absent.
+- Added private and public omnidirectional connector channels: creation picks the visibility, public channels are visible to every player, private channels only to their creator, and channels saved before this release load as public.
+- Added AE2's native lock toggle to the connector screen; the channel list, its paging, the selected-channel line and the join action only ever use channels the current player can see, and the server re-checks every selection.
+- Changed the Crafting Ripper to draw no idle power and charge no AE for a whole-chain rip; it is treated as infinite parallel crafting, so a chain commits in one tick regardless of the CPU's co-processors.
+- Made the ripper's pattern slots safe for pattern upload and migration by other AE2 addons: a slot index past a shrunk tail row grows the library back instead of failing, unsupported patterns are returned instead of stored, and accepted patterns are advertised in the same server tick.
+- Added an optional Thunderbolt bridge so the supercomputer's single channel doubling also reaches AE2 Lightning Tech overloaded and advanced overloaded controllers; the bridge applies nothing when that mod is absent.
+- Changed the Crafting Ripper recipe to use a 256M Loop Storage Core instead of the 4M core.
+- Restored ordered recipes for four Loop Factory machines — network terminal, pattern provider, pattern encoding panel and handheld encoder — with exactly the same materials.
+- Fixed the connector language file that failed strict JSON parsing and was skipped at runtime, which had replaced every connector string with its raw translation key.
+- Fixed the ripper's pattern import button reporting an available network when the connected ME network had no power.
 
 ### 简体中文
 
-- 全向连接器新增私有／公开频道：私有频道仅创建者可见，公开频道对所有玩家可见，旧存档频道按公开加载。
-- 连接器界面新增 AE2 原生可见性开关；频道列表、翻页与当前频道行只显示当前玩家可用的频道。
-- 合成撕裂者取消自身待机耗电，行为与原生样板供应器一致，只需频道即可工作。
-- 撕裂者样板槽位对其它 AE2 附属的样板上传与迁移安全：收缩后的尾部槽位索引会重新生长，不再触发越界失败；不支持的样板原样返回而非写入。
-- 合成撕裂者配方由 4M 循环存储核心改为 256M 循环存储核心，指南页同步为零待机耗电合同。
-- 修正四个被错误登记为无序的循环工厂机器配方（网络终端、样板供应器、样板编码面板、手持编码器）：改为有序配方，材料与数量完全不变。
-- 取消合成撕裂者每次整链合成 50 AE 的费用：撕裂者不再收取自身合成费用，并被视为无限并行合成，整条链不再受 CPU 协处理器数量限制。
-- 超算的单次频道翻倍接入 AE2 闪电科技的过载控制器：闪电科技的最大流网络获得双倍的单控制器供给；该模组不存在时桥接不生效。
+- 全向连接器新增私有／公开频道：创建时选择可见性，公开频道对所有玩家可见，私有频道仅创建者可见；本版之前保存的频道按公开加载。
+- 连接器界面新增 AE2 原生锁形开关；频道列表、翻页、当前频道行与加入动作只使用当前玩家可见的频道，服务端对每次选择二次校验。
+- 合成撕裂者取消自身待机耗电，也不再收取整链合成费用；它被视为无限并行合成，整条链不受 CPU 协处理器数量限制，在一个 tick 内提交。
+- 撕裂者样板槽位对其它 AE2 附属的样板上传与迁移安全：收缩后的尾部槽位索引会重新生长而非失败，不支持的样板原样返回而非写入，接收的样板在同一次服务端处理中即可见。
+- 新增可选的闪电科技桥接：超算的单次频道翻倍同样作用于 AE2 闪电科技的过载与高级过载控制器；该模组不存在时不应用任何桥接。
+- 合成撕裂者配方由 4M 循环存储核心改为 256M 循环存储核心。
+- 四个循环工厂机器配方（网络终端、样板供应器、样板编码面板、手持编码器）恢复为有序配方，材料与数量完全不变。
+- 修正连接器语言文件严格 JSON 解析失败、运行时被跳过的问题：此前界面上所有连接器文案都退化成原始翻译键。
+- 修正撕裂者在所连 ME 网络无电时，样板导入按钮仍显示网络可用的问题。
 
 ## 0.0.5
 

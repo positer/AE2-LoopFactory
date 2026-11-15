@@ -1,5 +1,11 @@
 # AE2-LoopFactory (AE2LF) Project Overview
 
+## 2026-11-15 发布 0.0.6
+
+- 版本 0.0.6 已构建并打标签 `v0.0.6`：两代制品 1.21.1 794,553 B `84af9216…36ab`、26.1.2 813,220 B `a47d131e…72c7`；单测 281／279 全通过；1.21.1 `-Chain template` 原生链通过（零合成费、一次 tick 整链、材料精确）。
+- 发布内容：连接器私有／公开频道与原生锁形开关、撕裂者零待机耗电／零整链费用／无限并行、第三方样板槽位兼容、超算翻倍接入闪电科技、撕裂者 256M 配方、四个工厂机器配方恢复有序，以及连接器语言文件与导入按钮的两处修复。
+- 发布留痕归属枢纽 `../Minecraft Forge Workspace/archive/20261115-191500-ae2lf-omni-access-ripper-ae2lt/`；未推送远端、未部署 PCL。
+
 ## 2026-11-15 频道私有/公开、撕裂者零自身耗电与闪电科技兼容
 
 - `shared/.../network/OmniLinkDirectory.java`：`Link` 增加 `owner`（UUID 字符串）与 `visibility`（`PUBLIC`/`PRIVATE`），名称索引按可见性分命名空间，新增 `visibleTo`/`canSee`/`sortedVisible`；旧存档字段缺失时按公开加载。
