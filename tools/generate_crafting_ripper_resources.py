@@ -30,9 +30,9 @@ cyclic planning. Its compressed execution order and initial seeds are preserved
 when the ripper executes the chain. Quantities use checked signed 64-bit values.
 Unsupported or stale recipes cannot partially consume a chain.
 
-The machine draws no idle power of its own, like a native AE2 pattern provider, and
-charges **50 AE** for each complete chain execution. It waits for this energy before
-committing.
+The machine draws no idle power of its own and charges no AE for a chain, like a
+native AE2 pattern provider. It is treated as infinite parallel crafting: a whole chain
+commits in one tick regardless of the CPU's co-processors.
 Delivery can wait when the requester is full; it does not repeat the craft or
 charge again. The face is cyan while its grid node is active and dim while offline.
 
@@ -77,8 +77,8 @@ Click the down-arrow button beside the pattern area to move supported encoded pa
 撕裂者执行时遵循其压缩顺序并保留初始种子，数量使用带溢出检查的有符号 64 位数。
 不支持或已失效的配方不会先消耗部分合成链材料。
 
-自身没有待机耗电，与原生 AE2 样板供应器一致；每次完整合成链执行消耗 **50 AE**。
-能量不足时等待，充足后才结算。接收方已满时可以延后交付，不会重新合成或重复收费。
+自身没有待机耗电，也不收取合成费用，与原生 AE2 样板供应器一致；并被视为无限并行合成：
+整条链不受 CPU 协处理器数量限制，在一个 tick 内提交。接收方已满时可以延后交付，不会重新合成或重复收费。
 网络节点激活时核心呈青色，离线时变暗。
 
 ## 自动样板

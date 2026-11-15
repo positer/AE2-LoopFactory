@@ -118,7 +118,9 @@ public final class CraftingRipperMenu extends PatternProviderMenu {
     }
     @Override public void broadcastChanges() {
         if (isServerSide()) {
-            networkAvailable = !host.isRemoved() && host.getMainNode().isActive();
+            // Importing needs a reachable, powered ME network. A zero-power ripper stays active on its own
+            // ad-hoc grid, so activity alone would report a usable network that has nothing to import from.
+            networkAvailable = !host.isRemoved() && host.getMainNode().isActive() && host.getMainNode().isPowered();
             if (importer != null) {
                 if (!stillValid(getPlayer()) || getPlayer().containerMenu != this) importer = null;
                 else {

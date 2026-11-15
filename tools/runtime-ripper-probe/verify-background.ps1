@@ -99,7 +99,7 @@ function Assert-GameplayEvidence([string]$world) {
     $chainNames = @{omni='omni_connector';omni_access='omni_access';ae2lt_capacity='ae2lt_capacity';channel_capacity='channel_capacity';template='template_growth';smithing='template_growth_then_netherite_pickaxe_smithing';layered='logs_planks_sticks_tool_and_template_growth_then_smithing';core256m='all_ten_core_tiers_crystal_growth_and_netherite_ingots';native_catalog='native_catalog_map_extension';exact_components='exact_components';catalog_audit='catalog_audit';pack_catalog='pack_catalog';tool_components='tool_components'}
     if ($report.chain -ne $chainNames[$Chain]) { throw 'The requested chain is not the completed fixture' }
     # 0.0.6 removed the ripper's own idle drain; older evidence keeps its recorded 5 AE/t.
-    if ($Chain -notin @('omni','omni_access','ae2lt_capacity') -and $report.ripperConfiguredIdleAEPerTick -ne 5) { throw 'Ripper idle drain did not remain 5 AE/t' }
+    if ($Chain -notin @('omni','omni_access','ae2lt_capacity') -and $report.ripperConfiguredIdleAEPerTick -ne 0) { throw 'Ripper idle drain is not zero' }
     if ($Chain -eq 'omni_access' -and $report.ripperIdlePower -ne 0) { throw 'Ripper idle drain is no longer zero' }
     if ($Chain -eq 'omni') {
         foreach ($check in @('four_loaded_endpoints','one_star_hub','connected_without_power','connectors_require_no_channels',
@@ -188,7 +188,7 @@ function Assert-GameplayEvidence([string]$world) {
     if ($Chain -eq 'core256m') {
         if ($report.scheduleOwner -ne 'RING_TERMINAL' -or $report.bothPlannerServicesOnline -ne $true -or
             $report.run1.passed -ne $true -or $report.run1.nativeCpuTicks -ne 1 -or $report.run1.ripperCalls -ne 1 -or
-            $report.run1.isolatedExecutionAE -ne 50 -or $report.run1.sameExecutionTick -ne $true -or
+            $report.run1.isolatedExecutionAE -ne 0 -or $report.run1.sameExecutionTick -ne $true -or
             $report.run1.after.core_256m -ne 3000 -or $report.run1.after.loop_crystal -ne 1) {
             throw 'Core256M native CPU/fee/seed/output contract failed'
         }
@@ -197,7 +197,7 @@ function Assert-GameplayEvidence([string]$world) {
         $exact = Read-PassingFixture 'exact-components-report.json'
         if (@($exact.runs).Count -ne 2 -or @($exact.runs | Where-Object {
             $_.passed -ne $true -or $_.outputFullKeyCount -ne 3000 -or $_.nativeCpuCalls -ne 1 -or
-            $_.ripperCalls -ne 1 -or $_.executionFeeAE -ne 50 -or $_.nativeCpuFinished -ne $true -or $_.fullInventoryExact -ne $true
+            $_.ripperCalls -ne 1 -or $_.executionFeeAE -ne 0 -or $_.nativeCpuFinished -ne $true -or $_.fullInventoryExact -ne $true
         }).Count -ne 0 -or $exact.runs[0].mode -ne 'manual' -or $exact.runs[1].mode -ne 'loop_card') {
             throw 'Both 3000-copy exact component orders must pass'
         }
@@ -209,7 +209,7 @@ function Assert-GameplayEvidence([string]$world) {
             $native.remainingSourceMaps -ne 0 -or $native.remainingPaper -ne 0 -or
             $continuation.roundTripPerformed -ne $true -or $continuation.cpuRoundTripPerformed -ne $true -or
             $continuation.completeCpuRoundTrip.passed -ne $true -or
-            $continuation.totalExecutionFeeAE -ne 50 -or -not (Test-Path -LiteralPath (Join-Path $evidence 'native-cpu-first-commit.nbt'))) {
+            $continuation.totalExecutionFeeAE -ne 0 -or -not (Test-Path -LiteralPath (Join-Path $evidence 'native-cpu-first-commit.nbt'))) {
             throw 'Native map identities, CPU persistence or one-time fee contract failed'
         }
     }

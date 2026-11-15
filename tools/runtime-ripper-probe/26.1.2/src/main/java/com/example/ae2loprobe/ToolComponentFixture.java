@@ -234,7 +234,7 @@ public final class ToolComponentFixture {
         expected.remove(AEItemKey.of(actualKnife)); expected.remove(AEItemKey.of(Items.IRON_INGOT));
         expected.put(target, order); expected.putAll(knives);
         require(expected.equals(after), "Full finite inventory differs after tool order");
-        require(completed && Math.abs(fee - 50) < 0.00001, "Tool order did not complete for exactly 50 AE");
+        require(completed && Math.abs(fee) < 0.00001, "Tool order did not complete with zero AE");
         if (round == 1) require(!sawNative && ripCalls == 1 && cpuCalls == 1 && firstExecuteTick - submitTick <= 1
                 && damageTotal == OPERATIONS, "Ordinary knife failed exact one-tick deterministic damage control");
         else require(sawNative && committed == OPERATIONS && executionRemainders == OPERATIONS

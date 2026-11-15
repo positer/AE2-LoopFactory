@@ -141,6 +141,14 @@ abstract class ExecutingCraftingJobMixin implements ScheduledCraftingJob {
 
     @Override
     public int ae2lightoptimizer$limitOperations(int requestedOperations) {
+        // The ripper is treated as infinite parallel crafting: a ripper-owned job is not throttled by the
+        // CPU's co-processor budget, so its whole remaining batch may commit in one tick. Native
+        // continuations (map expansion, stochastic tool damage) keep their native one-step cadence.
+        if (ae2lightoptimizer$isRipperRequested() || ae2lightoptimizer$isRipped()) {
+            return ae2lightoptimizer$hasSchedule()
+                    ? (int) Math.min(Integer.MAX_VALUE, ae2lightoptimizer$getRemainingInBatch())
+                    : requestedOperations;
+        }
         return ae2lightoptimizer$hasSchedule()
                 ? ae2lightoptimizer$cursor.limit(requestedOperations)
                 : requestedOperations;

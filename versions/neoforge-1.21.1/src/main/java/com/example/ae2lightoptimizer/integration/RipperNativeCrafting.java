@@ -9,12 +9,10 @@ import java.util.Map;
 import java.util.UUID;
 
 import appeng.api.config.Actionable;
-import appeng.api.config.PowerMultiplier;
 import appeng.api.crafting.IPatternDetails;
 import appeng.api.crafting.PatternDetailsHelper;
 import appeng.api.ids.AEComponents;
 import appeng.api.networking.crafting.ICraftingPlan;
-import appeng.api.networking.energy.IEnergyService;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
 import appeng.api.stacks.GenericStack;
@@ -96,7 +94,7 @@ public final class RipperNativeCrafting {
 
     /** Caller must keep this State on the same executing job and save it alongside CPU inventory. */
     public static Result execute(State state, ListCraftingInventory inventory, ScheduledCraftingJob job,
-            Level level, IEnergyService energy) {
+            Level level) {
         if (state.invalid) return Result.INVALID;
         if (job.ae2lightoptimizer$hasWaitingItems()) return Result.WAITING;
         if (state.remaining.isEmpty()) return deliver(state, inventory, job);
@@ -116,16 +114,8 @@ public final class RipperNativeCrafting {
                 if (prepared != null) break;
             }
             if (prepared == null) return Result.INVALID;
-            if (!state.paid) {
-                double needed = CraftingRipperExecutor.RIP_ENERGY;
-                if (energy.extractAEPower(needed, Actionable.SIMULATE, PowerMultiplier.ONE) < needed) return Result.WAITING;
-                double charged = energy.extractAEPower(needed, Actionable.MODULATE, PowerMultiplier.ONE);
-                if (charged < needed) {
-                    if (charged > 0) energy.injectPower(charged, Actionable.MODULATE);
-                    return Result.WAITING;
-                }
-                state.paid = true;
-            }
+            // The first committed operation marks the job as started; no AE is charged for it.
+            state.paid = true;
             return commit(prepared, state, inventory, job, level);
         } catch (IllegalArgumentException | ArithmeticException invalidPlan) {
             state.invalid = true;

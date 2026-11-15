@@ -1,6 +1,7 @@
 package com.example.ae2loprobe;
 
 import appeng.api.config.Actionable;
+import appeng.api.config.PowerMultiplier;
 import appeng.api.config.Settings;
 import appeng.api.config.YesNo;
 import appeng.api.crafting.PatternDetailsHelper;
@@ -174,8 +175,20 @@ final class RipperImportFixture {
         check(total() == 751 + CANCEL_SUPPLY && stored(cancelPattern) == 0, "Resume lost/duplicated patterns");
         report.put("resumeConserved", true); report.put("finalPatterns", total()); finalVerified = true;
     }
-    static void disconnect() { host.getMainNode().setExposedOnSides(EnumSet.noneOf(Direction.class)); }
-    static void reconnect() { host.getMainNode().setExposedOnSides(EnumSet.allOf(Direction.class)); }
+    // The ripper draws no idle power, so it no longer drains the finite test cell into an offline state.
+    // Draining the network itself is the honest way to make the menu report an unavailable network.
+    static double savedEnergy;
+    static void disconnect() {
+        var grid = host.getMainNode().getGrid();
+        if (grid == null) return;
+        var energy = grid.getEnergyService();
+        savedEnergy = energy.extractAEPower(1e9, Actionable.SIMULATE, PowerMultiplier.ONE);
+        energy.extractAEPower(savedEnergy, Actionable.MODULATE, PowerMultiplier.ONE);
+    }
+    static void reconnect() {
+        var grid = host.getMainNode().getGrid();
+        if (grid != null) grid.getEnergyService().injectPower(savedEnergy, Actionable.MODULATE);
+    }
     static void observe() {
         if (!prepared || finalVerified || failure != null) return;
         long current = total(), delta = current - lastTotal;

@@ -69,7 +69,7 @@ public final class NativeContinuationAssertions {
             report.put("minecraft", "26.1.2");
             report.put("world", server.getServer().getWorldData().getLevelName());
             report.put("expectedOperations", 3);
-            report.put("expectedExecutionFeeAE", 50);
+            report.put("expectedExecutionFeeAE", 0);
             report.put("calls", calls);
             report.put("roundTripPerformed", false);
             report.put("passed", false);
@@ -138,7 +138,7 @@ public final class NativeContinuationAssertions {
                 require(state.committedOperations() == 3 && state.paid() && state.remainingTasks().isEmpty()
                         && job.ae2lightoptimizer$getRemainingRequest() == 0, "Native job did not complete exactly three operations");
                 require(identity.equals(state.identity()), "Restored job lost its identity before completion");
-                require(Math.abs(totalFee - 50) < TOLERANCE, "Whole-job execute fee differs from 50 AE: " + totalFee);
+                require(Math.abs(totalFee) < TOLERANCE, "Whole-job execute fee is no longer zero: " + totalFee);
                 if (job.ae2lightoptimizer$isStandalone()) {
                     long credited = 0;
                     var mapIds = new java.util.HashSet<Object>();

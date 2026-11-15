@@ -19,8 +19,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(value = CraftingRipperExecutor.class, remap = false)
 public abstract class RipperExecutionObserver {
     @Inject(method = "execute", at = @At("HEAD"), require = 1)
-    private static void ae2loprobe$before(IGrid grid, IEnergyService energy, ListCraftingInventory inventory,
+    private static void ae2loprobe$before(IGrid grid, ListCraftingInventory inventory,
             ScheduledCraftingJob job, Level level, CallbackInfoReturnable<CraftingRipperExecutor.Result> callback) {
+        // The executor no longer charges AE; the observer reads the grid's own energy service to prove that.
+        IEnergyService energy = grid.getEnergyService();
         RuntimeRipperProbe.beforeRipper(grid, energy, inventory);
         NativeContinuationAssertions.before(energy, inventory, job, level);
         ExactComponentFixture.beforeRipper(grid, energy, job, level);
@@ -28,8 +30,9 @@ public abstract class RipperExecutionObserver {
     }
 
     @Inject(method = "execute", at = @At("RETURN"), require = 1)
-    private static void ae2loprobe$after(IGrid grid, IEnergyService energy, ListCraftingInventory inventory,
+    private static void ae2loprobe$after(IGrid grid, ListCraftingInventory inventory,
             ScheduledCraftingJob job, Level level, CallbackInfoReturnable<CraftingRipperExecutor.Result> callback) {
+        IEnergyService energy = grid.getEnergyService();
         RuntimeRipperProbe.afterRipper(grid, energy, inventory, callback.getReturnValue());
         NativeContinuationAssertions.after(energy, inventory, job, level, callback.getReturnValue());
         ExactComponentFixture.afterRipper(grid, energy, inventory, job, level, callback.getReturnValue());

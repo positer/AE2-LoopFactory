@@ -34,9 +34,9 @@ cyclic planning. Its compressed execution order and initial seeds are preserved
 when the ripper executes the chain. Quantities use checked signed 64-bit values.
 Unsupported or stale recipes cannot partially consume a chain.
 
-The machine draws no idle power of its own, like a native AE2 pattern provider, and
-charges **50 AE** for each complete chain execution. It waits for this energy before
-committing.
+The machine draws no idle power of its own and charges no AE for a chain, like a
+native AE2 pattern provider. It is treated as infinite parallel crafting: a whole chain
+commits in one tick regardless of the CPU's co-processors.
 Delivery can wait when the requester is full; it does not repeat the craft or
 charge again. The face is cyan while its grid node is active and dim while offline.
 

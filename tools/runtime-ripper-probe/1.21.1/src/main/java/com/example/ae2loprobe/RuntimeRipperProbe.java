@@ -351,7 +351,7 @@ public final class RuntimeRipperProbe {
             report.put("bothPlannerServicesOnline", true);
         }
         check(cpu.getAvailableStorage() == CPU_CAPACITY, "Unexpected physical CPU capacity");
-        check(ripper.getMainNode().getNode().getIdlePowerUsage() == 5.0, "Ripper's own idle draw differs from 5 AE/t");
+        check(ripper.getMainNode().getNode().getIdlePowerUsage() == 0.0, "Ripper must not draw idle power");
         report.put("ripperConfiguredIdleAEPerTick", ripper.getMainNode().getNode().getIdlePowerUsage());
         if (ToolComponentFixture.ENABLED) {
             ToolComponentFixture.begin(level, grid, ripper, output);
@@ -565,7 +565,7 @@ public final class RuntimeRipperProbe {
         check(cpuCalls == 1 && ripCalls == 1, "Expected exactly one native CPU tick and ripper call");
         check(executionTick - submitTick <= 1, "Execution exceeded one AE2 tick");
         check(sameExecutionTick, "Synchronous execution crossed a native game tick");
-        check(Math.abs(measuredFee - 50.0) < 0.00001, "Extra execution fee differs from 50 AE: " + measuredFee);
+        check(Math.abs(measuredFee) < 0.00001, "Ripper must not charge AE: " + measuredFee);
         if (Core256MFixture.ENABLED) {
             Core256MFixture.verifyFinal(beforeStock, after);
         } else {
@@ -589,7 +589,7 @@ public final class RuntimeRipperProbe {
                             && after.get("stick") == 0 && after.get("diamond_pickaxe") == 0,
                     "Completed layered job must leave only the final products and unconsumed raw materials");
         }
-        check(ripper.getMainNode().getNode().getIdlePowerUsage() == 5.0, "Ripper's own working base draw differs from 5 AE/t");
+        check(ripper.getMainNode().getNode().getIdlePowerUsage() == 0.0, "Ripper must not draw working base power");
         check(!cpu.craftingLogic.hasJob() && cpu.craftingLogic.getInventory().list.isEmpty(), "CPU is not reusable");
         var result = new LinkedHashMap<String, Object>();
         result.put("passed", true);
@@ -632,9 +632,9 @@ public final class RuntimeRipperProbe {
             }
             report.put("passed", true);
             ProbeState.status = Core256MFixture.ENABLED
-                    ? "PASS: 3000 256M cores from all ten tiers and crystal growth, exact full-chain balances, one tick and 50 AE total"
+                    ? "PASS: 3000 256M cores from all ten tiers and crystal growth, exact full-chain balances, one tick and zero AE total"
                     : LAYERED_CHAIN
-                    ? "PASS: whole five-recipe layered job, million netherite pickaxes, exact raw and intermediate balance, one tick and 50 AE total"
+                    ? "PASS: whole five-recipe layered job, million netherite pickaxes, exact raw and intermediate balance, one tick and zero AE total"
                     : SMITHING_CHAIN
                     ? "PASS: million netherite pickaxes through native growth ring and smithing, exact plan balance, one tick and 50 AE"
                     : "PASS: million-template growth, long stock, seed retained, one tick and 50 AE per run";

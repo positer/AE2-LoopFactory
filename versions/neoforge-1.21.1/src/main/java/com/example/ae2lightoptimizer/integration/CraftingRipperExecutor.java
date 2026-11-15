@@ -1,11 +1,9 @@
 package com.example.ae2lightoptimizer.integration;
 
 import appeng.api.config.Actionable;
-import appeng.api.config.PowerMultiplier;
 import appeng.api.crafting.IPatternDetails;
 import appeng.api.networking.IGrid;
 import appeng.api.networking.crafting.ICraftingPlan;
-import appeng.api.networking.energy.IEnergyService;
 import appeng.api.stacks.AEKey;
 import appeng.api.stacks.KeyCounter;
 import appeng.crafting.execution.CraftingCpuHelper;
@@ -20,9 +18,11 @@ import java.util.Map;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-/** Validates and replays the entire selected job privately before its single 50 AE commit. */
+/**
+ * Validates and replays the entire selected job privately before its atomic commit. The ripper charges
+ * no AE of its own: the network only pays the ordinary channel/idle costs of the machines it uses.
+ */
 public final class CraftingRipperExecutor {
-    public static final double RIP_ENERGY = 50;
 
     private CraftingRipperExecutor() {
     }
@@ -89,7 +89,7 @@ public final class CraftingRipperExecutor {
                 plan.finalOutput().what(), plan.finalOutput().amount(), reserve, level) != null;
     }
 
-    public static Result execute(IGrid grid, IEnergyService energy, ListCraftingInventory inventory,
+    public static Result execute(IGrid grid, ListCraftingInventory inventory,
                                  ScheduledCraftingJob job, Level level) {
         if (job.ae2lightoptimizer$isNativeRipperJob()) {
             var state = job.ae2lightoptimizer$getNativeState();
@@ -103,7 +103,7 @@ public final class CraftingRipperExecutor {
                     : selectProvider(grid, state.remainingTasks(), true);
             if (selected == null && !state.remainingTasks().isEmpty()) return Result.WAITING;
             long before = state.committedOperations();
-            var result = RipperNativeCrafting.execute(state, inventory, job, level, energy);
+            var result = RipperNativeCrafting.execute(state, inventory, job, level);
             if (state.committedOperations() > before && selected != null && state.lastPattern() != null) {
                 selected.provider().onRipperCrafted(state.lastPattern());
             }
@@ -144,19 +144,7 @@ public final class CraftingRipperExecutor {
         if (result == null) {
             return Result.INVALID;
         }
-        if (energy.extractAEPower(RIP_ENERGY, Actionable.SIMULATE,
-                PowerMultiplier.ONE) < RIP_ENERGY) {
-            return Result.WAITING;
-        }
-
         // Server-thread execution owns this CPU stock. No external storage is mutated during preflight.
-        double charged = energy.extractAEPower(RIP_ENERGY, Actionable.MODULATE, PowerMultiplier.ONE);
-        if (charged < RIP_ENERGY) {
-            if (charged > 0) {
-                energy.injectPower(charged, Actionable.MODULATE);
-            }
-            return Result.WAITING;
-        }
         inventory.clear();
         result.forEach((key, amount) -> inventory.insert(key, amount, Actionable.MODULATE));
         job.ae2lightoptimizer$markRipped();
@@ -184,8 +172,8 @@ public final class CraftingRipperExecutor {
                 inventory.extract(finalKey, routed, Actionable.MODULATE);
             }
         }
-        // Keep undelivered products private and persist the paid execution state. A full requester
-        // retries delivery on following ticks without replaying the recipe or paying another 50 AE.
+        // Keep undelivered products private and persist the executed state. A full requester retries
+        // delivery on following ticks without replaying the recipe or charging again.
         job.ae2lightoptimizer$decrementRemainingRequest(routed);
         return job.ae2lightoptimizer$getRemainingRequest() == 0 ? Result.COMPLETED : Result.WAITING;
     }

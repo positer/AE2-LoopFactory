@@ -286,7 +286,7 @@ public final class ExactComponentFixture {
         require(expected.equals(stock()), "Full exact-key final inventory differs: wrong NBT selected or unexpected output");
         require(completed && ripCalls == 1 && cpuCalls == 1 && executeTick - submitTick <= 1,
                 "Exact-component order did not finish in exactly one CPU/ripper call within one tick");
-        require(Math.abs(measuredFee - 50) < 0.00001, "Exact-component order execution fee differs from 50 AE");
+        require(Math.abs(measuredFee) < 0.00001, "Ripper must not charge AE for an exact-component order");
         require((link.isStandalone() || link.isDone()) && !link.isCanceled() && !cpu.craftingLogic.hasJob()
                 && !cpu.isBusy() && cpu.craftingLogic.getInventory().list.isEmpty()
                 && cpu.craftingLogic.getWaitingFor(target) == 0, "Native CPU did not finish and return the exact output");

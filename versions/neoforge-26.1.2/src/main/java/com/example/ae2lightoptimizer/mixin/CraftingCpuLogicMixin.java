@@ -92,7 +92,7 @@ abstract class CraftingCpuLogicMixin {
             return;
         }
         var beforeTasks = scheduledJob.ae2lightoptimizer$getRemainingTasks();
-        var result = CraftingRipperExecutor.execute(cluster.getGrid(), energyService,
+        var result = CraftingRipperExecutor.execute(cluster.getGrid(),
                 inventory, scheduledJob, cluster.getLevel());
         if (result != CraftingRipperExecutor.Result.NOT_HANDLED) {
             cluster.markDirty();

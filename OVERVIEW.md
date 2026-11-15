@@ -5,11 +5,12 @@
 - `shared/.../network/OmniLinkDirectory.java`：`Link` 增加 `owner`（UUID 字符串）与 `visibility`（`PUBLIC`/`PRIVATE`），名称索引按可见性分命名空间，新增 `visibleTo`/`canSee`/`sortedVisible`；旧存档字段缺失时按公开加载。
 - 两代 `omni/OmniLinkSavedData.java`：编解码新增可选 `owner`/`visibility` 字段；`create(name, visibility, owner)` 重载。两代 `omni/OmniConnectorMenu.java`：`createPrivate`/`selectedPrivate` 同步字段、`omniCreatePrivate` 客户端动作、可见性过滤与服务端二次校验。
 - 两代 `client/OmniConnectorScreen.java` 与 `assets/ae2/screens/ae2lightoptimizer_omni_connector.json`：原生 `ToggleButton`（LOCKED/UNLOCKED）可见性开关、行文本私有标记、名称框宽度让位；双语语言文件新增 `omni.private`、`omni.visibility`、`omni.visibility.hint` 并缩短 `omni.links`。
-- 两代 `block/CraftingRipperBlockEntity.java`：节点待机功耗 5.0 → 0（每次合成 50 AE 的合同不变）。两代 `block/RipperPatternInventory.java`：`insertItem` 对超出收缩后尾部的槽位重新生长库存，写入后批量触发一次变更；不接受的样板原样返回。
+- 两代 `block/CraftingRipperBlockEntity.java`：节点待机功耗 5.0 → 0；同日后继改动又取消了每次整链 50 AE 的费用（见下条）。两代 `block/RipperPatternInventory.java`：`insertItem` 对超出收缩后尾部的槽位重新生长库存，写入后批量触发一次变更；不接受的样板原样返回。
 - 两代 `compat/OptimizerFlowContext.java`、`compat/OptionalCompatMixinPlugin.java`、`mixin/compat/ThunderboltBorrowedCapacityMixin.java`、`mixin/compat/ThunderboltSupplyMixin.java`、`resources/ae2lightoptimizer.compat.mixins.json`、`META-INF/neoforge.mods.toml`：可选的 Thunderbolt 最大流桥接，缺该模组时按类资源缺失整份不应用。
 - `tools/runtime-ripper-probe/1.21.1/.../OmniAccessProbe.java`、`OmniAccessClient.java`、`Ae2LtCapacityProbe.java`：新链 `omni_access`（可见性、菜单拒绝、撕裂者零耗电与第三方槽位写入、双语界面截图）与 `ae2lt_capacity`（过载控制器 128→256→128）；`verify-background.ps1` 扩展链白名单、截图门禁、链名映射与耗电断言；`tools/verify_omni_saved_data.py` 支持 `omni_access` 的所有者／可见性磁盘回读。
 - 追加（同日）：合成撕裂者配方 `C` 键由 4M 循环存储核心改为 256M 循环存储核心，生成器与配方契约测试同步；指南页耗电文案改为零待机耗电。
 - 追加（同日）：四个循环工厂机器配方（网络终端、样板供应器、编码面板、手持编码器）由无序改为有序，材料不变；新增 `shared/.../crafting/LoopFactoryRecipeShapeTest.java` 锁定形状与结构性约束。
+- 追加（同日）：取消合成撕裂者每次整链 50 AE 的费用（`CraftingRipperExecutor` 与 `RipperNativeCrafting` 不再扣电，`RIP_ENERGY` 删除）；`ExecutingCraftingJobMixin.ae2lightoptimizer$limitOperations` 对撕裂者任务返回整批剩余量，撕裂者视为无限并行合成；探针与门禁的费用／待机断言同步为 0。
 - 版本 0.0.5 → 0.0.6（两代 `gradle.properties`），`CHANGELOG.md` 增加 0.0.6 双语文案；`docs/omni-connector.md`、`docs/crafting-ripper-patterns.md`、`docs/optimizer-channel-capacity.md` 同步合同与边界。
 - 验收：1.21.1／26.1.2 各 278／276 项单测零失败；1.21.1 `-Chain omni_access` 与 `-Chain ae2lt_capacity`（thunderbolt 2.0.3 + ae2lt 2.1.3）原生通过，制品 794,886 B `144cfc3e…`／813,566 B `1be91d8b…`。证据归属枢纽 `../Minecraft Forge Workspace/archive/20261115-191500-ae2lf-omni-access-ripper-ae2lt/`；26.1.2 未跑原生客户端，未部署 PCL。
 ## 2026-11-12 全向连接器一次性破坏版 PCL 部署
