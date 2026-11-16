@@ -105,8 +105,13 @@ final class Core256MFixture {
         var required = new LinkedHashMap<String, Long>(consumption());
         required.put("loop_crystal", 1L);
         var keys = keys();
-        for (var key : keys.entrySet()) check(plan.usedItems().get(key.getValue()) == required.getOrDefault(key.getKey(), 0L),
-                "Core plan reserves unexpected initial input: " + key.getKey());
+        var mismatches = new java.util.LinkedHashMap<String, String>();
+        for (var key : keys.entrySet()) {
+            long actual = plan.usedItems().get(key.getValue());
+            long expected = required.getOrDefault(key.getKey(), 0L);
+            if (actual != expected) mismatches.put(key.getKey(), "actual=" + actual + " expected=" + expected);
+        }
+        check(mismatches.isEmpty(), "Core plan reserves unexpected initial inputs: " + mismatches);
     }
 
     static Map<String, Long> expectedApplications() {

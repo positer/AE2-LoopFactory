@@ -190,7 +190,7 @@ public final class ToolComponentFixture {
                     for (var entry : toolStock(grid.getStorageService().getInventory().getAvailableStacks()).entrySet()) add(allTools, entry.getKey(), entry.getValue());
                     require(allTools.equals(callbackToolBalance), "Actual CPU/network tool keys differ from real callback remainders");
                 }
-                require(Math.abs(delta - (operationsBefore == 0 && increment == 1 ? 50 : 0)) < 0.00001, "Native tool fee was not charged exactly once");
+                require(Math.abs(delta) < 0.00001, "Native tool operations must not charge AE");
                 committed = operationsAfter;
             } else require(!nativeMode && callRemainders == 0, "Ordinary knife was incorrectly sent through random-tool continuation");
             completed |= result == CraftingRipperExecutor.Result.COMPLETED;

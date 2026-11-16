@@ -123,7 +123,8 @@ public final class NativeContinuationAssertions {
             require(identity.equals(state.identity()), "Production continuation identity changed");
             long operations = state.committedOperations() - beforeCommitted;
             require(operations >= 0 && operations <= 1, "More than one native operation occurred in one execute call");
-            double expectedFee = operations == 1 && !beforePaid ? 50 : 0;
+            // The ripper charges no AE per operation by design; the call-local fee must stay zero.
+            double expectedFee = 0;
             require(Math.abs(fee - expectedFee) < TOLERANCE, "Wrong call-local fee: " + fee + " expected " + expectedFee);
             if (!roundTripAttempted && state.committedOperations() == 1) {
                 roundTripAttempted = true;

@@ -3,7 +3,7 @@
   "textures": {
     "front": "ae2lightoptimizer:block/loop_factory_terminal",
     "case": "ae2lightoptimizer:block/loop_factory_terminal_top",
-    "side": "ae2lightoptimizer:block/loop_factory_terminal_case",
+    "side": "ae2lightoptimizer:block/loop_factory_terminal_side",
     "particle": "ae2lightoptimizer:block/loop_factory_terminal_top"
   },
   "elements": [
@@ -21,7 +21,7 @@
       ],
       "faces": {
         "down": {
-          "texture": "#side",
+          "texture": "#case",
           "uv": [
             0,
             0,
