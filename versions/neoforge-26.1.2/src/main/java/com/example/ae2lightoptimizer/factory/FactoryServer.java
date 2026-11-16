@@ -8,8 +8,8 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 public final class FactoryServer {
     private static final Set<FactoryBlockEntity> LOADED = java.util.Collections.newSetFromMap(new WeakHashMap<>());
-    public static void add(FactoryBlockEntity host) { LOADED.add(host); }
-    public static void remove(FactoryBlockEntity host) { LOADED.remove(host); }
+    public static void add(FactoryBlockEntity host) { LOADED.add(host); OWNER_CACHE.clear(); }
+    public static void remove(FactoryBlockEntity host) { LOADED.remove(host); OWNER_CACHE.clear(); }
     public static boolean powered(net.minecraft.world.level.SignalGetter level, net.minecraft.core.BlockPos pos) {
         if (!(level instanceof net.minecraft.server.level.ServerLevel)) return false;
         for (var host : LOADED) if (!host.isRemoved() && host.getLevel() == level && host.powers(pos)) return true;
@@ -54,12 +54,21 @@ public final class FactoryServer {
         return level.tickRateManager().runsNormally() && level.getChunkSource().isPositionTicking(chunk)
                 && level.areEntitiesLoaded(chunk) && level.getWorldBorder().isWithinBounds(pos);
     }
+    /** Election results are reused between topology changes; the cache is dropped on add/remove. */
+    private static final java.util.Map<IGrid, java.lang.ref.WeakReference<FactoryBlockEntity>> OWNER_CACHE = new java.util.WeakHashMap<>();
     public static FactoryBlockEntity owner(IGrid grid) {
         if (grid == null) return null;
-        return LOADED.stream().filter(host -> !host.isRemoved() && host.kind() != FactoryBlock.Kind.CABLE
+        var cached = OWNER_CACHE.get(grid);
+        var known = cached == null ? null : cached.get();
+        if (known != null && !known.isRemoved() && known.kind() != FactoryBlock.Kind.CABLE
+                && known.factoryGrid() == grid && known.isolated() && !UniqueNetworkServices.disconnected(known)) return known;
+        var resolved = LOADED.stream().filter(host -> !host.isRemoved() && host.kind() != FactoryBlock.Kind.CABLE
                 && host.factoryGrid() == grid && host.isolated() && !UniqueNetworkServices.disconnected(host))
                 .min(java.util.Comparator.<FactoryBlockEntity>comparingInt(host -> host.isProvider() ? 0 : 1)
                         .thenComparingLong(host -> host.getBlockPos().asLong())).orElse(null);
+        if (resolved == null) OWNER_CACHE.remove(grid);
+        else OWNER_CACHE.put(grid, new java.lang.ref.WeakReference<>(resolved));
+        return resolved;
     }
     /** One live election per query, with no topology retained between operations. */
     private static java.util.Map<IGrid, FactoryBlockEntity> owners() {

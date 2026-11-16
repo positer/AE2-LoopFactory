@@ -15,7 +15,9 @@ public final class FactoryTags {
 
     /**
      * Unions the imported names instead of replacing them: a factory network hosts several patterns,
-     * and saving one must not drop the tag names another pattern declares.
+     * and saving one must not drop the tag names another pattern declares. Names that no pattern uses
+     * are kept on purpose: a player debugging a program may remove a tag and add it back, and the
+     * bindings should still be there.
      */
     public void reconcile(Collection<String> imported) {
         imported.stream().sorted().forEach(tag -> bindings.computeIfAbsent(tag, ignored -> new LinkedHashSet<>()));

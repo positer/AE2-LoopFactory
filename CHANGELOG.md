@@ -8,7 +8,8 @@
 - Added an orbiting white ring particle inside the connector's own block while the structure is formed, and the connector still opens its normal channel configuration screen.
 - The connector no longer exposes its bottom face to physical cabling: the bottom is the factory mounting slot, so a machine placed underneath can never short the channel network or a provider's subnet through adjacency.
 - Fixed the structure re-check: a machine whose grid becomes ready after placement still joins, because the machine notifies the connector on ready and the connector re-validates once per second.
-- The factory network joins on the structure alone, with no channel required: the connector's base face may point in any direction, and a factory pattern provider only has to look back at it. The selected channel now carries only the AE network, so two channels sharing one machine join each other.
+- The factory network joins on the structure alone, with no channel required: the connector's base face can point in any direction, and a factory pattern provider only has to look back at it. The selected channel now carries only the AE network, so two channels sharing one machine join each other.
+- Factory network election results are cached until a host is added or removed, so the shared tag store no longer re-scans every host each second.
 - Wireless discovery is a blacklist, not a whitelist: every block in a member chunk stays discoverable and taggable by any mod, except the factory network terminal and the factory pattern provider, which only join a network by cable. Nothing is scanned or joined before a tag binds a position.
 - Factory tags are now one store per factory network: a tag marked on one terminal is the same tag on every other terminal of that network, and saving a pattern no longer unbinds the tags another pattern of the same provider declares.
 - Removed a stray README file from the shipped item texture folder that made Minecraft report an invalid datapack path.
@@ -20,6 +21,7 @@
 - 连接器不再向底部面暴露物理接线：底部是工厂安装位，因此下方机器不会通过相邻关系把频道网络或供应器子网短接。
 - 修正结构复核：机器在放置后才就绪时也能加入——机器就绪会通知连接器，连接器每秒再复核一次。
 - 工厂网络仅凭结构接入，不要求已选频道：连接器基座面可朝任意方向，供应器只需朝向基座面即可；所选频道只承载 AE 网络，因此同一机器被两个频道登记时两个频道自然连通。
+- 工厂网络 owner 选举结果加缓存（宿主增删时失效），共享标签表不再每秒全量扫描宿主。
 - 无线发现采用黑名单而非白名单：成员区块内除工厂网络终端与工厂样板供应器外，所有方块都保持可发现、可打 tag，兼容各模组机器；打 tag 之前不扫描、不入网。
 - 工厂标签改为每个工厂网络一份：在一个终端标记的 tag，同网络的其他终端看到同一份绑定；保存一个样板不再解绑同一供应器里其他样板声明的同名 tag。
 - 删除物品贴图目录里误入的 README 文件，Minecraft 不再报告无效数据包路径。
