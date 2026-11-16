@@ -110,7 +110,8 @@ public final class FactoryServer {
                     && block.getBlockPos().distManhattan(pos) == 1 && block.getLevel().hasChunkAt(pos)
                     && !block.getLevel().getBlockState(pos).isAir()) return true;
         }
-        return false;
+        // A wireless member chunk of the same factory network is addressable without joining any AE grid.
+        return com.example.ae2lightoptimizer.omni.OmniFactoryNetworks.reachable(grid, factoryOwner.getLevel(), pos);
     }
     /** Resolve one tag against one live grid traversal; never retain world membership across operations. */
     public static java.util.List<net.minecraft.core.BlockPos> members(IGrid grid, java.util.Set<Long> positions) {
@@ -138,6 +139,14 @@ public final class FactoryServer {
                 }
             }
             if(found.size()==positions.size())break;
+        }
+        if (found.size() < positions.size()) {
+            for (var packed : positions) {
+                if (found.contains(packed)) continue;
+                var candidate = net.minecraft.core.BlockPos.of(packed);
+                if (!level.hasChunkAt(candidate)) continue;
+                if (com.example.ae2lightoptimizer.omni.OmniFactoryNetworks.reachable(grid, level, candidate)) found.add(packed);
+            }
         }
         return found.stream().sorted().map(net.minecraft.core.BlockPos::of).toList();
     }

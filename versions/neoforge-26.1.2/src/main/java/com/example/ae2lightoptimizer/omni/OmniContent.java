@@ -28,6 +28,10 @@ public final class OmniContent {
             // A small stable cadence; native random display ticks alone are too sparse for one block.
             if (Math.floorMod(level.getGameTime() + pos.asLong(), 12) == 0)
                 BLOCK.get().animateTick(state, level, pos, level.getRandom());
+            // Re-check the factory structure once per second so a machine that finished loading after the
+            // neighbour update still joins the channel's factory network.
+            if (!level.isClientSide() && Math.floorMod(level.getGameTime() + pos.asLong(), 20) == 0)
+                endpoint.refreshFactoryLink();
         }, null);
         appeng.blockentity.AEBaseBlockEntity.registerBlockEntityItem(ENTITY.get(), ITEM.get());
     }

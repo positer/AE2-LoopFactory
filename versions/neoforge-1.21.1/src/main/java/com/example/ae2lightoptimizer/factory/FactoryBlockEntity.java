@@ -171,6 +171,10 @@ public final class FactoryBlockEntity extends AENetworkedBlockEntity implements 
         super.onReady();
         if (isProvider()) { subnet.setExposedOnSides(EnumSet.of(getFront())); subnet.create(getLevel(), getBlockPos()); logic.updatePatterns(); }
         FactoryServer.add(this);
+        // A connector resting on this machine may have run its own check before this node existed.
+        if (getLevel() != null && !getLevel().isClientSide()
+                && getLevel().getBlockEntity(getBlockPos().above()) instanceof com.example.ae2lightoptimizer.omni.OmniConnectorBlockEntity link)
+            link.refreshFactoryLink();
         if(kind()!=FactoryBlock.Kind.CABLE)UniqueNetworkServices.add(this,isProvider()?subnet:getMainNode(),UniqueNetworkServices.Kind.FACTORY,isProvider());
     }
     @Override protected void onOrientationChanged(BlockOrientation orientation) {

@@ -35,49 +35,47 @@ public final class OmniConnectorBlockEntity extends AENetworkedBlockEntity imple
         saveChanges(); markForUpdate();
         if (getLevel() != null && getLevel().getServer() != null && getMainNode().getNode() != null)
             OmniNetworks.get(getLevel().getServer()).attach(this);
+        // A channel change re-targets the factory-network membership as well.
+        refreshFactoryLink();
     }
     public boolean linked() {
         return getLevel() != null && getLevel().getServer() != null && OmniNetworks.get(getLevel().getServer()).linked(this);
     }
-    /** True while a formed Loop Factory structure is bridged to this connector. */
-    public boolean factoryLinked() { return factoryLink != null; }
+    /** True while a formed Loop Factory structure is joined to this connector's channel. */
+    public boolean factoryLinked() { return OmniFactoryNetworks.linked(this); }
     /**
-     * Bridges the channel network to the machine below when the structure is formed. The machine's
-     * MAIN node is used; a provider's subnet is never joined, because the subnet is the factory side.
+     * Joins the channel to the machine below. Two independent halves:
+     * the factory network registers the machine's factory side (a provider's subnet) plus this chunk so
+     * scheduled code can address it, while the AE transport joins only the machine's MAIN network to the
+     * channel. A provider's subnet is never put on the AE channel.
      */
     public void refreshFactoryLink() {
         var level = getLevel();
         if (level == null || level.isClientSide()) return;
         var target = OmniFactoryWireless.target(level, getBlockPos());
         var self = getMainNode().getNode();
-        if (target == null || self == null) { dropFactoryLink(); markForUpdate(); return; }
+        if (target == null || linkId.isEmpty() || self == null) { dropFactoryLink(); markForUpdate(); return; }
+        OmniFactoryNetworks.join(this, target);
         var main = target.getMainNode().getNode();
-        if (main == null) { dropFactoryLink(); markForUpdate(); return; }
-        // The connector rests on the machine, so AE2 may already have joined it to that machine's node
-        // (or, for a provider, to the subnet on its up face). Sever every physical edge to the machine:
-        // the channel network must be the only carrier, and a provider's subnet is never the bridge.
-        var subnet = target.isProvider() ? target.getGridNode(net.minecraft.core.Direction.UP) : null;
-        for (var connection : java.util.List.copyOf(self.getConnections())) {
-            var other = connection.getOtherSide(self);
-            if (other == main || (subnet != null && other == subnet)) {
-                try { connection.destroy(); } catch (RuntimeException ignored) { }
-            }
-        }
-        if (factoryLink == null || factoryNode != main) {
-            dropFactoryLink();
+        if (main == null || main == self) { dropAeLink(); markForUpdate(); return; }
+        if (factoryNode != main) {
+            dropAeLink();
             factoryNode = main;
-            try { factoryLink = appeng.api.networking.GridHelper.createConnection(self, main); }
-            catch (RuntimeException alreadyConnected) { factoryLink = null; }
+            if (main.getGrid() != self.getGrid()) {
+                try { factoryLink = appeng.api.networking.GridHelper.createConnection(self, main); }
+                catch (RuntimeException alreadyConnected) { factoryLink = null; }
+            }
         }
         markForUpdate();
     }
-    private void dropFactoryLink() {
+    private void dropAeLink() {
         if (factoryLink != null) {
             try { factoryLink.destroy(); } catch (RuntimeException ignored) { }
             factoryLink = null;
         }
         factoryNode = null;
     }
+    private void dropFactoryLink() { dropAeLink(); OmniFactoryNetworks.leave(this); }
     @Override public void onReady() {
         super.onReady();
         if (getLevel().getServer() != null) OmniNetworks.get(getLevel().getServer()).attach(this);

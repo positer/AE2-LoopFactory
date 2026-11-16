@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.0.8
+
+### English
+
+- Reworked the Loop Factory wireless structure so it no longer broadcasts the AE network. The connector's channel joins only the machine's **main** AE network, while factory code addresses remote machines through a separate factory-network membership that registers the machine's factory side (a provider's **subnet**) plus the connector's chunk. A provider's subnet is never put on the AE channel, and the main network is never added to the factory membership.
+- Fixed the structure re-check: a machine whose grid becomes ready after placement now still joins, because the machine notifies the connector on ready and the connector re-validates once per second.
+- Supersedes the 0.0.7 wireless behaviour, which merged the AE grids instead of only carrying the factory network.
+
+### 简体中文
+
+- 重做循环工厂无线结构，不再广播 AE 网络：连接器频道只接入机器的**主网**；工厂代码通过独立的工厂网络成员关系寻址远端机器——登记机器的工厂侧（供应器的**子网**）与连接器所在区块。供应器子网永远不接入 AE 频道，主网也永远不进入工厂网络成员。
+- 修正结构复核：机器在放置后才就绪时也能加入——机器就绪会通知连接器，连接器每秒再复核一次。
+- 取代 0.0.7 的无线行为：0.0.7 合并了 AE 网格，而不是只承载工厂网络。
+
 ## 0.0.7
 
 ### English

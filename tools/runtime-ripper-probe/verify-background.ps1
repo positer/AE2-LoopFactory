@@ -136,11 +136,14 @@ function Assert-GameplayEvidence([string]$world) {
         $null = Read-PassingFixture 'saved-data-readback.json'
     }
     if ($Chain -eq 'factory_wireless') {
-        foreach ($check in @('terminal_structure_links_connector','terminal_structure_sets_wireless_state',
-                'terminal_structure_merges_channel_and_terminal_grid','removed_terminal_drops_link',
-                'removed_terminal_clears_wireless_state','provider_subnet_face_points_up','provider_structure_links_connector',
-                'provider_structure_merges_main_network','provider_subnet_is_not_merged','provider_structure_sets_wireless_state',
-                'removed_provider_drops_link','removed_provider_clears_wireless_state')) {
+        foreach ($check in @('terminal_structure_joins_channel_factory_network','terminal_structure_sets_wireless_state',
+                'terminal_structure_merges_ae_main_grid','terminal_chunk_is_factory_network_member',
+                'removed_terminal_drops_membership','removed_terminal_clears_wireless_state','removed_terminal_clears_membership',
+                'provider_subnet_face_points_up','provider_structure_joins_channel_factory_network',
+                'provider_structure_sets_wireless_state','provider_structure_merges_ae_main_grid',
+                'provider_subnet_is_factory_network_member','provider_subnet_is_not_on_the_ae_channel',
+                'provider_main_network_is_not_broadcast','removed_provider_drops_membership',
+                'removed_provider_clears_wireless_state')) {
             if ($report.$check -ne $true) { throw "Missing factory wireless contract: $check" }
         }
     }

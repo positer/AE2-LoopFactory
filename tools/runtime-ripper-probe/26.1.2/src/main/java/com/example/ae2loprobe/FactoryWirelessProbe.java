@@ -6,6 +6,8 @@ import com.example.ae2lightoptimizer.factory.FactoryContent;
 import com.example.ae2lightoptimizer.omni.OmniConnectorBlock;
 import com.example.ae2lightoptimizer.omni.OmniConnectorBlockEntity;
 import com.example.ae2lightoptimizer.omni.OmniContent;
+import com.example.ae2lightoptimizer.omni.OmniFactoryNetworks;
+import com.example.ae2lightoptimizer.omni.OmniLinkSavedData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.MinecraftServer;
@@ -18,11 +20,15 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** Acceptance only: the omni connector's wireless Loop Factory structure on real grids. */
+/**
+ * Acceptance only: the connector's wireless Loop Factory structure.
+ * Factory membership registers the machine's factory side (a provider's subnet); the AE transport joins
+ * only the machine's MAIN network to the channel. Both require a selected channel.
+ */
 public final class FactoryWirelessProbe {
  public static final boolean ENABLED = "factory_wireless".equals(System.getProperty("ae2lo.probe.chain"));
  static MinecraftServer server; static ServerPlayer player; static Path output;
- static ServerLevel level;
+ static ServerLevel level; static String link;
  static final BlockPos TERMINAL = new BlockPos(0, 100, 0), TERMINAL_LINK = new BlockPos(0, 101, 0);
  static final BlockPos PROVIDER = new BlockPos(6, 100, 0), PROVIDER_LINK = new BlockPos(6, 101, 0);
  static OmniConnectorBlockEntity terminalLink, providerLink; static FactoryBlockEntity terminal, provider;
@@ -42,11 +48,14 @@ public final class FactoryWirelessProbe {
   level.setBlockAndUpdate(pos, block.defaultBlockState().setValue(BlockStateProperties.FACING, facing));
   return (FactoryBlockEntity) level.getBlockEntity(pos);
  }
+ static boolean reachable(appeng.api.networking.IGrid grid, BlockPos pos) {
+  return OmniFactoryNetworks.reachable(grid, level, pos);
+ }
  public static void start(MinecraftServer s, ServerPlayer p, Path o) {
   server = s; player = p; output = o; level = s.overworld();
   report.put("minecraft", "26.1.2"); report.put("world", s.getWorldData().getLevelName());
   report.put("chain", "factory_wireless"); report.put("passed", false);
-  try { player.setGameMode(GameType.CREATIVE); since = level.getGameTime(); save(); }
+  try { player.setGameMode(GameType.CREATIVE); link = OmniLinkSavedData.get(server).create("wireless factory").id(); since = level.getGameTime(); save(); }
   catch (Throwable ex) { fail(ex); }
  }
  public static void tick() {
@@ -55,30 +64,39 @@ public final class FactoryWirelessProbe {
    if (level.getGameTime() - since < 60) return;
    switch (phase) {
     case 0 -> {
-     terminal = machine(TERMINAL, FactoryBlock.Kind.TERMINAL, Direction.UP);
      terminalLink = connector(TERMINAL_LINK);
+     terminalLink.selectLink(link);
      advance();
     }
     case 1 -> {
-     check(terminalLink != null && terminalLink.factoryLinked(), "terminal_structure_links_connector");
-     check(level.getBlockState(TERMINAL_LINK).getValue(OmniConnectorBlock.WIRELESS), "terminal_structure_sets_wireless_state");
-     check(terminalLink.getMainNode().getNode().getGrid() == terminal.getMainNode().getNode().getGrid(),
-             "terminal_structure_merges_channel_and_terminal_grid");
-     level.removeBlock(TERMINAL, false);
+     terminal = machine(TERMINAL, FactoryBlock.Kind.TERMINAL, Direction.UP);
      advance();
     }
     case 2 -> {
-     check(!terminalLink.factoryLinked(), "removed_terminal_drops_link");
-     check(!level.getBlockState(TERMINAL_LINK).getValue(OmniConnectorBlock.WIRELESS), "removed_terminal_clears_wireless_state");
-     level.removeBlock(TERMINAL_LINK, false);
-     provider = machine(PROVIDER, FactoryBlock.Kind.PROVIDER, Direction.UP);
-     providerLink = connector(PROVIDER_LINK);
+     check(terminalLink != null && terminalLink.factoryLinked(), "terminal_structure_joins_channel_factory_network");
+     check(level.getBlockState(TERMINAL_LINK).getValue(OmniConnectorBlock.WIRELESS), "terminal_structure_sets_wireless_state");
+     check(terminalLink.getMainNode().getNode().getGrid() == terminal.getMainNode().getNode().getGrid(),
+             "terminal_structure_merges_ae_main_grid");
+     check(reachable(terminal.factoryGrid(), TERMINAL_LINK), "terminal_chunk_is_factory_network_member");
+     level.removeBlock(TERMINAL, false);
      advance();
     }
     case 3 -> {
+     check(!terminalLink.factoryLinked(), "removed_terminal_drops_membership");
+     check(!level.getBlockState(TERMINAL_LINK).getValue(OmniConnectorBlock.WIRELESS), "removed_terminal_clears_wireless_state");
+     check(!reachable(terminal.factoryGrid(), TERMINAL_LINK), "removed_terminal_clears_membership");
+     level.removeBlock(TERMINAL_LINK, false);
+     providerLink = connector(PROVIDER_LINK);
+     providerLink.selectLink(link);
+     advance();
+    }
+    case 4 -> {
+     provider = machine(PROVIDER, FactoryBlock.Kind.PROVIDER, Direction.UP);
+     advance();
+    }
+    case 5 -> {
      report.put("providerFront", String.valueOf(provider.getFront()));
      if (provider.getFront() != Direction.UP) {
-      // AE2's FRONT mapping is orientation-relative; flip the block so the subnet face points up.
       level.setBlockAndUpdate(PROVIDER, level.getBlockState(PROVIDER)
               .setValue(BlockStateProperties.FACING, Direction.DOWN));
       provider = (FactoryBlockEntity) level.getBlockEntity(PROVIDER);
@@ -87,19 +105,21 @@ public final class FactoryWirelessProbe {
      }
      advance();
     }
-    case 4 -> {
+    case 6 -> {
      check(provider.getFront() == Direction.UP, "provider_subnet_face_points_up");
-     check(providerLink.factoryLinked(), "provider_structure_links_connector");
-     check(providerLink.getMainNode().getNode().getGrid() == provider.getMainNode().getNode().getGrid(),
-             "provider_structure_merges_main_network");
-     check(providerLink.getMainNode().getNode().getGrid() != provider.factoryGrid(),
-             "provider_subnet_is_not_merged");
+     check(providerLink.factoryLinked(), "provider_structure_joins_channel_factory_network");
      check(level.getBlockState(PROVIDER_LINK).getValue(OmniConnectorBlock.WIRELESS), "provider_structure_sets_wireless_state");
+     check(providerLink.getMainNode().getNode().getGrid() == provider.getMainNode().getNode().getGrid(),
+             "provider_structure_merges_ae_main_grid");
+     check(reachable(provider.factoryGrid(), PROVIDER_LINK), "provider_subnet_is_factory_network_member");
+     check(providerLink.getMainNode().getNode().getGrid() != provider.factoryGrid(),
+             "provider_subnet_is_not_on_the_ae_channel");
+     check(!reachable(provider.getMainNode().getGrid(), PROVIDER_LINK), "provider_main_network_is_not_broadcast");
      level.removeBlock(PROVIDER, false);
      advance();
     }
-    case 5 -> {
-     check(!providerLink.factoryLinked(), "removed_provider_drops_link");
+    case 7 -> {
+     check(!providerLink.factoryLinked(), "removed_provider_drops_membership");
      check(!level.getBlockState(PROVIDER_LINK).getValue(OmniConnectorBlock.WIRELESS), "removed_provider_clears_wireless_state");
      finish();
     }
