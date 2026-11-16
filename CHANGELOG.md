@@ -4,26 +4,20 @@
 
 ### English
 
-- Added the Loop Factory wireless structure: an omni connector resting on a Loop Factory network terminal, or on a factory pattern provider whose subnet face points up, joins its selected channel to that machine. The channel joins only the machine's **main** AE network; factory code addresses the connector's chunk through a separate factory-network membership that registers the machine's factory side (a provider's **subnet**). A provider's subnet is never put on the AE channel, and the main network is never added to the factory membership.
-- Added an orbiting white ring particle inside the connector's own block while the structure is formed, and the connector still opens its normal channel configuration screen.
-- The connector no longer exposes its bottom face to physical cabling: the bottom is the factory mounting slot, so a machine placed underneath can never short the channel network or a provider's subnet through adjacency.
-- Fixed the structure re-check: a machine whose grid becomes ready after placement still joins, because the machine notifies the connector on ready and the connector re-validates once per second.
-- The factory network joins on the structure alone, with no channel required: the connector's base face can point in any direction, and a factory pattern provider only has to look back at it. The selected channel now carries only the AE network, so two channels sharing one machine join each other.
-- Factory network election results are cached until a host is added or removed, so the shared tag store no longer re-scans every host each second.
-- Wireless discovery is a blacklist, not a whitelist: every block in a member chunk stays discoverable and taggable by any mod, except the factory network terminal and the factory pattern provider, which only join a network by cable. Nothing is scanned or joined before a tag binds a position.
+- Added the Loop Factory wireless structure: an omnidirectional connector whose base face rests on a Loop Factory network terminal's top face, or on a factory pattern provider's subnet face, joins the selected channel to that machine. The channel carries only the machine's main AE network, and a provider's subnet never joins it. The structure alone also extends the factory network to the connector's chunk, so machines there can be discovered and tagged without selecting a channel.
+- Factory terminals and factory pattern providers never join a network wirelessly: they must be cabled, and a connector mounted on one never wires its base face into that machine. Every other block in the chunk stays discoverable and taggable, and nothing is scanned, joined or moved before a tag binds a machine.
+- Added a white ring particle that orbits inside the connector's own block while the structure is formed, aligned with the base face normal and completing a full circle.
 - Factory tags are now one store per factory network: a tag marked on one terminal is the same tag on every other terminal of that network, and saving a pattern no longer unbinds the tags another pattern of the same provider declares.
+- Reworked the Loop Factory network terminal model: the front and top keep their textures, the sides use a striped texture, the back has its own texture, and the bottom reuses the top.
 - Removed a stray README file from the shipped item texture folder that made Minecraft report an invalid datapack path.
 
 ### 简体中文
 
-- 新增循环工厂无线结构：全向连接器压在循环工厂网络终端上，或压在子网面朝上的工厂样板供应器上时，把所选频道与该机器相连。频道只接入机器的**主网**；工厂代码通过独立的工厂网络成员关系寻址连接器所在区块——登记机器的工厂侧（供应器的**子网**）。供应器子网永远不接入 AE 频道，主网也永远不进入工厂网络成员。
-- 结构成型时，连接器在自身单方块内显示白色环绕粒子；连接器仍可正常打开频道配置界面。
-- 连接器不再向底部面暴露物理接线：底部是工厂安装位，因此下方机器不会通过相邻关系把频道网络或供应器子网短接。
-- 修正结构复核：机器在放置后才就绪时也能加入——机器就绪会通知连接器，连接器每秒再复核一次。
-- 工厂网络仅凭结构接入，不要求已选频道：连接器基座面可朝任意方向，供应器只需朝向基座面即可；所选频道只承载 AE 网络，因此同一机器被两个频道登记时两个频道自然连通。
-- 工厂网络 owner 选举结果加缓存（宿主增删时失效），共享标签表不再每秒全量扫描宿主。
-- 无线发现采用黑名单而非白名单：成员区块内除工厂网络终端与工厂样板供应器外，所有方块都保持可发现、可打 tag，兼容各模组机器；打 tag 之前不扫描、不入网。
-- 工厂标签改为每个工厂网络一份：在一个终端标记的 tag，同网络的其他终端看到同一份绑定；保存一个样板不再解绑同一供应器里其他样板声明的同名 tag。
+- 新增循环工厂无线结构：全向连接器基座面贴在循环工厂网络终端顶面，或贴在工厂样板供应器的子网（朝向）面时，把所选频道与该机器相连。频道只承载机器的主网，供应器子网永远不接入；同时结构本身把工厂网络扩展到连接器所在区块，不选频道也能被该网络发现并打标签。
+- 工厂终端与工厂样板供应器永远不通过无线接入：必须接线，压在其上的连接器也不会把基座面接进该机器。区块内其余方块保持可发现、可打标签；打标签之前不扫描、不入网、不搬运任何物品。
+- 结构成型时，连接器在自身单方块内显示白色环绕粒子，环绕平面与基座法线对齐并完整绕行一周。
+- 工厂标签改为每个工厂网络一份：在一个终端标记的 tag，同网络其他终端看到同一份绑定；保存一个样板不再解绑同一供应器里其他样板声明的同名 tag。
+- 重做循环工厂网络终端模型：正面与顶面保留原贴图，侧面使用条纹贴图，背面使用独立贴图，底面复用顶面。
 - 删除物品贴图目录里误入的 README 文件，Minecraft 不再报告无效数据包路径。
 
 ## 0.0.6
