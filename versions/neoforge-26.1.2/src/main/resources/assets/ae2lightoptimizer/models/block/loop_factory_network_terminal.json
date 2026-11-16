@@ -5,6 +5,7 @@
     "case": "ae2lightoptimizer:block/loop_factory_terminal_top",
     "side": "ae2lightoptimizer:block/loop_factory_terminal_side",
     "back": "ae2lightoptimizer:block/loop_factory_terminal_back",
+    "back": "ae2lightoptimizer:block/loop_factory_terminal_back",
     "particle": "ae2lightoptimizer:block/loop_factory_terminal_top"
   },
   "elements": [
