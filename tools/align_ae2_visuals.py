@@ -73,11 +73,104 @@ def restore_cable(gen, resources, ae):
     blockbench(gen, 'loop_factory_interface_cable', model, resources, ae)
 
 
-def generate(gen, version, only_cable=False):
+def handheld_encoder(gen, assets):
+    """Pixel source of truth for the rugged handheld code terminal, including its editor."""
+    art = Image.new('RGBA', (32, 32))
+    d = ImageDraw.Draw(art)
+    d.rectangle((7, 2, 24, 29), fill='#454b58')
+    d.rectangle((5, 4, 26, 27), fill='#454b58')
+    d.rectangle((7, 3, 24, 28), fill='#a9adb8')
+    d.rectangle((6, 5, 25, 26), fill='#a9adb8')
+    d.line((8, 3, 23, 3), fill='#e0e2e8')
+    d.line((6, 5, 6, 25), fill='#d1d5dd')
+    d.line((25, 6, 25, 26), fill='#767e8e')
+    d.line((8, 28, 23, 28), fill='#697181')
+    d.rectangle((8, 6, 23, 22), fill='#5e6574')
+    d.rectangle((9, 7, 22, 21), fill='#151f2b')
+    d.line((10, 8, 21, 8), fill='#2e4355')
+    # Indented program lines remain readable at inventory size; no miniature lettering.
+    for y, indent, a, b in ((10, 0, 4, 3), (12, 2, 3, 2), (14, 2, 4, 2), (16, 0, 3, 4), (18, 2, 3, 2)):
+        x = 10+indent
+        d.line((x, y, x+a-1, y), fill='#77d3ef')
+        d.line((x+a+1, y, x+a+b, y), fill='#3989b0')
+    d.line((10, 20, 12, 20), fill='#b3dce8')
+    d.rectangle((10, 24, 13, 25), fill='#596575')
+    d.line((10, 24, 13, 24), fill='#e0e2e8')
+    d.rectangle((17, 24, 21, 25), fill='#596575')
+    d.line((17, 24, 21, 24), fill='#e0e2e8')
+    d.line((13, 5, 18, 5), fill='#626c7d')
+    d.point((21, 5), fill='#b5e2ef')
+    for x, y in ((8, 4), (23, 4), (8, 27), (23, 27)):
+        d.point((x, y), fill='#5c6574')
+    path = assets/'textures/item/handheld_loop_factory_encoder.png'
+    art.save(path)
+    editable = ROOT/f'design/loop_factory/{gen}/handheld_loop_factory_encoder.bbmodel'
+    raw = editable.read_bytes()
+    old_source = json.loads(raw)['textures'][0]['source']
+    new_source = 'data:image/png;base64,'+base64.b64encode(path.read_bytes()).decode()
+    editable.write_bytes(raw.replace(old_source.encode(), new_source.encode()))
+
+
+def terminal_housing(gen, resources, ae):
+    """Rebuild the editable 16px housing without touching the screen or lid."""
+    assets = resources/f'assets/{MOD}'
+    shell = Image.open(io.BytesIO(ae.read('assets/ae2/textures/block/interface.png'))).convert('RGBA')
+    side = shell.copy()
+    d = ImageDraw.Draw(side)
+    # Quiet recessed steel panel, three louvres and two flush fasteners.
+    d.rectangle((3, 3, 12, 12), fill='#adb0b8')
+    d.line((3, 3, 12, 3), fill='#c8cbd1')
+    d.line((3, 4, 3, 12), fill='#c8cbd1')
+    d.line((4, 12, 12, 12), fill='#858995')
+    d.line((12, 4, 12, 11), fill='#858995')
+    for y in (5, 7, 9):
+        d.line((5, y, 10, y), fill='#626875')
+        d.line((5, y+1, 10, y+1), fill='#c5c8ce')
+    for x, y in ((4, 4), (11, 11)):
+        d.point((x, y), fill='#777d89')
+    side.save(assets/'textures/block/loop_factory_terminal_side.png')
+
+    back = shell.copy()
+    d = ImageDraw.Draw(back)
+    d.rectangle((3, 3, 12, 12), fill='#adb0b8')
+    d.line((3, 3, 12, 3), fill='#c8cbd1')
+    d.line((3, 4, 3, 12), fill='#c8cbd1')
+    d.line((4, 12, 12, 12), fill='#858995')
+    d.line((12, 4, 12, 11), fill='#858995')
+    # Recessed AE cable socket, with metal contacts rather than another screen.
+    d.rectangle((5, 5, 10, 10), fill='#676d7a')
+    d.rectangle((6, 6, 9, 9), fill='#303845')
+    d.line((6, 6, 9, 6), fill='#b6bbc5')
+    d.line((6, 7, 6, 9), fill='#949caa')
+    d.line((7, 9, 9, 9), fill='#4b5667')
+    d.line((8, 7, 8, 8), fill='#8dabc0')
+    for x, y in ((4, 4), (11, 4), (4, 11), (11, 11)):
+        d.point((x, y), fill='#777d89')
+    back.save(assets/'textures/block/loop_factory_terminal_back.png')
+
+    model = dict(parent='minecraft:block/block', textures={
+        'front': f'{MOD}:block/loop_factory_terminal',
+        'case': f'{MOD}:block/loop_factory_terminal_top',
+        'side': f'{MOD}:block/loop_factory_terminal_side',
+        'back': f'{MOD}:block/loop_factory_terminal_back',
+        'particle': f'{MOD}:block/loop_factory_terminal_top'},
+        elements=[cube('AE2 terminal housing', [0, 0, 0], [16, 16, 16], '#case', [0, 0, 16, 16])])
+    for face, texture in (('north', '#front'), ('south', '#back'), ('east', '#side'), ('west', '#side')):
+        model['elements'][0]['faces'][face]['texture'] = texture
+    write_json(assets/'models/block/loop_factory_network_terminal.json', model)
+    blockbench(gen, 'loop_factory_network_terminal', model, resources, ae)
+    handheld_encoder(gen, assets)
+
+
+def generate(gen, version, only_cable=False, only_terminal=False):
     resources = ROOT/f'versions/neoforge-{gen}/src/main/resources'
     assets = resources/f'assets/{MOD}'
     jar = next((ROOT/f'.gradle-user-home/{gen}/caches/modules-2/files-2.1/org.appliedenergistics/appliedenergistics2/{version}').rglob(f'appliedenergistics2-{version}.jar'))
     with ZipFile(jar) as ae:
+        if only_terminal:
+            terminal_housing(gen, resources, ae)
+            print(f'{gen}: terminal side/back and editable source generated')
+            return
         if only_cable:
             restore_cable(gen, resources, ae)
             print(f'{gen}: restored original low-contrast full-cube cable')
@@ -110,14 +203,7 @@ def generate(gen, version, only_cable=False):
                 grey = round((r+g+b)/3 * .75)
                 top.putpixel((x, y), (grey, grey, grey, a))
         top.save(assets/'textures/block/loop_factory_terminal_top.png')
-        model = dict(parent='minecraft:block/block', textures={
-            'front': f'{MOD}:block/loop_factory_terminal',
-            'case': f'{MOD}:block/loop_factory_terminal_top',
-            'particle': f'{MOD}:block/loop_factory_terminal_top'},
-            elements=[cube('AE2 terminal housing', [0, 0, 0], [16, 16, 16], '#case', [0, 0, 16, 16])])
-        model['elements'][0]['faces']['north']['texture'] = '#front'
-        write_json(assets/'models/block/loop_factory_network_terminal.json', model)
-        blockbench(gen, 'loop_factory_network_terminal', model, resources, ae)
+        terminal_housing(gen, resources, ae)
 
         restore_cable(gen, resources, ae)
         # The editable panel must show the same 12px housing and 8px neck as the real part.
@@ -134,7 +220,9 @@ def generate(gen, version, only_cable=False):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('--only-cable', action='store_true')
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument('--only-cable', action='store_true')
+    modes.add_argument('--only-terminal', action='store_true')
     args = parser.parse_args()
     for gen, version in (('1.21.1', '19.2.17'), ('26.1.2', '26.1.10-beta')):
-        generate(gen, version, args.only_cable)
+        generate(gen, version, args.only_cable, args.only_terminal)

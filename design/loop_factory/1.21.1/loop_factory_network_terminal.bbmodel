@@ -62,7 +62,7 @@
             16,
             16
           ],
-          "texture": 1,
+          "texture": 3,
           "tint": -1
         },
         "west": {
@@ -72,7 +72,7 @@
             16,
             16
           ],
-          "texture": 1,
+          "texture": 2,
           "tint": -1
         },
         "east": {
@@ -82,7 +82,7 @@
             16,
             16
           ],
-          "texture": 1,
+          "texture": 2,
           "tint": -1
         }
       }
@@ -115,6 +115,30 @@
       "uv_width": 16,
       "uv_height": 16,
       "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABC0lEQVR4nI1TwYnEMAycXfwwIoRA/irBnRzXw9XgMlLD9XBsJynB/wUTFuHf3SNIa2cd9uYTW0SasUa6bNv2ixOIFBB5iJQmTuTt7ADg8+PLAsM447HdMYxzt+hju9v55/a9F9DLkVnPPXYldSLF2JZlAQAwM1JKTWIdizFajilQJmZuvmdFFFaAyFvSuq695yOEAGaGSLFeOGBvjEhBSsmKTNPUJOecAQAppcaFK5E/7XjO2RKPGMYZIgXXWs5/oTlEHk4V1LIUx2f0FDQu1J0/k87Mr5MI7C5oE0MIp8xq44sL9Q/vBqmGqy8xxmZ063HWparlE/lnAZ3tnqW6XD23LvU69xbnyHrEH43jlXNSeGzXAAAAAElFTkSuQmCC"
+    },
+    {
+      "id": "2",
+      "name": "loop_factory_terminal_side.png",
+      "namespace": "ae2lightoptimizer",
+      "folder": "block",
+      "uuid": "6e82f070-b05d-5c2a-93bc-0403738327a7",
+      "width": 16,
+      "height": 16,
+      "uv_width": 16,
+      "uv_height": 16,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABHUlEQVR4nJ1TsWoCQRB9whbLcFxjZSHkqoNrLAR/II0QQup0Yr4rYpcyJCFgkx8QLGzEK8RWAjaLLNclxTHj3LoXkrxqZrg37+3MTcc594UWeF+ByML7qlEnshIbALi7nUohSbs4uSOStBttenJHiV/eZnUDTkJljmPqLGq8r0RtU+7bXtNAkWfCEQes9Py6wGg4aCVvyx2KPJNcGrC10XCA98VHlHwzvhYxnoUB6sHotz5M7qMNDofPhhgAGCJ7MfHH+dOPDoB6W95X9RD1an7jgDlE9uxA2/qTAy78ewYc6CJ/GGK5WiNNEgC43AJjW+6iZABC1jA6KfIMV/2e5Pp35qPSTonsuQH/27Ej4uMKtwUAHX3OscMJVUN8A3T0hgKscT6GAAAAAElFTkSuQmCC"
+    },
+    {
+      "id": "3",
+      "name": "loop_factory_terminal_back.png",
+      "namespace": "ae2lightoptimizer",
+      "folder": "block",
+      "uuid": "f84e8dff-5545-56bb-98ec-dc03338dd7db",
+      "width": 16,
+      "height": 16,
+      "uv_width": 16,
+      "uv_height": 16,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABQ0lEQVR4nI1TPUsDQRB9CVcsy3LNFSLRkEtzcE2KQMo0gTSi+Q/+jEAgv8TWwkISEUTQwjIQ8BA0V0SxsAzIEZYDCy3CbPZu58BXzcwy897ORy3Lsl9UQOscUgponRfiUgpjewAwOj03AeUH2GYbKD9gi26zjbFnNxe7AuSUmcnm2InU0zo3bK/pR9VvCoij0OQYBcR0Pb9Dr9thExfLBL5SiKPQxEwBktbrdnD/8MQWGA76WKVraJ2bXnjArjHlv47OTgr+bH5rbHsKdSkF2/H3zy+MJ1O8ff9gPJk678oPoHWOui3nv6AcKcVegS2L0Gi28Xh1iUazXanAmQLhJXnG0QG/TM4m2sHFMsFw0GcTaYwA3CkQfKWwStdsAUq24dlOHIVoHR86Uu2jsuVLKfYFaLe5kdJxcdOq2efMHU6ZtYw/UhiJA2YsGvIAAAAASUVORK5CYII="
     }
   ]
 }

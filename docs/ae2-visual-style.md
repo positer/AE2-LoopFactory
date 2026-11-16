@@ -21,6 +21,7 @@ AE2 资源归原项目所有；依赖的许可证声明为 `See GitHub repositor
 - **接口线缆必须是完整立方体**。保持原有 blockstate、物品模型、碰撞和网络逻辑。按 2026-11-11 用户修正，材质恢复 0.0.5 初版低色差浅灰贴图，不再套用后来新增的高对比金属网格。
 - 环解算、超算接口、合成撕裂者的三像素外框使用对应世代的 AE2 金属边框；内部 10×10 像素保持原有图形。离线与在线的几何及外框相同，状态只改变核心亮度。
 - 网络终端正面为代码显示区，其他面为灰色设备外壳，避免四侧重复显示屏。保留全部历史 `facing` 状态；新放置方向仍由既有代码处理。
+- 2026-11-16：网络终端左右面使用三道散热栅与检修板，背面独立引用 `loop_factory_terminal_back.png` 的凹入式接口；保持 16×16、不透明与 AE2 原生外框。正面、顶底面和几何不变。手持编码终端采用 32×32 透明底浅灰金属机身、蓝色缩进代码屏与底部按键；物品模型与显示变换不变。
 - 编码面板继续直接引用 AE2 的薄型外壳，叠加既有透明核心遮罩。物品模型、世界模型、染色索引、亮度和状态灯沿用原生合同。
 - 不重绘或重新编码存储核心、存储元件／便携元件、晶体素材和现有面板遮罩。
 
@@ -57,6 +58,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File build-26.1.2.ps1 --offline
 
 `align_ae2_visuals.py` 同步两代 PNG、终端模型与三类 Blockbench 文件；重复生成必须字节一致。
 Blockbench 插件导出后自动运行该收口步骤，防止旧外壳重新覆盖产品资源。
+
+只重新生成本轮两类终端：`python tools/align_ae2_visuals.py --only-terminal`。此路径不改正面和顶底面；同时更新两代侧背贴图、手持贴图、终端模型与 Blockbench 内嵌图。手持像素源统一在 `handheld_encoder()`，Blockbench 导出不再维护另一份绘制代码。专项检查：`python tools/verify_ae2_visual_style.py --terminal-only --baseline <修改前提交> --report <报告路径>`，覆盖模型分面、历史状态、受保护贴图、透明度、编辑源与重复生成。
 
 客户端使用 `tools/runtime-factory-probe/verify-background.ps1 -StyleOnly`：检查真实物品渲染、世界方块／面板及现有 UI 场景，保留逐场景截图、资源身份与正常退出证据。
 `-EvidenceRoot` 可将结果直接写入枢纽归档。原生夹具中的菜单操作是自动化回调／数据包，不等同于人工鼠标验收。

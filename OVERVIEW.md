@@ -1,5 +1,12 @@
 # AE2-LoopFactory (AE2LF) Project Overview
 
+## 2026-11-16 工厂终端与手持终端贴图
+
+- 两代 `textures/block/loop_factory_terminal_side.png`：16px 侧面检修板与三道散热栅；新增 `loop_factory_terminal_back.png`：16px 背部接口。`models/block/loop_factory_network_terminal.json` 分别将东西面、南面引用这两张图，正面与顶底引用保持。
+- 两代 `textures/item/handheld_loop_factory_encoder.png`：32px 透明底金属手持终端。四份 `design/loop_factory/{generation}/{loop_factory_network_terminal,handheld_loop_factory_encoder}.bbmodel` 与产品引用／内嵌图一致。
+- `tools/align_ae2_visuals.py`：`terminal_housing()` 与 `handheld_encoder()` 为像素生成来源，`--only-terminal` 定向生成两类终端；`tools/blockbench/ae2lf_assets.js` 从同一来源读取手持图，不再另画旧手机。
+- `tools/verify_ae2_visual_style.py --terminal-only`：检查分面、受保护图、保存状态、编辑源、跨代一致和重复生成。留痕位于枢纽 `archive/20261116-203649-ae2lf-terminal-housing/`。
+
 ## 2026-11-16 发布 0.0.7：循环工厂无线结构（工厂网络成员 + 主网传输）
 
 - 两代 `omni/OmniFactoryWireless.java`：结构判定（正下方是终端，或 `getFront()==UP` 的工厂样板供应器）。

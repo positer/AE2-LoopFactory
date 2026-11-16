@@ -4,6 +4,7 @@
     "front": "ae2lightoptimizer:block/loop_factory_terminal",
     "case": "ae2lightoptimizer:block/loop_factory_terminal_top",
     "side": "ae2lightoptimizer:block/loop_factory_terminal_side",
+    "back": "ae2lightoptimizer:block/loop_factory_terminal_back",
     "particle": "ae2lightoptimizer:block/loop_factory_terminal_top"
   },
   "elements": [
@@ -48,7 +49,7 @@
           ]
         },
         "south": {
-          "texture": "#side",
+          "texture": "#back",
           "uv": [
             0,
             0,

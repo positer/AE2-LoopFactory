@@ -21,6 +21,8 @@
     async function build() {
         const fs = require('fs');
         const path = require('path');
+        // The deterministic Python pixel source also owns the handheld texture.
+        require('child_process').execFileSync('python', [root+'/tools/align_ae2_visuals.py', '--only-terminal'], {cwd:root, windowsHide:true});
         const report = {tool: 'Blockbench ' + Blockbench.version, generated: new Date().toISOString(), assets: []};
         const write = (file, data) => { fs.mkdirSync(path.dirname(file), {recursive: true}); fs.writeFileSync(file, data); };
         const json = (file, data) => write(file, JSON.stringify(data, null, 2) + '\n');
@@ -48,19 +50,6 @@
             x.fillStyle='#4fb6e4';x.fillRect(5,5,3,1);x.fillRect(9,5,2,1);
             x.fillStyle='#3187b8';x.fillRect(5,7,2,1);x.fillRect(8,7,3,1);
             x.fillStyle='#68c8eb';x.fillRect(5,9,4,1);x.fillRect(10,9,1,1);
-            return c;
-        }
-        function phone() {
-            const c = canvas(32), x = c.getContext('2d');
-            const rect = (color,a,b,w,h) => { x.fillStyle = color; x.fillRect(a,b,w,h); };
-            rect('#20242a',8,2,16,28); rect('#0d1015',7,4,18,24);
-            rect('#858b92',9,2,14,1); rect('#5e666e',8,3,1,25); rect('#343b44',23,3,1,25);
-            rect('#151b24',9,6,14,20); rect('#263340',10,7,12,1);
-            rect('#929ba4',13,4,5,1); rect('#3b92c7',20,4,1,1);
-            [[9,3,3],[11,5,2],[13,2,5],[15,4,3],[17,3,4],[19,6,1],[21,2,4],[23,4,2]].forEach(([y,a,b],i) => {
-                rect(i%2 ? '#4693c8':'#62c6ef',10,y,a,1); rect('#2879ad',11+a,y,b,1);
-            });
-            rect('#5d6975',14,28,4,1); rect('#4b525c',25,10,1,4);
             return c;
         }
         function emptyTexture(size) {
@@ -236,7 +225,9 @@
                 loop_factory_cable:await read(common+'/loop_factory_cable_original.png')
             },'block',assets);
             await project(gen,'loop_factory_pattern',{loop_factory_pattern:recolor(await read(ref+'/blank_pattern.png'),darkerPattern)},'item',assets);
-            await project(gen,'handheld_loop_factory_encoder',{handheld_loop_factory_encoder:phone()},'item',assets);
+            await project(gen,'handheld_loop_factory_encoder',{
+                handheld_loop_factory_encoder:await read(assets+'/textures/item/handheld_loop_factory_encoder.png')
+            },'item',assets);
             const ringCore = await read(ref+'/recipe_ring_solver_terminal_connected.png');
             const nativeMasks = [
                 await read(ref+'/pattern_encoding_terminal_bright.png'),
