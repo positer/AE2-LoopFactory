@@ -73,7 +73,6 @@ public final class CraftingRipperLogic extends PatternProviderLogic {
     @Override public RipperPatternInventory getPatternInv() { return slots; }
     @Override public void updatePatterns() {
         if (host == null || host.getLevel() == null || isClientSide()) return;
-        slots.setLocked(host.isLoopCardInstalled());
         var manual = new java.util.LinkedHashSet<IPatternDetails>();
         var coveredOutputs = new java.util.LinkedHashSet<appeng.api.stacks.AEKey>();
         for (var stack : slots.nonEmptyStacks()) {

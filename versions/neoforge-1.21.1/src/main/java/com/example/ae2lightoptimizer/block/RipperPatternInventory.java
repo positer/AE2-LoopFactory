@@ -14,8 +14,6 @@ public final class RipperPatternInventory extends BaseInternalInventory {
     private final Runnable changed;
     private int batching;
     private boolean dirty;
-    /** While the loop card owns the retained row, no slot accepts a new pattern. */
-    private boolean locked;
 
     public RipperPatternInventory(Predicate<ItemStack> accepts, Runnable changed) {
         this.accepts = accepts;
@@ -25,16 +23,15 @@ public final class RipperPatternInventory extends BaseInternalInventory {
     @Override public int getSlotLimit(int slot) { return 1; }
     @Override public ItemStack getStackInSlot(int slot) { return stacks.getOrDefault(slot, ItemStack.EMPTY); }
     @Override public boolean isItemValid(int slot, ItemStack stack) {
-        return !locked && slot >= 0 && !stack.isEmpty() && accepts.test(stack);
+        return slot >= 0 && !stack.isEmpty() && accepts.test(stack);
     }
-    public void setLocked(boolean value) { locked = value; }
     /**
      * Pattern upload and migration from other AE2 addons keep the physical slot index they read. The tail
      * row shrinks when its last pattern leaves, so that index can sit past the current logical size; grow
      * it back instead of failing the platform's range check, and never drop a pattern the ripper accepts.
      */
     @Override public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-        if (locked || stack.isEmpty() || slot < 0 || !accepts.test(stack)) return stack;
+        if (stack.isEmpty() || slot < 0 || !accepts.test(stack)) return stack;
         if (!getStackInSlot(slot).isEmpty()) return stack;
         if (simulate) return stack.getCount() <= 1 ? ItemStack.EMPTY : stack.copyWithCount(stack.getCount() - 1);
         batch(() -> setItemDirect(slot, stack.copyWithCount(1)));
@@ -49,7 +46,7 @@ public final class RipperPatternInventory extends BaseInternalInventory {
         if (batching == 0) { dirty = false; changed.run(); }
     }
     @Override public ItemStack addItems(ItemStack stack, boolean simulate) {
-        if (locked || stack.isEmpty()) return stack;
+        if (stack.isEmpty()) return ItemStack.EMPTY;
         if (!accepts.test(stack)) return stack;
         // Simulation has the same append capacity as execution, even before the empty row grows.
         if (simulate) return ItemStack.EMPTY;

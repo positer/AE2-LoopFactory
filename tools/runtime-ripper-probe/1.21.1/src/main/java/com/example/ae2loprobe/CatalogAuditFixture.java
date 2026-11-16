@@ -128,12 +128,13 @@ public final class CatalogAuditFixture {
             } else if (stage == 3 && settled()) {
                 check("card_installed", ripper.isLoopCardInstalled());
                 check("retained_pattern_unchanged", ItemStack.matches(manual, ripper.getLogic().getPatternInv().getStackInSlot(0)));
-                check("insertion_locked", !ripper.getLogic().getPatternInv().isItemValid(2, manual));
+                // The loop card keeps the directory open: only the retained slot is protected.
+                check("insertion_open_with_card", ripper.getLogic().getPatternInv().isItemValid(2, manual));
                 var withdrawn = ripper.getLogic().getPatternInv().extractItem(1, 1, false);
                 check("retained_pattern_withdrawable", ItemStack.matches(manual, withdrawn));
-                var rejected = ripper.getLogic().getPatternInv().insertItem(1, withdrawn.copy(), false);
-                check("withdrawn_pattern_cannot_be_reinserted", ItemStack.matches(withdrawn, rejected)
-                        && ripper.getLogic().getPatternInv().getStackInSlot(1).isEmpty());
+                var reinserted = ripper.getLogic().getPatternInv().insertItem(1, withdrawn.copy(), false);
+                check("withdrawn_pattern_can_be_reinserted", reinserted.isEmpty()
+                        && ItemStack.matches(withdrawn, ripper.getLogic().getPatternInv().getStackInSlot(1)));
                 auditPublished(networkPatterns());
                 if (STOCK_WITNESSES) {
                     report.put("beforeLateInsertion", latePublication());
@@ -173,8 +174,9 @@ public final class CatalogAuditFixture {
                 check("card_removed", !ripper.isLoopCardInstalled());
                 check("manual_publication_restored", restored.equals(manualPatterns));
                 check("retained_slot_unchanged_after_removal", ItemStack.matches(manual, ripper.getLogic().getPatternInv().getStackInSlot(0)));
-                check("insertion_unlocked", ripper.getLogic().getPatternInv().isItemValid(1, manual));
-                check("normal_insert_succeeds", ripper.getLogic().getPatternInv().insertItem(1, manual.copy(), false).isEmpty());
+                // Slot 1 still holds the retained pattern, so prove normal insertion on the next free slot.
+                check("insertion_unlocked", ripper.getLogic().getPatternInv().isItemValid(2, manual));
+                check("normal_insert_succeeds", ripper.getLogic().getPatternInv().insertItem(2, manual.copy(), false).isEmpty());
                 // Leave the final screenshot in card mode after proving normal-state restoration.
                 ripper.getUpgrades().setItemDirect(0, ModItems.LOOP_CARD.get().getDefaultInstance());
                 transition(5, "reinstall_wait");
