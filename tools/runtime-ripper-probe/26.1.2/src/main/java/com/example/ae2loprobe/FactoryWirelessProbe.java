@@ -146,10 +146,35 @@ public final class FactoryWirelessProbe {
      check(reachable(tb.factoryGrid(), A1), "shared_machine_is_a_member_of_network_b");
      check(!reachable(ta.factoryGrid(), CB2), "network_a_does_not_reach_network_b_only_chunk");
      check(reachable(tb.factoryGrid(), CB2), "network_b_reaches_its_second_chunk");
-     level.removeBlock(CB1, false);
      advance();
     }
     case 10 -> {
+     // A wireless member is inert until a tag binds it: tagging is refused outside the network,
+     // and tagging alone moves nothing.
+     var chest = new BlockPos(7, 100, 0);
+     level.setBlockAndUpdate(chest, net.minecraft.world.level.block.Blocks.CHEST.defaultBlockState());
+     var chestEntity = (net.minecraft.world.level.block.entity.ChestBlockEntity) level.getBlockEntity(chest);
+     chestEntity.setItem(0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.STONE, 5));
+     var belongsA = (java.util.function.Predicate<Long>) pos -> com.example.ae2lightoptimizer.factory.FactoryServer.contains(ta.factoryGrid(), net.minecraft.core.BlockPos.of(pos));
+     var belongsB = (java.util.function.Predicate<Long>) pos -> com.example.ae2lightoptimizer.factory.FactoryServer.contains(tb.factoryGrid(), net.minecraft.core.BlockPos.of(pos));
+     ta.tags.reconcile(java.util.List.of("in", "out"));
+     tb.tags.reconcile(java.util.List.of("in"));
+     check(ta.tags.tag("in", chest.asLong(), belongsA), "network_a_tag_binds_the_shared_member");
+     check(tb.tags.tag("in", chest.asLong(), belongsB), "network_b_tag_binds_the_same_member");
+     check(!ta.tags.tag("out", CB2.asLong(), belongsA), "network_a_cannot_tag_network_b_only_chunk");
+     check(chestEntity.getItem(0).getCount() == 5, "tagging_alone_moves_nothing");
+     check(com.example.ae2lightoptimizer.factory.FactoryServer.members(ta.factoryGrid(), ta.tags.positions("in")).contains(chest),
+             "network_a_resolves_its_tagged_member");
+     check(com.example.ae2lightoptimizer.factory.FactoryServer.members(tb.factoryGrid(), tb.tags.positions("in")).contains(chest),
+             "network_b_resolves_its_tagged_member");
+     check(!ta.tags.names().contains("bonly") && !tb.tags.names().contains("aonly"), "tag_stores_are_per_network");
+     ta.tags.reconcile(java.util.List.of("in", "out", "aonly"));
+     ta.tags.tag("aonly", A1.asLong(), belongsA);
+     check(ta.tags.names().contains("aonly") && !tb.tags.names().contains("aonly"), "one_network_tag_does_not_leak");
+     level.removeBlock(CB1, false);
+     advance();
+    }
+    case 11 -> {
      check(!reachable(tb.factoryGrid(), A1), "removed_connector_drops_that_network_membership");
      check(reachable(ta.factoryGrid(), B1), "other_network_membership_is_untouched");
      finish();

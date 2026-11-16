@@ -172,6 +172,7 @@ public final class FactoryBlockEntity extends AENetworkedBlockEntity implements 
         super.onReady();
         if (isProvider()) { subnet.setExposedOnSides(EnumSet.of(getFront())); subnet.create(getLevel(), getBlockPos()); logic.updatePatterns(); }
         FactoryServer.add(this);
+        shareTags();
         // A connector resting on this machine may have run its own check before this node existed.
         if (getLevel() != null && !getLevel().isClientSide()
                 && getLevel().getBlockEntity(getBlockPos().above()) instanceof com.example.ae2lightoptimizer.omni.OmniConnectorBlockEntity link)
@@ -182,8 +183,23 @@ public final class FactoryBlockEntity extends AENetworkedBlockEntity implements 
         super.onOrientationChanged(orientation);
         if (subnet != null && isProvider()) subnet.setExposedOnSides(EnumSet.of(getFront()));
     }
+    /**
+     * A factory network keeps one tag store: every host on the network reads and writes the network
+     * owner's store, so a tag marked on one terminal is the same tag on every other terminal and in
+     * every pattern of a provider. Bindings are merged, never replaced.
+     */
+    private void shareTags() {
+        var grid = factoryGrid();
+        if (grid == null) return;
+        var networkOwner = FactoryServer.owner(grid);
+        if (networkOwner == null || networkOwner == this || networkOwner.tags == tags) return;
+        networkOwner.tags.mergeFrom(tags);
+        tags = networkOwner.tags;
+        saveChanges();
+    }
     @Override public void onMainNodeStateChanged(IGridNodeListener.State reason) {
         if (logic != null) logic.onMainNodeStateChanged();
+        shareTags();
         markForUpdate();
     }
     @Override public void setRemoved() { subnet.destroy(); FactoryServer.remove(this); UniqueNetworkServices.remove(this); super.setRemoved(); }
@@ -226,6 +242,7 @@ public final class FactoryBlockEntity extends AENetworkedBlockEntity implements 
         terminalRestartPending=false;installedTerminalProgram=FactoryPatternData.EMPTY;
     }
     public void tickFactory() {
+        if (getLevel() != null && Math.floorMod(getLevel().getGameTime() + getBlockPos().asLong(), 20) == 0) shareTags();
         recovery.tick(this);
         tickPulses();
         if (isProvider() && isolated() && getMainNode().getGrid() != null && factoryGrid() != null) {

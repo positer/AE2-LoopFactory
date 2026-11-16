@@ -13,9 +13,19 @@ import java.util.function.Predicate;
 public final class FactoryTags {
     private final Map<String, LinkedHashSet<Long>> bindings = new LinkedHashMap<>();
 
+    /**
+     * Unions the imported names instead of replacing them: a factory network hosts several patterns,
+     * and saving one must not drop the tag names another pattern declares.
+     */
     public void reconcile(Collection<String> imported) {
-        bindings.keySet().retainAll(imported);
         imported.stream().sorted().forEach(tag -> bindings.computeIfAbsent(tag, ignored -> new LinkedHashSet<>()));
+    }
+
+    /** Folds another view of the same network into this store; later views never lose bindings. */
+    public void mergeFrom(FactoryTags other) {
+        if (other == null || other == this) return;
+        for (var entry : other.bindings.entrySet())
+            bindings.computeIfAbsent(entry.getKey(), ignored -> new LinkedHashSet<>()).addAll(entry.getValue());
     }
 
     public boolean tag(String tag, long position, Predicate<Long> belongsToNetwork) {

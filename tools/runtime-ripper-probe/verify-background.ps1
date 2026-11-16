@@ -146,7 +146,11 @@ function Assert-GameplayEvidence([string]$world) {
                 'removed_provider_clears_wireless_state','network_a_reaches_its_own_chunk',
                 'network_b_reaches_the_shared_chunk','shared_machine_is_a_member_of_network_a',
                 'shared_machine_is_a_member_of_network_b','network_a_does_not_reach_network_b_only_chunk',
-                'network_b_reaches_its_second_chunk','removed_connector_drops_that_network_membership',
+                'network_b_reaches_its_second_chunk','network_a_tag_binds_the_shared_member',
+                'network_b_tag_binds_the_same_member','network_a_cannot_tag_network_b_only_chunk',
+                'tagging_alone_moves_nothing','network_a_resolves_its_tagged_member',
+                'network_b_resolves_its_tagged_member','tag_stores_are_per_network',
+                'one_network_tag_does_not_leak','removed_connector_drops_that_network_membership',
                 'other_network_membership_is_untouched')) {
             if ($report.$check -ne $true) { throw "Missing factory wireless contract: $check" }
         }

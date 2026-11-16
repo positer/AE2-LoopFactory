@@ -13,7 +13,8 @@ class FactoryTagsTest {
         assertEquals(java.util.Set.of(1L,2L,3L),tags.positions("A"));assertEquals(java.util.Set.of(2L),tags.positions("B"));
         assertTrue(tags.remove("A",2));assertEquals(java.util.Set.of(1L,3L),tags.positions("A"));assertEquals(java.util.Set.of(2L),tags.positions("B"));
     }
-    @Test void editingImportsPreservesOnlyUnchangedTagBindings() {
+    @Test void savingAnotherPatternKeepsEarlierTagBindings() {
+        // A network hosts several patterns: importing a second pattern's names must not unbind the first.
         var tags = new FactoryTags();
         tags.reconcile(List.of("A", "B"));
         assertTrue(tags.tag("A", 12, position -> true));
@@ -21,7 +22,7 @@ class FactoryTagsTest {
         tags = FactoryTags.restore(tags.snapshot());
         tags.reconcile(List.of("A", "C"));
         assertEquals(java.util.Set.of(12L), tags.positions("A"));
-        assertTrue(tags.positions("B").isEmpty());
+        assertEquals(java.util.Set.of(34L), tags.positions("B"));
         assertTrue(tags.positions("C").isEmpty());
         assertFalse(tags.tag("C", 90, position -> false));
         assertFalse(tags.tag("missing", 12, position -> true));
