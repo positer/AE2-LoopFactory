@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.0.7
+
+### English
+
+- Added the Loop Factory wireless structure: an omni connector resting on a Loop Factory network terminal, or on a factory pattern provider whose subnet face points up, bridges its selected channel network to that machine's MAIN network. A provider's subnet is deliberately never joined, so the factory side stays isolated.
+- Added an orbiting white ring particle inside the connector's own block while the structure is formed, and the connector still opens its normal channel configuration screen.
+- The connector no longer exposes its bottom face to physical cabling: the bottom is the factory mounting slot, so a machine placed underneath can never short the channel network or a provider's subnet through adjacency.
+- Removed a stray README file from the shipped item texture folder that made Minecraft report an invalid datapack path.
+
+### 简体中文
+
+- 新增循环工厂无线结构：全向连接器压在循环工厂网络终端上，或压在子网面朝上的工厂样板供应器上时，把所选频道网络与该机器的**主网**相连；供应器的子网刻意不并入，工厂侧保持隔离。
+- 结构成型时，连接器在自身单方块内显示白色环绕粒子；连接器仍可正常打开频道配置界面。
+- 连接器不再向底部面暴露物理接线：底部是工厂安装位，因此下方机器不会通过相邻关系把频道网络或供应器子网短接。
+- 删除物品贴图目录里误入的 README 文件，Minecraft 不再报告无效数据包路径。
+
 ## 0.0.6
 
 ### English

@@ -10,6 +10,8 @@ public final class OmniContent {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks("ae2lightoptimizer");
     public static final DeferredRegister<net.minecraft.core.particles.ParticleType<?>> PARTICLES = DeferredRegister.create(Registries.PARTICLE_TYPE, "ae2lightoptimizer");
     public static final DeferredHolder<net.minecraft.core.particles.ParticleType<?>, net.minecraft.core.particles.SimpleParticleType> PULSE = PARTICLES.register("omni_pulse", () -> new net.minecraft.core.particles.SimpleParticleType(false) {});
+    /** Ring particle shown while a formed Loop Factory structure is wirelessly bridged. */
+    public static final DeferredHolder<net.minecraft.core.particles.ParticleType<?>, net.minecraft.core.particles.SimpleParticleType> ORBIT = PARTICLES.register("omni_orbit", () -> new net.minecraft.core.particles.SimpleParticleType(false) {});
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems("ae2lightoptimizer");
     public static final DeferredRegister<BlockEntityType<?>> ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, "ae2lightoptimizer");
     public static final DeferredBlock<OmniConnectorBlock> BLOCK = BLOCKS.register("omnidirectional_connector", OmniConnectorBlock::new);

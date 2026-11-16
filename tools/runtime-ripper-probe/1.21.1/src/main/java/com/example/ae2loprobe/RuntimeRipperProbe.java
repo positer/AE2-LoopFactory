@@ -138,6 +138,7 @@ public final class RuntimeRipperProbe {
             Files.createDirectories(output);
             if (OmniProbe.ENABLED) { OmniProbe.start(server, player, output); return; }
             if (OmniAccessProbe.ENABLED) { OmniAccessProbe.start(server, player, output); return; }
+            if (FactoryWirelessProbe.ENABLED) { FactoryWirelessProbe.start(server, player, output); return; }
             if (Ae2LtCapacityProbe.ENABLED) { Ae2LtCapacityProbe.start(server, player, output); return; }
             report.put("probe", "real-serverlevel-ae2-grid-ring-whole-job-ripper");
             report.put("minecraft", "1.21.1");
@@ -191,6 +192,7 @@ public final class RuntimeRipperProbe {
         if (level == null || ProbeState.finished) return;
         if (OmniProbe.ENABLED) { OmniProbe.tick(); return; }
         if (OmniAccessProbe.ENABLED) { OmniAccessProbe.tick(); return; }
+        if (FactoryWirelessProbe.ENABLED) { FactoryWirelessProbe.tick(); return; }
         if (Ae2LtCapacityProbe.ENABLED) { Ae2LtCapacityProbe.tick(); return; }
         try {
             if (tick() - startedTick > (ChannelCapacityFixture.ENABLED ? 5000 : 2400)) throw new IllegalStateException("Probe timeout in " + ProbeState.phase);

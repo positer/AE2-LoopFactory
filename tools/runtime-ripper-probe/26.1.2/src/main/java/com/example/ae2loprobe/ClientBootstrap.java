@@ -74,6 +74,10 @@ public final class ClientBootstrap {
             if (OmniClient.tick(minecraft)) advanceNormalShutdown(minecraft);
             return;
         }
+        if (FactoryWirelessProbe.ENABLED) {
+            if (ProbeState.finished) advanceNormalShutdown(minecraft);
+            return;
+        }
         DynamicPatternClient.observePatternAccess(minecraft);
         var request = ProbeState.screenshotRequest;
         if (request != null && !CAPTURED.contains(request)) {

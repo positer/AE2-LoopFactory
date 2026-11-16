@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory=$true)][ValidateSet('1.21.1','26.1.2')][string]$Generation,
-    [Parameter(Mandatory=$true)][ValidateSet('omni','omni_access','ae2lt_capacity','template','channel_capacity','smithing','layered','core256m','catalog_audit','native_catalog','exact_components','pack_catalog','tool_components')][string]$Chain,
+    [Parameter(Mandatory=$true)][ValidateSet('omni','omni_access','ae2lt_capacity','factory_wireless','template','channel_capacity','smithing','layered','core256m','catalog_audit','native_catalog','exact_components','pack_catalog','tool_components')][string]$Chain,
     [Parameter(Mandatory=$true)][ValidatePattern('^ripper-[A-Za-z0-9_.-]+$')][string]$EvidenceName,
     [string]$EvidenceRoot,
     [switch]$PrepareOnly,
@@ -96,10 +96,10 @@ function Assert-RuntimeMatchesProduction {
 function Assert-GameplayEvidence([string]$world) {
     $report = Read-PassingFixture 'report.json'
     if ($report.minecraft -ne $Generation -or $report.world -ne $world) { throw 'Report generation/world is not this run' }
-    $chainNames = @{omni='omni_connector';omni_access='omni_access';ae2lt_capacity='ae2lt_capacity';channel_capacity='channel_capacity';template='template_growth';smithing='template_growth_then_netherite_pickaxe_smithing';layered='logs_planks_sticks_tool_and_template_growth_then_smithing';core256m='all_ten_core_tiers_crystal_growth_and_netherite_ingots';native_catalog='native_catalog_map_extension';exact_components='exact_components';catalog_audit='catalog_audit';pack_catalog='pack_catalog';tool_components='tool_components'}
+    $chainNames = @{omni='omni_connector';omni_access='omni_access';ae2lt_capacity='ae2lt_capacity';factory_wireless='factory_wireless';channel_capacity='channel_capacity';template='template_growth';smithing='template_growth_then_netherite_pickaxe_smithing';layered='logs_planks_sticks_tool_and_template_growth_then_smithing';core256m='all_ten_core_tiers_crystal_growth_and_netherite_ingots';native_catalog='native_catalog_map_extension';exact_components='exact_components';catalog_audit='catalog_audit';pack_catalog='pack_catalog';tool_components='tool_components'}
     if ($report.chain -ne $chainNames[$Chain]) { throw 'The requested chain is not the completed fixture' }
     # 0.0.6 removed the ripper's own idle drain; older evidence keeps its recorded 5 AE/t.
-    if ($Chain -notin @('omni','omni_access','ae2lt_capacity') -and $report.ripperConfiguredIdleAEPerTick -ne 0) { throw 'Ripper idle drain is not zero' }
+    if ($Chain -notin @('omni','omni_access','ae2lt_capacity','factory_wireless') -and $report.ripperConfiguredIdleAEPerTick -ne 0) { throw 'Ripper idle drain is not zero' }
     if ($Chain -eq 'omni_access' -and $report.ripperIdlePower -ne 0) { throw 'Ripper idle drain is no longer zero' }
     if ($Chain -eq 'omni') {
         foreach ($check in @('four_loaded_endpoints','one_star_hub','connected_without_power','connectors_require_no_channels',
@@ -134,6 +134,15 @@ function Assert-GameplayEvidence([string]$world) {
         $diskResult = & python (Join-Path $taskRoot 'tools/verify_omni_saved_data.py') $evidence --generation $Generation
         if ($LASTEXITCODE -ne 0) { throw 'Connector disk NBT readback failed' }
         $null = Read-PassingFixture 'saved-data-readback.json'
+    }
+    if ($Chain -eq 'factory_wireless') {
+        foreach ($check in @('terminal_structure_links_connector','terminal_structure_sets_wireless_state',
+                'terminal_structure_merges_channel_and_terminal_grid','removed_terminal_drops_link',
+                'removed_terminal_clears_wireless_state','provider_subnet_face_points_up','provider_structure_links_connector',
+                'provider_structure_merges_main_network','provider_subnet_is_not_merged','provider_structure_sets_wireless_state',
+                'removed_provider_drops_link','removed_provider_clears_wireless_state')) {
+            if ($report.$check -ne $true) { throw "Missing factory wireless contract: $check" }
+        }
     }
     if ($Chain -eq 'omni_access') {
         foreach ($check in @('public_and_private_ids_differ','same_private_name_is_per_owner','owner_sees_public_and_own_private',
@@ -215,7 +224,7 @@ function Assert-GameplayEvidence([string]$world) {
     }
     $requiredFrames = if ($Chain -eq 'omni') { @('ae2lo-ripper-omni-ui.png','ae2lo-ripper-omni-world.png') }
         elseif ($Chain -eq 'omni_access') { @('ae2lo-ripper-omni-access-ui.png','ae2lo-ripper-omni-access-private-toggle.png','ae2lo-ripper-omni-access-private-created.png','ae2lo-ripper-omni-access-zh-2x.png','ae2lo-ripper-omni-access-en-2x.png') }
-        elseif ($Chain -eq 'ae2lt_capacity') { @() }
+        elseif ($Chain -eq 'ae2lt_capacity' -or $Chain -eq 'factory_wireless') { @() }
         else { @('ae2lo-ripper-after.png','ae2lo-ripper-ui.png') }
     foreach ($frame in $requiredFrames) {
         $framePath = Join-Path $evidence ('screenshots/' + $frame)

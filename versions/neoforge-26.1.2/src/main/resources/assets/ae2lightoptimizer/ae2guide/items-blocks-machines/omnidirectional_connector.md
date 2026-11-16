@@ -24,3 +24,9 @@ Craft one wireless access point, one loop crystal and one quantum entangled sing
 
 
 A linked, online connector emits slow outward white particles confined to its own block. Unlinking or going offline stops the effect. Online status follows AE2; this adds no energy demand.
+
+## Loop Factory wireless structure
+
+Rest the connector's bottom face directly on a Loop Factory network terminal, or on a factory pattern provider whose subnet face points up. The structure then bridges the selected channel network to that machine's **main** network; a provider's subnet is never joined, so the factory side stays isolated. A white ring of particles orbits the connector inside its own block while the structure is formed, and the connector still opens its normal channel screen.
+
+The bottom face is the factory mounting slot and is not exposed to cabling, so a machine underneath can never short the channel network or a provider's subnet through adjacency. Removing the machine drops the bridge and the ring.

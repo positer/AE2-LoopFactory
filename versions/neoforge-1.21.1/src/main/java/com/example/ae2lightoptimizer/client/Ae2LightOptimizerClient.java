@@ -38,6 +38,7 @@ public final class Ae2LightOptimizerClient {
     public Ae2LightOptimizerClient(IEventBus modEventBus) {
         modEventBus.addListener(OmniWhiteSprite::register);
         modEventBus.addListener(OmniPulseParticle::register);
+        modEventBus.addListener(OmniOrbitParticle::register);
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(FactoryEncoderClient::scroll);
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(FactoryEncoderClient::use);
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(FactoryEncoderClient::render);

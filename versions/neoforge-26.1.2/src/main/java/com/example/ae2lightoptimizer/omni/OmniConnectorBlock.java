@@ -21,14 +21,16 @@ import net.minecraft.world.phys.shapes.*;
 /** Native wireless-access-point placement and shapes, with its own zero-power network endpoint. */
 public final class OmniConnectorBlock extends AEBaseEntityBlock<OmniConnectorBlockEntity> implements SimpleWaterloggedBlock {
     public static final net.minecraft.world.level.block.state.properties.BooleanProperty ONLINE = net.minecraft.world.level.block.state.properties.BooleanProperty.create("online");
+    /** True while the connector bridges a formed Loop Factory structure below it. */
+    public static final net.minecraft.world.level.block.state.properties.BooleanProperty WIRELESS = net.minecraft.world.level.block.state.properties.BooleanProperty.create("wireless");
     public OmniConnectorBlock(net.minecraft.world.level.block.state.BlockBehaviour.Properties properties) {
         super(properties);
         registerDefaultState(defaultBlockState().setValue(WirelessAccessPointBlock.STATE, WirelessAccessPointBlock.State.OFF)
-                .setValue(BlockStateProperties.WATERLOGGED, false).setValue(ONLINE, false));
+                .setValue(BlockStateProperties.WATERLOGGED, false).setValue(ONLINE, false).setValue(WIRELESS, false));
     }
     @Override public appeng.api.orientation.IOrientationStrategy getOrientationStrategy() { return appeng.api.orientation.OrientationStrategies.facing(); }
     @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder); builder.add(WirelessAccessPointBlock.STATE, BlockStateProperties.WATERLOGGED, ONLINE);
+        super.createBlockStateDefinition(builder); builder.add(WirelessAccessPointBlock.STATE, BlockStateProperties.WATERLOGGED, ONLINE, WIRELESS);
     }
     @Override public BlockState getStateForPlacement(BlockPlaceContext context) {
         var nativeState = AEBlocks.WIRELESS_ACCESS_POINT.block().getStateForPlacement(context);
@@ -59,10 +61,27 @@ public final class OmniConnectorBlock extends AEBaseEntityBlock<OmniConnectorBlo
         // A broken block is already air while its block entity is being removed; deriving a state there would write the block back.
         if (endpoint.getLevel() == null || !endpoint.getLevel().getBlockState(endpoint.getBlockPos()).is(this)) return current;
         if (endpoint.getLevel().isClientSide()) return current;
-        return current.setValue(ONLINE, endpoint.linked() && endpoint.getMainNode().isActive()).setValue(WirelessAccessPointBlock.STATE, endpoint.linked() ? WirelessAccessPointBlock.State.HAS_CHANNEL
+        return current.setValue(ONLINE, endpoint.linked() && endpoint.getMainNode().isActive())
+                .setValue(WIRELESS, endpoint.factoryLinked())
+                .setValue(WirelessAccessPointBlock.STATE, endpoint.linked() ? WirelessAccessPointBlock.State.HAS_CHANNEL
                 : endpoint.linkId().isEmpty() ? WirelessAccessPointBlock.State.OFF : WirelessAccessPointBlock.State.ON);
     }
+    @Override public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block,
+            net.minecraft.world.level.redstone.Orientation orientation, boolean movedByPiston) {
+        if (level.isClientSide()) return;
+        if (level.getBlockEntity(pos) instanceof OmniConnectorBlockEntity endpoint) endpoint.refreshFactoryLink();
+    }
     @Override public void animateTick(BlockState state, Level level, BlockPos pos, net.minecraft.util.RandomSource random) {
+        if (state.getValue(WIRELESS)) {
+            // One ring particle per tick orbiting the connector centre inside its own block.
+            double angle = Math.floorMod(level.getGameTime() * 6L + pos.asLong(), 360L) * Math.PI / 180.0;
+            double radius = 0.30 + random.nextDouble() * 0.06;
+            double x = pos.getX() + 0.5 + Math.cos(angle) * radius;
+            double z = pos.getZ() + 0.5 + Math.sin(angle) * radius;
+            double y = pos.getY() + 0.5 + (random.nextDouble() - 0.5) * 0.12;
+            double speed = 0.02;
+            level.addParticle(OmniContent.ORBIT.get(), x, y, z, -Math.sin(angle) * speed, 0.0, Math.cos(angle) * speed);
+        }
         if (!state.getValue(ONLINE) || state.getValue(WirelessAccessPointBlock.STATE) != WirelessAccessPointBlock.State.HAS_CHANNEL) return;
         double dx = random.nextDouble() * 2 - 1, dy = random.nextDouble() * 2 - 1, dz = random.nextDouble() * 2 - 1;
         double length = Math.sqrt(dx * dx + dy * dy + dz * dz);

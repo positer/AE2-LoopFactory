@@ -89,6 +89,10 @@ public final class ClientBootstrap {
             if (OmniAccessClient.tick(minecraft)) advanceNormalShutdown(minecraft);
             return;
         }
+        if (FactoryWirelessProbe.ENABLED) {
+            if (ProbeState.finished) advanceNormalShutdown(minecraft);
+            return;
+        }
         if (Ae2LtCapacityProbe.ENABLED) {
             if (ProbeState.finished) advanceNormalShutdown(minecraft);
             return;
