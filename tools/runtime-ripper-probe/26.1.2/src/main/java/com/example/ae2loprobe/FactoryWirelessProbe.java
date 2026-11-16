@@ -140,10 +140,13 @@ public final class FactoryWirelessProbe {
     }
     case 9 -> {
      // Chunk 0 holds machines of both networks: a shared member of two factory networks.
+     level.setBlockAndUpdate(new BlockPos(7, 100, 0), net.minecraft.world.level.block.Blocks.CHEST.defaultBlockState());
      check(reachable(ta.factoryGrid(), CA1), "network_a_reaches_its_own_chunk");
      check(reachable(tb.factoryGrid(), CB1), "network_b_reaches_the_shared_chunk");
-     check(reachable(ta.factoryGrid(), B1), "shared_machine_is_a_member_of_network_a");
-     check(reachable(tb.factoryGrid(), A1), "shared_machine_is_a_member_of_network_b");
+     check(reachable(ta.factoryGrid(), new BlockPos(7, 100, 0)), "shared_machine_is_a_member_of_network_a");
+     check(reachable(tb.factoryGrid(), new BlockPos(7, 100, 0)), "shared_machine_is_a_member_of_network_b");
+     check(!reachable(ta.factoryGrid(), B1), "terminals_are_not_wirelessly_joined_from_a");
+     check(!reachable(tb.factoryGrid(), A1), "terminals_are_not_wirelessly_joined_from_b");
      check(!reachable(ta.factoryGrid(), CB2), "network_a_does_not_reach_network_b_only_chunk");
      check(reachable(tb.factoryGrid(), CB2), "network_b_reaches_its_second_chunk");
      advance();
@@ -152,7 +155,6 @@ public final class FactoryWirelessProbe {
      // A wireless member is inert until a tag binds it: tagging is refused outside the network,
      // and tagging alone moves nothing.
      var chest = new BlockPos(7, 100, 0);
-     level.setBlockAndUpdate(chest, net.minecraft.world.level.block.Blocks.CHEST.defaultBlockState());
      var chestEntity = (net.minecraft.world.level.block.entity.ChestBlockEntity) level.getBlockEntity(chest);
      chestEntity.setItem(0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.STONE, 5));
      var belongsA = (java.util.function.Predicate<Long>) pos -> com.example.ae2lightoptimizer.factory.FactoryServer.contains(ta.factoryGrid(), net.minecraft.core.BlockPos.of(pos));
@@ -176,7 +178,7 @@ public final class FactoryWirelessProbe {
     }
     case 11 -> {
      check(!reachable(tb.factoryGrid(), A1), "removed_connector_drops_that_network_membership");
-     check(reachable(ta.factoryGrid(), B1), "other_network_membership_is_untouched");
+     check(reachable(ta.factoryGrid(), new BlockPos(7, 100, 0)), "other_network_membership_is_untouched");
      finish();
     }
    }
