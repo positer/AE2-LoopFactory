@@ -63,9 +63,12 @@ public final class OmniFactoryNetworks {
     /** True when {@code pos} lies in a member chunk of a factory network that {@code grid} belongs to. */
     public static boolean reachable(IGrid grid, Level level, BlockPos pos) {
         if (grid == null || level == null) return false;
-        // Factory hosts (terminals, providers, cables) join a network by wire only: a wireless member
-        // chunk must never link two terminals that happen to share it.
-        if (level.getBlockEntity(pos) instanceof com.example.ae2lightoptimizer.factory.FactoryBlockEntity) return false;
+        // Blacklist, not a whitelist: every other block stays unconditionally reachable so machines from
+        // any mod keep working. The factory network terminal and the factory pattern provider are the
+        // mutually exclusive members, so two of them sharing a chunk are never linked without a cable.
+        if (level.getBlockEntity(pos) instanceof com.example.ae2lightoptimizer.factory.FactoryBlockEntity factory
+                && (factory.kind() == com.example.ae2lightoptimizer.factory.FactoryBlock.Kind.TERMINAL
+                    || factory.kind() == com.example.ae2lightoptimizer.factory.FactoryBlock.Kind.PROVIDER)) return false;
         var server = level.getServer();
         if (server == null) return false;
         var groups = SERVERS.get(server);
