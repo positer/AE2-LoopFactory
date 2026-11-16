@@ -49,15 +49,27 @@ public final class OmniConnectorBlockEntity extends AENetworkedBlockEntity imple
      * scheduled code can address it, while the AE transport joins only the machine's MAIN network to the
      * channel. A provider's subnet is never put on the AE channel.
      */
+    /** The connector's base (mounting) face; it may point in any direction. */
+    private Direction base() { return getOrientation().getSide(RelativeSide.BACK); }
     public void refreshFactoryLink() {
         var level = getLevel();
         if (level == null || level.isClientSide()) return;
-        var target = OmniFactoryWireless.target(level, getBlockPos());
+        // The factory network joins on the structure alone; the channel only carries the AE network.
+        var target = OmniFactoryWireless.target(level, getBlockPos(), base());
         var self = getMainNode().getNode();
-        if (target == null || linkId.isEmpty() || self == null) { dropFactoryLink(); markForUpdate(); return; }
+        if (target == null || self == null) { dropFactoryLink(); markForUpdate(); return; }
         OmniFactoryNetworks.join(this, target);
+        // A provider's subnet looks back at the base face; AE2 may have wired that edge physically.
+        // The subnet must never be on the channel, so drop exactly that edge (never the main pair).
+        if (target.isProvider()) {
+            var subnet = target.getGridNode(base().getOpposite());
+            if (subnet != null) for (var connection : java.util.List.copyOf(self.getConnections())) {
+                var other = connection.getOtherSide(self);
+                if (other == subnet) { try { connection.destroy(); } catch (RuntimeException ignored) { } }
+            }
+        }
         var main = target.getMainNode().getNode();
-        if (main == null || main == self) { dropAeLink(); markForUpdate(); return; }
+        if (main == null || main == self || linkId.isEmpty()) { dropAeLink(); markForUpdate(); return; }
         if (factoryNode != main) {
             dropAeLink();
             factoryNode = main;
@@ -87,7 +99,12 @@ public final class OmniConnectorBlockEntity extends AENetworkedBlockEntity imple
         // The bottom face is the factory-mounting slot: cabling downward would physically short the
         // machine (and, for a provider, its subnet) before the wireless bridge can be the carrier.
         var back = orientation.getSide(RelativeSide.BACK);
-        return back == Direction.DOWN ? Set.of() : Set.of(back);
+        // A base face resting on a factory machine never cables: that edge would short the machine's
+        // network (or a provider's subnet) before the wireless bridge can carry the channel.
+        var level = getLevel();
+        if (level != null && level.getBlockEntity(getBlockPos().relative(back))
+                instanceof com.example.ae2lightoptimizer.factory.FactoryBlockEntity) return Set.of();
+        return Set.of(back);
     }
     @Override public AECableType getCableConnectionType(Direction direction) { return AECableType.DENSE_SMART; }
     @Override public void onMainNodeStateChanged(IGridNodeListener.State state) { markForUpdate(); }

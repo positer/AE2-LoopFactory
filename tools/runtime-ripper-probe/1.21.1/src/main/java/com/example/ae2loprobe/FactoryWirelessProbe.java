@@ -148,7 +148,7 @@ public final class FactoryWirelessProbe {
      check(!reachable(ta.factoryGrid(), B1), "terminals_are_not_wirelessly_joined_from_a");
      check(!reachable(tb.factoryGrid(), A1), "terminals_are_not_wirelessly_joined_from_b");
      check(!reachable(ta.factoryGrid(), CB2), "network_a_does_not_reach_network_b_only_chunk");
-     check(reachable(tb.factoryGrid(), CB2), "network_b_reaches_its_second_chunk");
+     check(reachable(tb2.factoryGrid(), CB2), "network_b_reaches_its_second_chunk");
      advance();
     }
     case 10 -> {

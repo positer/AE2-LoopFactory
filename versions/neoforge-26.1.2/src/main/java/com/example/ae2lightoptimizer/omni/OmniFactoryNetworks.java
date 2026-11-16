@@ -1,9 +1,9 @@
 package com.example.ae2lightoptimizer.omni;
 
 import appeng.api.networking.IGrid;
+import com.example.ae2lightoptimizer.factory.FactoryBlock;
 import com.example.ae2lightoptimizer.factory.FactoryBlockEntity;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -15,34 +15,28 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 
 /**
- * Wireless Loop Factory membership. A formed structure joins the connector's channel to one factory
- * network and marks the connector's chunk as a member; factory code may then address machines in that
- * chunk. AE grids are never joined: this registry is only consulted by factory machine resolution.
+ * Wireless Loop Factory membership. The structure alone joins a connector's chunk to the machine's
+ * factory network; the selected channel is only the AE transport. A chunk may belong to several
+ * networks at once, and a network is only reachable through the factory network that registered it.
  */
 public final class OmniFactoryNetworks {
     private record Spot(ResourceKey<Level> dimension, long chunk) {}
-    /** The factory machine is kept instead of a grid snapshot: an AE merge may replace the grid instance. */
-    private record Member(String channel, Spot spot, FactoryBlockEntity factory) {}
-    private static final Map<MinecraftServer, Map<String, Set<Member>>> SERVERS = new WeakHashMap<>();
+    private record Member(Spot spot, FactoryBlockEntity factory) {}
+    private static final Map<MinecraftServer, Set<Member>> SERVERS = new WeakHashMap<>();
     private static final Map<OmniConnectorBlockEntity, Member> ENDPOINTS = new IdentityHashMap<>();
 
     private OmniFactoryNetworks() {}
 
-    /** Joins the channel's factory network. A provider contributes its factory subnet; its AE main network stays out. */
     public static void join(OmniConnectorBlockEntity endpoint, FactoryBlockEntity target) {
         var level = endpoint.getLevel();
         var server = level == null ? null : level.getServer();
-        if (server == null || endpoint.linkId().isEmpty() || target == null) { leave(endpoint); return; }
+        if (server == null || target == null || target.factoryGrid() == null) { leave(endpoint); return; }
         leave(endpoint);
-        var grid = target.factoryGrid();
-        if (grid == null) return;
         var pos = endpoint.getBlockPos();
         var spot = new Spot(level.dimension(), ChunkPos.pack(pos.getX() >> 4, pos.getZ() >> 4));
-        var member = new Member(endpoint.linkId(), spot, target);
+        var member = new Member(spot, target);
         ENDPOINTS.put(endpoint, member);
-        SERVERS.computeIfAbsent(server, ignored -> new java.util.HashMap<>())
-                .computeIfAbsent(member.channel(), ignored -> Collections.newSetFromMap(new IdentityHashMap<>()))
-                .add(member);
+        SERVERS.computeIfAbsent(server, ignored -> Collections.newSetFromMap(new IdentityHashMap<>())).add(member);
     }
 
     public static void leave(OmniConnectorBlockEntity endpoint) {
@@ -51,37 +45,30 @@ public final class OmniFactoryNetworks {
         var level = endpoint.getLevel();
         var server = level == null ? null : level.getServer();
         if (server == null) return;
-        var groups = SERVERS.get(server);
-        var members = groups == null ? null : groups.get(removed.channel());
-        if (members != null) { members.remove(removed); if (members.isEmpty()) groups.remove(removed.channel()); }
+        var members = SERVERS.get(server);
+        if (members != null) { members.remove(removed); if (members.isEmpty()) SERVERS.remove(server); }
     }
 
     public static boolean linked(OmniConnectorBlockEntity endpoint) { return ENDPOINTS.containsKey(endpoint); }
     /** Diagnostics for the acceptance probe. */
     public static int endpoints() { return ENDPOINTS.size(); }
 
-    /** True when {@code pos} lies in a member chunk of a factory network that {@code grid} belongs to. */
+    /** True when {@code pos} lies in a member chunk of the factory network that {@code grid} belongs to. */
     public static boolean reachable(IGrid grid, Level level, BlockPos pos) {
         if (grid == null || level == null) return false;
         // Blacklist, not a whitelist: every other block stays unconditionally reachable so machines from
         // any mod keep working. The factory network terminal and the factory pattern provider are the
         // mutually exclusive members, so two of them sharing a chunk are never linked without a cable.
-        if (level.getBlockEntity(pos) instanceof com.example.ae2lightoptimizer.factory.FactoryBlockEntity factory
-                && (factory.kind() == com.example.ae2lightoptimizer.factory.FactoryBlock.Kind.TERMINAL
-                    || factory.kind() == com.example.ae2lightoptimizer.factory.FactoryBlock.Kind.PROVIDER)) return false;
+        if (level.getBlockEntity(pos) instanceof FactoryBlockEntity factory
+                && (factory.kind() == FactoryBlock.Kind.TERMINAL || factory.kind() == FactoryBlock.Kind.PROVIDER)) return false;
         var server = level.getServer();
         if (server == null) return false;
-        var groups = SERVERS.get(server);
-        if (groups == null) return false;
+        var members = SERVERS.get(server);
+        if (members == null) return false;
         var spot = new Spot(level.dimension(), ChunkPos.pack(pos.getX() >> 4, pos.getZ() >> 4));
-        for (var members : groups.values()) {
-            boolean member = false;
-            for (var entry : members) if (entry.spot().equals(spot)) { member = true; break; }
-            if (!member) continue;
-            for (var entry : members) {
-                var factory = entry.factory();
-                if (factory != null && !factory.isRemoved() && factory.factoryGrid() == grid) return true;
-            }
+        for (var entry : members) {
+            var factory = entry.factory();
+            if (factory != null && !factory.isRemoved() && entry.spot().equals(spot) && factory.factoryGrid() == grid) return true;
         }
         return false;
     }
