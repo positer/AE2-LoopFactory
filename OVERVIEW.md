@@ -1,5 +1,14 @@
 # AE2-LoopFactory (AE2LF) Project Overview
 
+## 2026-11-16 发布 0.0.7：循环工厂无线结构
+
+- 两代 `omni/OmniFactoryWireless.java`：结构判定（正下方是终端，或 `getFront()==UP` 的工厂样板供应器）。
+- 两代 `omni/OmniConnectorBlockEntity.java`：`refreshFactoryLink()` 把连接器节点与机器**主节点**桥接，切断可能存在的物理边，并暴露 `factoryLinked()`；`getGridConnectableSides` 排除底面，避免下方机器通过相邻关系短接频道网络或供应器子网。
+- 两代 `omni/OmniConnectorBlock.java`：新增 `wireless` 方块状态、`neighborChanged` 刷新与环绕粒子发射；`omni/OmniContent.java` 注册 `omni_orbit` 粒子。
+- 两代 `client/OmniOrbitParticle.java` 与 `particles/omni_orbit.json`：单方块内切向环绕粒子，结构消失或越界即移除；`Ae2LightOptimizerClient` 注册。
+- 删除 `versions/neoforge-26.1.2/.../textures/item/README.txt`，消除 `Invalid path in datapack` 告警。
+- 探针：两代 `FactoryWirelessProbe` 与 `factory_wireless` 链（12 条断言），`verify-background.ps1` 同步链白名单、链名、截图豁免与断言。
+- 验收：单测 281／279；两代 `factory_wireless` 通过（供应器主网合并、子网不合并）；制品 801,144 B `9e8c58f3…7605`／819,596 B `f743a97a…07b1c`；已推送 `v0.0.7` 并建 GitHub Release，未部署 PCL。归档见枢纽 `../Minecraft Forge Workspace/archive/20261116-111753-ae2lf-factory-wireless/`。
 ## 2026-11-15 发布 0.0.6
 
 - 版本 0.0.6 已构建并打标签 `v0.0.6`：两代制品 1.21.1 794,553 B `84af9216…36ab`、26.1.2 813,220 B `a47d131e…72c7`；单测 281／279 全通过；1.21.1 `-Chain template` 原生链通过（零合成费、一次 tick 整链、材料精确）。
