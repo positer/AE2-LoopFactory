@@ -25,8 +25,18 @@ Craft one wireless access point, one loop crystal and one quantum entangled sing
 
 A linked, online connector emits slow outward white particles confined to its own block. Unlinking or going offline stops the effect. Online status follows AE2; this adds no energy demand.
 
-## Loop Factory wireless structure
+## Deploying the wireless factory network
 
-Rest the connector's bottom face directly on a Loop Factory network terminal, or on a factory pattern provider whose subnet face points up. The structure then bridges the selected channel network to that machine's **main** network; a provider's subnet is never joined, so the factory side stays isolated. A white ring of particles orbits the connector inside its own block while the structure is formed, and the connector still opens its normal channel screen.
+The connector's base (mounting) face may point in any direction. The factory network joins on the structure alone; the selected channel only carries the AE network.
 
-The bottom face is the factory mounting slot and is not exposed to cabling, so a machine underneath can never short the channel network or a provider's subnet through adjacency. Removing the machine drops the bridge and the ring.
+| Placement | Factory wireless | AE network |
+| --- | --- | --- |
+| Base on a Loop Factory network terminal's **top** face | Yes: that terminal's factory network | A selected channel joins the terminal's network |
+| Base on a factory pattern provider's **subnet (front) face** | Yes: the provider's subnet | A selected channel joins the provider's **main** network; the subnet never joins it |
+| Base on any other face of a terminal or provider | No | The connector still joins its channel through the base face |
+
+1. Place the terminal or provider first, then place the connector so its base face rests on the matching face.
+2. A white ring of particles orbiting inside the connector block means the factory structure is formed.
+3. Open the connector screen to select a channel when the AE network should also be carried. Without a channel the machine's AE network is left untouched.
+4. The connector's chunk becomes the wireless range: every machine in it can be discovered and tagged by that factory network, from any mod. Loop Factory terminals and providers are excluded and must be cabled.
+5. Nothing is scanned, joined or moved before a tag binds a machine.
