@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.0.8
+
+### English
+
+- The loop card no longer locks the ripper's pattern directory: manual and third-party uploads, including ECO and EAEP, keep working with the card installed, while patterns already in the directory are never overwritten.
+- Added a deployment section to the in-game guide describing the wireless factory network structure, its placement rules and the channel and tagging boundaries.
+- Reworked the Loop Factory network terminal model: hand-drawn side and back textures, with the bottom reusing the top.
+
+### 简体中文
+
+- 循环卡不再锁定撕裂者的样板目录：装卡状态下手动与第三方上传（含 ECO、EAEP）照常写入，目录里已有的样板不会被覆盖。
+- 游戏内指导书新增部署章节，说明无线工厂网络结构、放置规则以及频道与打标签的边界。
+- 重做循环工厂网络终端模型：侧面与背面使用手绘贴图，底面复用顶面。
 ## 0.0.7
 
 ### English
