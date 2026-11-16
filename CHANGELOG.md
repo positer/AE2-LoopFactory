@@ -1,33 +1,21 @@
 # Changelog
 
-## 0.0.8
-
-### English
-
-- Reworked the Loop Factory wireless structure so it no longer broadcasts the AE network. The connector's channel joins only the machine's **main** AE network, while factory code addresses remote machines through a separate factory-network membership that registers the machine's factory side (a provider's **subnet**) plus the connector's chunk. A provider's subnet is never put on the AE channel, and the main network is never added to the factory membership.
-- Fixed the structure re-check: a machine whose grid becomes ready after placement now still joins, because the machine notifies the connector on ready and the connector re-validates once per second.
-- Supersedes the 0.0.7 wireless behaviour, which merged the AE grids instead of only carrying the factory network.
-
-### 简体中文
-
-- 重做循环工厂无线结构，不再广播 AE 网络：连接器频道只接入机器的**主网**；工厂代码通过独立的工厂网络成员关系寻址远端机器——登记机器的工厂侧（供应器的**子网**）与连接器所在区块。供应器子网永远不接入 AE 频道，主网也永远不进入工厂网络成员。
-- 修正结构复核：机器在放置后才就绪时也能加入——机器就绪会通知连接器，连接器每秒再复核一次。
-- 取代 0.0.7 的无线行为：0.0.7 合并了 AE 网格，而不是只承载工厂网络。
-
 ## 0.0.7
 
 ### English
 
-- Added the Loop Factory wireless structure: an omni connector resting on a Loop Factory network terminal, or on a factory pattern provider whose subnet face points up, bridges its selected channel network to that machine's MAIN network. A provider's subnet is deliberately never joined, so the factory side stays isolated.
+- Added the Loop Factory wireless structure: an omni connector resting on a Loop Factory network terminal, or on a factory pattern provider whose subnet face points up, joins its selected channel to that machine. The channel joins only the machine's **main** AE network; factory code addresses the connector's chunk through a separate factory-network membership that registers the machine's factory side (a provider's **subnet**). A provider's subnet is never put on the AE channel, and the main network is never added to the factory membership.
 - Added an orbiting white ring particle inside the connector's own block while the structure is formed, and the connector still opens its normal channel configuration screen.
 - The connector no longer exposes its bottom face to physical cabling: the bottom is the factory mounting slot, so a machine placed underneath can never short the channel network or a provider's subnet through adjacency.
+- Fixed the structure re-check: a machine whose grid becomes ready after placement still joins, because the machine notifies the connector on ready and the connector re-validates once per second.
 - Removed a stray README file from the shipped item texture folder that made Minecraft report an invalid datapack path.
 
 ### 简体中文
 
-- 新增循环工厂无线结构：全向连接器压在循环工厂网络终端上，或压在子网面朝上的工厂样板供应器上时，把所选频道网络与该机器的**主网**相连；供应器的子网刻意不并入，工厂侧保持隔离。
+- 新增循环工厂无线结构：全向连接器压在循环工厂网络终端上，或压在子网面朝上的工厂样板供应器上时，把所选频道与该机器相连。频道只接入机器的**主网**；工厂代码通过独立的工厂网络成员关系寻址连接器所在区块——登记机器的工厂侧（供应器的**子网**）。供应器子网永远不接入 AE 频道，主网也永远不进入工厂网络成员。
 - 结构成型时，连接器在自身单方块内显示白色环绕粒子；连接器仍可正常打开频道配置界面。
 - 连接器不再向底部面暴露物理接线：底部是工厂安装位，因此下方机器不会通过相邻关系把频道网络或供应器子网短接。
+- 修正结构复核：机器在放置后才就绪时也能加入——机器就绪会通知连接器，连接器每秒再复核一次。
 - 删除物品贴图目录里误入的 README 文件，Minecraft 不再报告无效数据包路径。
 
 ## 0.0.6

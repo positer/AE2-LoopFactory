@@ -32,6 +32,10 @@ public final class FactoryWirelessProbe {
  static final BlockPos TERMINAL = new BlockPos(0, 100, 0), TERMINAL_LINK = new BlockPos(0, 101, 0);
  static final BlockPos PROVIDER = new BlockPos(6, 100, 0), PROVIDER_LINK = new BlockPos(6, 101, 0);
  static OmniConnectorBlockEntity terminalLink, providerLink; static FactoryBlockEntity terminal, provider;
+ static final BlockPos A1 = new BlockPos(0, 100, 0), CA1 = new BlockPos(0, 101, 0);
+ static final BlockPos B1 = new BlockPos(6, 100, 0), CB1 = new BlockPos(6, 101, 0);
+ static final BlockPos B2 = new BlockPos(20, 100, 0), CB2 = new BlockPos(20, 101, 0);
+ static FactoryBlockEntity ta, tb, tb2; static OmniConnectorBlockEntity ca, cb, cb2; static String alpha, beta;
  static int phase; static long since; static volatile boolean ready;
  static final Map<String, Object> report = new LinkedHashMap<>();
  static void check(boolean ok, String key) { if (!ok) throw new IllegalStateException(key); report.put(key, true); }
@@ -121,6 +125,33 @@ public final class FactoryWirelessProbe {
     case 7 -> {
      check(!providerLink.factoryLinked(), "removed_provider_drops_membership");
      check(!level.getBlockState(PROVIDER_LINK).getValue(OmniConnectorBlock.WIRELESS), "removed_provider_clears_wireless_state");
+     alpha = OmniLinkSavedData.get(server).create("alpha network").id();
+     beta = OmniLinkSavedData.get(server).create("beta network").id();
+     ta = machine(A1, FactoryBlock.Kind.TERMINAL, Direction.UP);
+     tb = machine(B1, FactoryBlock.Kind.TERMINAL, Direction.UP);
+     tb2 = machine(B2, FactoryBlock.Kind.TERMINAL, Direction.UP);
+     advance();
+    }
+    case 8 -> {
+     ca = connector(CA1); ca.selectLink(alpha);
+     cb = connector(CB1); cb.selectLink(beta);
+     cb2 = connector(CB2); cb2.selectLink(beta);
+     advance();
+    }
+    case 9 -> {
+     // Chunk 0 holds machines of both networks: a shared member of two factory networks.
+     check(reachable(ta.factoryGrid(), CA1), "network_a_reaches_its_own_chunk");
+     check(reachable(tb.factoryGrid(), CB1), "network_b_reaches_the_shared_chunk");
+     check(reachable(ta.factoryGrid(), B1), "shared_machine_is_a_member_of_network_a");
+     check(reachable(tb.factoryGrid(), A1), "shared_machine_is_a_member_of_network_b");
+     check(!reachable(ta.factoryGrid(), CB2), "network_a_does_not_reach_network_b_only_chunk");
+     check(reachable(tb.factoryGrid(), CB2), "network_b_reaches_its_second_chunk");
+     level.removeBlock(CB1, false);
+     advance();
+    }
+    case 10 -> {
+     check(!reachable(tb.factoryGrid(), A1), "removed_connector_drops_that_network_membership");
+     check(reachable(ta.factoryGrid(), B1), "other_network_membership_is_untouched");
      finish();
     }
    }
