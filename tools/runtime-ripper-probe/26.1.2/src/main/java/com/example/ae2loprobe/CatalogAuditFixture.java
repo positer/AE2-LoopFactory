@@ -766,6 +766,7 @@ public final class CatalogAuditFixture {
         report.put("completed", complete);
         report.put("passed", passed);
         report.put("lifecyclePassed", lifecyclePassed);
+        report.put("lifecycle", lifecycle);
         report.put("recipes", rows.values().stream().map(Row::describe).toList());
         Files.createDirectories(output.getParent());
         Files.writeString(output, new GsonBuilder().setPrettyPrinting().create().toJson(report));

@@ -48,8 +48,9 @@ final class Core256MFixture {
     }
 
     static Map<String, Long> consumption() {
+        // The loop-crystal replication chain no longer consumes fluix crystal by design.
         return Map.of("iron_ingot", 352_836_000L, "certus_quartz", 167_425_000L,
-                "fluix_crystal", 19_804_000L, "gold_ingot", 5_808_000L, "netherite_scrap", 5_808_000L,
+                "gold_ingot", 5_808_000L, "netherite_scrap", 5_808_000L,
                 "singularity", 363_000L, "loop_crystal_powder", 29_160_000L);
     }
 
@@ -75,7 +76,7 @@ final class Core256MFixture {
         result.put("estimatedPlanBytes", ESTIMATED_BYTES);
         result.put("rawStockPerKey", RAW);
         result.put("externalMaterials", consumption().keySet());
-        result.put("externalBoundary", "Iron/gold ingots, netherite scrap, certus/fluix crystals, singularities and loop powder are supplied. "
+        result.put("externalBoundary", "Iron/gold ingots, netherite scrap, certus quartz, singularities and loop powder are supplied. "
                 + "Powder requires the inscriber or optional machine processing; singularities require condensation. "
                 + "All ten cores, fragments, crystal growth and netherite ingots are crafted within the one submitted job.");
         result.put("expectedConsumption", consumption());
