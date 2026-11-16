@@ -1,5 +1,11 @@
 # AE2-LoopFactory (AE2LF) Project Overview
 
+## 2026-11-16 发布 0.0.8：无线结构只承载工厂网络
+
+- 两代 `omni/OmniFactoryNetworks.java`：频道 id → 工厂网络成员（机器实体 + 维度/区块），供 `FactoryServer.contains/members` 查询；成员持实体而非 `IGrid` 快照，避免 AE 合并后实例失效。
+- 两代 `omni/OmniConnectorBlockEntity.java`：`refreshFactoryLink()` 同时做「工厂网络成员登记（`factoryGrid()`，供应器为子网）」与「AE 传输（只接机器主节点）」，可连接面继续排除底面。
+- 两代 `factory/FactoryServer.java`：`contains`/`members` 接受成员区块内的位置；`factory/FactoryBlockEntity.onReady()` 就绪时通知上方连接器；`omni/OmniContent.java` 每秒复核结构。
+- 验收：单测 281／279；两代 `factory_wireless` 各 17 条断言通过（终端合并主网+区块成员；供应器合并主网、子网为工厂成员、子网不在 AE 频道、主网不进入工厂成员）；制品 806,437 B `8b999fc0…256e`／824,871 B `c796ce04…0c9f`；已推送 `v0.0.8` 并建 GitHub Release，未部署 PCL。归档见枢纽 `../Minecraft Forge Workspace/archive/20261116-125129-ae2lf-factory-network-wireless/`。
 ## 2026-11-16 发布 0.0.7：循环工厂无线结构
 
 - 两代 `omni/OmniFactoryWireless.java`：结构判定（正下方是终端，或 `getFront()==UP` 的工厂样板供应器）。
