@@ -73,14 +73,21 @@ public final class OmniConnectorBlock extends AEBaseEntityBlock<OmniConnectorBlo
     }
     @Override public void animateTick(BlockState state, Level level, BlockPos pos, net.minecraft.util.RandomSource random) {
         if (state.getValue(WIRELESS)) {
-            // One ring particle per tick orbiting the connector centre inside its own block.
+            // The ring lies in the plane perpendicular to the base face, so a side-mounted connector
+            // orbits around its own axis instead of always spinning horizontally.
+            var axis = state.getValue(BlockStateProperties.FACING).getOpposite();
+            var ring = OmniOrbitMath.basis(axis);
             double angle = Math.floorMod(level.getGameTime() * 6L + pos.asLong(), 360L) * Math.PI / 180.0;
             double radius = 0.30 + random.nextDouble() * 0.06;
-            double x = pos.getX() + 0.5 + Math.cos(angle) * radius;
-            double z = pos.getZ() + 0.5 + Math.sin(angle) * radius;
-            double y = pos.getY() + 0.5 + (random.nextDouble() - 0.5) * 0.12;
+            double cos = Math.cos(angle), sin = Math.sin(angle);
+            double x = pos.getX() + 0.5 + (ring.u().x() * cos + ring.v().x() * sin) * radius;
+            double y = pos.getY() + 0.5 + (ring.u().y() * cos + ring.v().y() * sin) * radius;
+            double z = pos.getZ() + 0.5 + (ring.u().z() * cos + ring.v().z() * sin) * radius;
             double speed = 0.02;
-            level.addParticle(OmniContent.ORBIT.get(), x, y, z, -Math.sin(angle) * speed, 0.0, Math.cos(angle) * speed);
+            level.addParticle(OmniContent.ORBIT.get(), x, y, z,
+                    (-ring.u().x() * sin + ring.v().x() * cos) * speed,
+                    (-ring.u().y() * sin + ring.v().y() * cos) * speed,
+                    (-ring.u().z() * sin + ring.v().z() * cos) * speed);
         }
         if (!state.getValue(ONLINE) || state.getValue(WirelessAccessPointBlock.STATE) != WirelessAccessPointBlock.State.HAS_CHANNEL) return;
         double dx = random.nextDouble() * 2 - 1, dy = random.nextDouble() * 2 - 1, dz = random.nextDouble() * 2 - 1;
