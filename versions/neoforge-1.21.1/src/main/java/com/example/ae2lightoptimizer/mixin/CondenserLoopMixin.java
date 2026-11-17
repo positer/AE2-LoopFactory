@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * Loop Card is installed. The node only exists to reach the network; the condenser logic stays native.
  */
 @Mixin(value = CondenserBlockEntity.class, remap = false)
-public abstract class CondenserLoopMixin implements IInWorldGridNodeHost {
+public abstract class CondenserLoopMixin implements IInWorldGridNodeHost, CondenserLoopNode {
     @Unique
     private IManagedGridNode ae2lf$node;
 
@@ -37,10 +37,12 @@ public abstract class CondenserLoopMixin implements IInWorldGridNodeHost {
                 .setFlags(GridFlags.REQUIRE_CHANNEL)
                 .setVisualRepresentation(self.getBlockState().getBlock());
         ae2lf$node.create(self.getLevel(), self.getBlockPos());
+        com.example.ae2lightoptimizer.integration.CondenserLoopService.register(self);
     }
 
     @Inject(method = "setRemoved", at = @At("HEAD"))
     private void ae2lf$destroyNode(CallbackInfo callback) {
+        com.example.ae2lightoptimizer.integration.CondenserLoopService.unregister((CondenserBlockEntity) (Object) this);
         if (ae2lf$node != null) {
             ae2lf$node.destroy();
             ae2lf$node = null;
@@ -54,6 +56,7 @@ public abstract class CondenserLoopMixin implements IInWorldGridNodeHost {
     }
 
     /** The managed node, for the server tick driver. */
+    @Override
     @Unique
     public IManagedGridNode ae2lf$node() {
         return ae2lf$node;

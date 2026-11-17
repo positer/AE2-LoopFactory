@@ -109,6 +109,7 @@ public final class Ae2LightOptimizer {
             Upgrades.add(ModItems.LOOP_CARD.get(), ModBlocks.CRAFTING_RIPPER.get(), 1);
             // The Matter Condenser accepts the Loop Card in its upgrade slot once it becomes a network member.
             Upgrades.add(ModItems.LOOP_CARD.get(), appeng.core.definitions.AEBlocks.CONDENSER.block(), 1);
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(com.example.ae2lightoptimizer.integration.CondenserLoopService::onServerTick);
             StorageCells.addCellHandler(LoopStorageCellHandler.INSTANCE);
             for (var cell : ModItems.PORTABLE_LOOP_STORAGE_CELLS) {
                 var item = cell.get();
