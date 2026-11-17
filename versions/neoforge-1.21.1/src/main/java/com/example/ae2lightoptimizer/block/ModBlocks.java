@@ -30,9 +30,6 @@ public final class ModBlocks {
     public static final DeferredBlock<LoopCondenserBlock> LOOP_CONDENSER = BLOCKS.register(
             "loop_condenser", LoopCondenserBlock::new);
 
-    public static final DeferredBlock<LoopTickerBlock> LOOP_TICKER = BLOCKS.register("loop_ticker",
-            () -> new LoopTickerBlock(BlockBehaviour.Properties.of().strength(3.5F).sound(SoundType.METAL)));
-
     public static final DeferredBlock<Block> LOOP_CRYSTAL_BLOCK = BLOCKS.register("loop_crystal_block",
             () -> new Block(BlockBehaviour.Properties.of().strength(1.5F).sound(SoundType.GLASS).lightLevel(s -> 3)));
     private ModBlocks() {
