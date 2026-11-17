@@ -1,10 +1,6 @@
 package com.example.ae2lightoptimizer.part;
 
-import appeng.api.networking.IGridNode;
 import appeng.api.networking.energy.IEnergyService;
-import appeng.api.networking.ticking.IGridTickable;
-import appeng.api.networking.ticking.TickRateModulation;
-import appeng.api.networking.ticking.TickingRequest;
 import appeng.api.parts.IPartCollisionHelper;
 import appeng.api.parts.IPartItem;
 import appeng.api.parts.IPartModel;
@@ -31,7 +27,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * while the grid is powered.
  */
 public final class LoopTickerPart extends AEBasePart
-        implements IGridTickable, IUpgradeableObject, com.example.ae2lightoptimizer.api.LoopTickerHost {
+        implements IUpgradeableObject, com.example.ae2lightoptimizer.api.LoopTickerHost {
     private static final int BASE_CAP = 4;
     private static final int MAX_CARDS = 4;
 
@@ -145,18 +141,24 @@ public final class LoopTickerPart extends AEBasePart
     }
 
     @Override
-    public TickingRequest getTickingRequest(IGridNode node) {
-        return new TickingRequest(1, 1, false);
+    public void addToWorld() {
+        super.addToWorld();
+        com.example.ae2lightoptimizer.integration.LoopTickerPartService.register(this);
     }
 
-    /** Diagnostic: how often the grid ticked this part. */
+    @Override
+    public void removeFromWorld() {
+        com.example.ae2lightoptimizer.integration.LoopTickerPartService.unregister(this);
+        super.removeFromWorld();
+    }
+
+    /** Diagnostic: how often the server tick service called this part. */
     public int tickCount;
 
-    @Override
-    public TickRateModulation tickingRequest(IGridNode node, int ticksSinceLastCall) {
+    /** Called once per server tick by the tick service. */
+    public void serverTick() {
         tickCount++;
         accelerate();
-        return TickRateModulation.SAME;
     }
 
     private boolean networkPowered() {

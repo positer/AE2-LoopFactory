@@ -70,8 +70,7 @@ public final class LoopTickerPartFixture {
         summary.put("partClass", part.getClass().getSimpleName());
         summary.put("partSide", String.valueOf(part.getSide()));
         lastPart = ticker;
-        summary.put("nodeActive", ticker.isActive());
-        summary.put("nodePowered", ticker.isPowered());
+
     }
 
     private static void placeFurnace(BlockPos pos) {
@@ -90,6 +89,7 @@ public final class LoopTickerPartFixture {
         int fast = count(fastFurnace);
         if (lastPart != null) {
             summary.put("tickCount", lastPart.tickCount);
+            summary.put("nodeActiveAtEnd", lastPart.isActive());
         }
         summary.put("controlOutput", plain);
         summary.put("acceleratedOutput", fast);

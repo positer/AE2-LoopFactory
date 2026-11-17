@@ -133,6 +133,7 @@ public final class Ae2LightOptimizer {
             appeng.blockentity.AEBaseBlockEntity.registerBlockEntityItem(ModBlockEntities.LOOP_TICKER.get(), ModItems.LOOP_TICKER.get());
             net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(com.example.ae2lightoptimizer.integration.CondenserLoopService::onServerTick);
             net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(com.example.ae2lightoptimizer.integration.LoopTickerService::onServerTick);
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(com.example.ae2lightoptimizer.integration.LoopTickerPartService::onServerTick);
             StorageCells.addCellHandler(LoopStorageCellHandler.INSTANCE);
             for (var cell : ModItems.LOOP_STORAGE_CELLS) {
                 Upgrades.add(AEItems.FUZZY_CARD, cell.get(), 1);
