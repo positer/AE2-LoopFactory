@@ -142,7 +142,8 @@ public final class RuntimeRipperProbe {
             report.put("probe", "real-serverlevel-ae2-grid-ring-whole-job-ripper");
             report.put("minecraft", "26.1.2");
             report.put("orderPerRun", ToolComponentFixture.ENABLED ? 12 : ExactComponentFixture.ENABLED ? 3000 : NativeCatalogFixture.ENABLED ? 3 : CatalogAuditFixture.ENABLED || PackRecipeReloadFixture.ENABLED ? 0 : ORDER);
-            report.put("chain", OmniMemoryCardFixture.ENABLED ? "omni_memory_card"
+            report.put("chain", LoopTickerPartFixture.ENABLED ? "loop_ticker_part"
+                    : OmniMemoryCardFixture.ENABLED ? "omni_memory_card"
                     : ExactComponentFixture.ENABLED ? "exact_components"
                     : ToolComponentFixture.ENABLED ? "tool_components"
                     : PackRecipeReloadFixture.ENABLED ? "pack_catalog"
@@ -198,9 +199,23 @@ public final class RuntimeRipperProbe {
             switch (ProbeState.phase) {
                 case "network_boot" -> {
                     bootNetwork();
+                    if (LoopTickerPartFixture.ENABLED) {
+                        LoopTickerPartFixture.start(level, new BlockPos(4, 100, 4));
+                        ProbeState.phase = "loop_ticker_part";
+                    }
                     if (OmniMemoryCardFixture.ENABLED) {
                         OmniMemoryCardFixture.start(level);
                         ProbeState.phase = "omni_memory_card";
+                    }
+                }
+                case "loop_ticker_part" -> {
+                    LoopTickerPartFixture.tick();
+                    if (LoopTickerPartFixture.isFinished()) {
+                        report.put("passed", LoopTickerPartFixture.passed());
+                        report.put("loopTickerPart", LoopTickerPartFixture.summary());
+                        ProbeState.phase = LoopTickerPartFixture.passed() ? "passed" : "failed";
+                        writeReport();
+                        ProbeState.finished = true;
                     }
                 }
                 case "omni_memory_card" -> {

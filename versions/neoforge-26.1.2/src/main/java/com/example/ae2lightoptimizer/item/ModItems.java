@@ -32,8 +32,8 @@ public final class ModItems {
             ITEMS.registerSimpleBlockItem("loop_ticker", ModBlocks.LOOP_TICKER);
 
     public static final DeferredItem<appeng.items.parts.PartItem<com.example.ae2lightoptimizer.part.LoopTickerPart>>
-            LOOP_TICKER_PART = ITEMS.register("loop_ticker_part",
-                    () -> new appeng.items.parts.PartItem<>(new Item.Properties(),
+            LOOP_TICKER_PART = ITEMS.registerItem("loop_ticker_part",
+                    properties -> new appeng.items.parts.PartItem<>(properties,
                             com.example.ae2lightoptimizer.part.LoopTickerPart.class,
                             com.example.ae2lightoptimizer.part.LoopTickerPart::new));
 
