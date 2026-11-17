@@ -136,6 +136,7 @@ public final class RuntimeRipperProbe {
             output = Path.of(System.getProperty("ae2lo.probe.reportDir",
                     System.getProperty("ae2lo.probe.output", "ae2lo-probe-evidence"))).toAbsolutePath();
             Files.createDirectories(output);
+            if (MachineAudit.ENABLED) { MachineAudit.start(server, player, output); return; }
             if (OmniProbe.ENABLED) { OmniProbe.start(server, player, output); return; }
             if (FactoryWirelessProbe.ENABLED) { FactoryWirelessProbe.start(server, player, output); return; }
             report.put("probe", "real-serverlevel-ae2-grid-ring-whole-job-ripper");
@@ -188,6 +189,7 @@ public final class RuntimeRipperProbe {
 
     private static void onTick(ServerTickEvent.Post event) {
         if (level == null || ProbeState.finished) return;
+        if (MachineAudit.ENABLED) { MachineAudit.tick(); return; }
         if (OmniProbe.ENABLED) { OmniProbe.tick(); return; }
         if (FactoryWirelessProbe.ENABLED) { FactoryWirelessProbe.tick(); return; }
         try {

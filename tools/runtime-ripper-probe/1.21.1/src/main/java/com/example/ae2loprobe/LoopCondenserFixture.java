@@ -77,7 +77,6 @@ public final class LoopCondenserFixture {
         beforePlanks = count(AEItemKey.of(Items.OAK_PLANKS));
         summary.put("inserted", inserted);
         summary.put("nodeActive", condenser.mainNode().isActive());
-        summary.put("gridNodeQueries", com.example.ae2lightoptimizer.block.LoopCondenserBlockEntity.gridNodeQueries);
         summary.put("drivePresent", level.getBlockEntity(pos.east(1)) != null);
         summary.put("driveClass", String.valueOf(level.getBlockEntity(pos.east(1)) == null ? null
                 : level.getBlockEntity(pos.east(1)).getClass().getSimpleName()));

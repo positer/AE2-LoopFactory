@@ -29,7 +29,8 @@
     "OmniNodeEnergyMixin",
     "OmniConnectionEnergyMixin",
     "OmniAdHocEnergyMixin",
-    "CondenserStorageSlotAccessor"
+    "CondenserStorageSlotAccessor",
+    "LoopCondenserMenuMixin"
   ],
   "injectors": {
     "defaultRequire": 1

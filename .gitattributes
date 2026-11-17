@@ -1,2 +1,4 @@
 # GuideME 页面保持 LF，确保资源与文档门禁跨平台一致。
 versions/neoforge-*/src/main/resources/assets/ae2lightoptimizer/ae2guide/** text eol=lf
+# 与 AE2 原生 JSON 按字节一致；Windows 新 worktree 也不得转换行尾。
+versions/neoforge-*/src/main/resources/assets/ae2lightoptimizer/models/block/drive/cells/*.json text eol=lf

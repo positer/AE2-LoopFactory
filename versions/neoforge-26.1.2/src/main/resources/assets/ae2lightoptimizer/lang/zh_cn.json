@@ -193,5 +193,8 @@
   "gui.ae2lightoptimizer.omni.links": "可见频道（括号内为端点数）",
   "gui.ae2lightoptimizer.omni.private": "私有",
   "gui.ae2lightoptimizer.omni.visibility": "频道可见性",
-  "gui.ae2lightoptimizer.omni.visibility.hint": "锁定：仅你可查看与加入该频道"
+  "gui.ae2lightoptimizer.omni.visibility.hint": "锁定：仅你可查看与加入该频道",
+  "block.ae2lightoptimizer.loop_ticker": "循环进刻器",
+  "block.ae2lightoptimizer.loop_condenser": "循环物质聚合器",
+  "gui.ae2lightoptimizer.loop_ticker.rate": "倍率"
 }

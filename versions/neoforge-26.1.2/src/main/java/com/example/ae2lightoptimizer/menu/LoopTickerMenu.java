@@ -30,7 +30,15 @@ public final class LoopTickerMenu extends AEBaseMenu {
                           LoopTickerBlockEntity host) {
         super(type, id, playerInventory, host);
         this.host = host;
+        for (int slot = 0; slot < LoopTickerBlockEntity.MAX_CARDS; slot++) {
+            addSlot(new appeng.menu.slot.RestrictedInputSlot(
+                    appeng.menu.slot.RestrictedInputSlot.PlacableItemType.UPGRADES, host.getUpgrades(), slot),
+                    SlotSemantics.UPGRADE);
+        }
+        createPlayerInventorySlots(playerInventory);
     }
+
+    public appeng.api.upgrades.IUpgradeInventory getTickerUpgrades() { return host.getUpgrades(); }
 
     @Override
     public void broadcastChanges() {

@@ -3,7 +3,7 @@ package com.example.ae2lightoptimizer.block;
 import appeng.api.upgrades.IUpgradeInventory;
 import appeng.api.upgrades.IUpgradeableObject;
 import appeng.api.upgrades.UpgradeInventories;
-import appeng.blockentity.AEBaseBlockEntity;
+import appeng.blockentity.grid.AENetworkedBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.storage.ValueInput;
@@ -19,16 +19,19 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
  * Accelerates the block it faces: every server tick it runs that block's ticker and random ticks
  * {@link #rate()} times. Speed cards raise the cap; the player's chosen rate is remembered.
  */
-public final class LoopTickerBlockEntity extends AEBaseBlockEntity implements IUpgradeableObject {
+public final class LoopTickerBlockEntity extends AENetworkedBlockEntity implements IUpgradeableObject {
     public static final int MAX_CARDS = 4;
     private static final int BASE_CAP = 4;
 
     private final IUpgradeInventory upgrades;
     /** 0 means "follow the maximum"; a stored value is the player's explicit pick. */
-    private int rate;
+    private double selectedBaseRate;
+    private static final ThreadLocal<java.util.Set<LoopTickerBlockEntity>> RUNNING =
+            ThreadLocal.withInitial(() -> java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>()));
 
     public LoopTickerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.LOOP_TICKER.get(), pos, state);
+        getMainNode().setFlags(appeng.api.networking.GridFlags.REQUIRE_CHANNEL).setIdlePowerUsage(0);
         this.upgrades = UpgradeInventories.forMachine(ModBlocks.LOOP_TICKER.get(), MAX_CARDS, this::saveChanges);
     }
 
@@ -51,29 +54,36 @@ public final class LoopTickerBlockEntity extends AEBaseBlockEntity implements IU
         return upgrades;
     }
 
-    public int maxRate() {
-        int installed = 0;
-        for (int slot = 0; slot < upgrades.size(); slot++) {
-            if (!upgrades.getStackInSlot(slot).isEmpty()) {
-                installed++;
-            }
-        }
-        return BASE_CAP << Math.min(installed, MAX_CARDS);
+    @Override
+    public void addAdditionalDrops(net.minecraft.world.level.Level level, BlockPos pos,
+                                   java.util.List<net.minecraft.world.item.ItemStack> drops) {
+        super.addAdditionalDrops(level, pos, drops);
+        for (var stack : upgrades) if (!stack.isEmpty()) drops.add(stack.copy());
     }
 
+    @Override
+    public void clearContent() { super.clearContent(); upgrades.clear(); }
+
+    public int cardMultiplier() {
+        return 1 << Math.min(MAX_CARDS, upgrades.getInstalledUpgrades(appeng.core.definitions.AEItems.SPEED_CARD));
+    }
+
+    public int maxRate() { return BASE_CAP * cardMultiplier(); }
+
     public int rate() {
-        return rate <= 0 ? maxRate() : Math.min(rate, maxRate());
+        return selectedBaseRate <= 0 ? maxRate()
+                : Math.max(1, Math.min(maxRate(), (int) Math.round(selectedBaseRate * cardMultiplier())));
     }
 
     public void setRate(int value) {
-        rate = Math.max(1, Math.min(value, maxRate()));
+        selectedBaseRate = Math.max(1, Math.min(value, maxRate())) / (double) cardMultiplier();
         saveChanges();
     }
 
     @Override
-    protected void saveAdditional(ValueOutput out) {
+    public void saveAdditional(ValueOutput out) {
         super.saveAdditional(out);
-        out.putInt("ae2lfRate", rate);
+        out.putDouble("ae2lfBaseRate", selectedBaseRate);
         upgrades.writeToNBT(out, "upgrades");
     }
 
@@ -81,7 +91,7 @@ public final class LoopTickerBlockEntity extends AEBaseBlockEntity implements IU
     public void loadTag(ValueInput in) {
         super.loadTag(in);
         upgrades.readFromNBT(in, "upgrades");
-        rate = in.getInt("ae2lfRate").orElse(0);
+        selectedBaseRate = in.getDoubleOr("ae2lfBaseRate", in.getInt("ae2lfRate").orElse(0) / (double) cardMultiplier());
     }
 
     public Direction facing() {
@@ -90,26 +100,29 @@ public final class LoopTickerBlockEntity extends AEBaseBlockEntity implements IU
                 ? state.getValue(BlockStateProperties.FACING) : Direction.NORTH;
     }
 
-    /** Runs the facing block's own ticker and random tick {@link #rate()} times. */
+    /** Additive ticks preserve the world clock and other accelerators' schedules. */
     public void accelerate() {
-        if (!(level instanceof ServerLevel server)) return;
+        if (!(level instanceof ServerLevel server) || !getMainNode().isActive()) return;
         BlockPos target = getBlockPos().relative(facing());
-        BlockState targetState = server.getBlockState(target);
-        if (targetState.isAir()) return;
-        int times = rate();
-        BlockEntity targetEntity = server.getBlockEntity(target);
-        BlockEntityTicker<BlockEntity> ticker = null;
-        if (targetEntity != null && targetState.getBlock() instanceof EntityBlock entityBlock) {
-            @SuppressWarnings("unchecked")
-            var found = (BlockEntityTicker<BlockEntity>) entityBlock.getTicker(
-                    server, targetState, targetEntity.getType());
-            ticker = found;
-        }
-        for (int i = 0; i < times; i++) {
-            targetState.randomTick(server, target, server.getRandom());
-            if (ticker != null) {
-                ticker.tick(server, target, targetState, targetEntity);
+        if (!server.hasChunkAt(target) || !server.shouldTickBlocksAt(target)) return;
+        var running = RUNNING.get();
+        if (!running.add(this)) return;
+        try {
+            for (int i = 0, times = rate(); i < times; i++) {
+                BlockState state = server.getBlockState(target);
+                if (state.isAir()) break;
+                BlockEntity entity = server.getBlockEntity(target);
+                if (entity != null && !entity.isRemoved() && state.getBlock() instanceof EntityBlock block) {
+                    @SuppressWarnings("unchecked")
+                    var ticker = (BlockEntityTicker<BlockEntity>) block.getTicker(server, state, entity.getType());
+                    if (ticker != null) ticker.tick(server, target, state, entity);
+                }
+                state = server.getBlockState(target);
+                if (state.isRandomlyTicking()) state.randomTick(server, target, server.getRandom());
             }
+        } finally {
+            running.remove(this);
+            if (running.isEmpty()) RUNNING.remove();
         }
     }
 }

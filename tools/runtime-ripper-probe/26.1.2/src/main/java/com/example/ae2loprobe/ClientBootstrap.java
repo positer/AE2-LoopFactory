@@ -28,6 +28,7 @@ public final class ClientBootstrap {
     private static final long SEED = 0xAE210004L;
     private static boolean attempted;
     private static int titleTicks;
+    private static boolean machineChineseApplied;
     private static String pendingScreenshot;
     private static int screenshotDelay;
     private static final java.util.Set<String> CAPTURED = java.util.concurrent.ConcurrentHashMap.newKeySet();
@@ -58,6 +59,14 @@ public final class ClientBootstrap {
     private static void onClientTick(ClientTickEvent.Post event) {
         var minecraft = Minecraft.getInstance();
         verifyHiddenWindow(minecraft);
+        if (MachineAudit.ENABLED && !machineChineseApplied && minecraft.getOverlay() == null
+                && (minecraft.screen instanceof TitleScreen || minecraft.screen != null
+                    && minecraft.screen.getClass().getSimpleName().equals("AccessibilityOnboardingScreen"))) {
+            machineChineseApplied = true;
+            minecraft.getLanguageManager().setSelected("zh_cn"); minecraft.options.languageCode = "zh_cn";
+            minecraft.reloadResourcePacks(); titleTicks = 0;
+            return;
+        }
         if (!attempted && Boolean.getBoolean("ae2lo.probe")
                 && minecraft.level == null && minecraft.getSingleplayerServer() == null
                 && minecraft.getOverlay() == null && (minecraft.screen instanceof TitleScreen
@@ -76,6 +85,16 @@ public final class ClientBootstrap {
         }
         if (FactoryWirelessProbe.ENABLED) {
             if (ProbeState.finished) advanceNormalShutdown(minecraft);
+            return;
+        }
+        if (MachineAudit.ENABLED) {
+            MachineAuditClient.tick(minecraft);
+            var frame = ProbeState.screenshotRequest;
+            if (frame != null && !CAPTURED.contains(frame)) {
+                if (!frame.equals(pendingScreenshot)) { pendingScreenshot = frame; screenshotDelay = 15; }
+                if (screenshotDelay > 0 && --screenshotDelay == 0) capture(frame);
+            }
+            if (ProbeState.finished && (frame == null || CAPTURED.contains(frame))) advanceNormalShutdown(minecraft);
             return;
         }
         DynamicPatternClient.observePatternAccess(minecraft);

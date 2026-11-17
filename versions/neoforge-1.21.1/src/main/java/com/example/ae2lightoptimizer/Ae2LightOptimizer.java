@@ -67,6 +67,10 @@ public final class Ae2LightOptimizer {
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, com.example.ae2lightoptimizer.omni.OmniContent.ENTITY.get(), (host, context) -> host);
         com.example.ae2lightoptimizer.storage.PortableLoopEnergy.registerCapabilities(event);
+        event.registerBlockEntity(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                ModBlockEntities.LOOP_CONDENSER.get(), (host, side) -> host.getExternalInv().toItemHandler());
+        event.registerBlockEntity(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,
+                ModBlockEntities.LOOP_CONDENSER.get(), (host, side) -> host.getFluidHandler());
         event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, com.example.ae2lightoptimizer.factory.FactoryContent.ENTITY.get(), (host, side) -> host);
         event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST,
                 ModBlockEntities.CRAFTING_RIPPER.get(), (ripper, side) -> ripper);
@@ -82,6 +86,8 @@ public final class Ae2LightOptimizer {
                 AECapabilities.IN_WORLD_GRID_NODE_HOST,
                 ModBlockEntities.LOOP_CONDENSER.get(),
                 (condenser, ignoredContext) -> condenser);
+        event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST,
+                ModBlockEntities.LOOP_TICKER.get(), (ticker, ignoredContext) -> ticker);
     }
 
     private static void addCreativeTabContents(BuildCreativeModeTabContentsEvent event) {
@@ -122,11 +128,16 @@ public final class Ae2LightOptimizer {
                     com.example.ae2lightoptimizer.block.LoopTickerBlockEntity.class, tickerType, null, null);
             ModBlocks.LOOP_CONDENSER.get().setBlockEntity(
                     appeng.blockentity.misc.CondenserBlockEntity.class, condenserType, null, null);
-            // The Matter Condenser accepts the Loop Card in its upgrade slot once it becomes a network member.
-            Upgrades.add(ModItems.LOOP_CARD.get(), appeng.core.definitions.AEBlocks.CONDENSER.block(), 1);
+            Upgrades.add(AEItems.SPEED_CARD, ModBlocks.LOOP_TICKER.get(), 4);
+            appeng.blockentity.AEBaseBlockEntity.registerBlockEntityItem(ModBlockEntities.LOOP_CONDENSER.get(), ModItems.LOOP_CONDENSER.get());
+            appeng.blockentity.AEBaseBlockEntity.registerBlockEntityItem(ModBlockEntities.LOOP_TICKER.get(), ModItems.LOOP_TICKER.get());
             net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(com.example.ae2lightoptimizer.integration.CondenserLoopService::onServerTick);
             net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(com.example.ae2lightoptimizer.integration.LoopTickerService::onServerTick);
             StorageCells.addCellHandler(LoopStorageCellHandler.INSTANCE);
+            for (var cell : ModItems.LOOP_STORAGE_CELLS) {
+                Upgrades.add(AEItems.FUZZY_CARD, cell.get(), 1);
+                Upgrades.add(AEItems.INVERTER_CARD, cell.get(), 1);
+            }
             for (var cell : ModItems.PORTABLE_LOOP_STORAGE_CELLS) {
                 var item = cell.get();
                 Upgrades.add(ModItems.LOOP_CARD.get(), item, 1);

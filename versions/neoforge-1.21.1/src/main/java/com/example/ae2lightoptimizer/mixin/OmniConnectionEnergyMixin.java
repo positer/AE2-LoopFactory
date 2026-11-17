@@ -8,5 +8,11 @@ public abstract class OmniConnectionEnergyMixin {
     private void ae2lf$freeLink(org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<Integer> result) {
         if (sideA.getOwner() instanceof com.example.ae2lightoptimizer.omni.OmniNetworkNode
                 && sideB.getOwner() instanceof com.example.ae2lightoptimizer.omni.OmniNetworkNode) result.setReturnValue(0);
+        else {
+            var parent = ((appeng.me.GridConnection)(Object)this).getControllerRoute();
+            if ((sideA.getOwner() instanceof com.example.ae2lightoptimizer.block.LoopCondenserBlockEntity && parent != sideA)
+                    || (sideB.getOwner() instanceof com.example.ae2lightoptimizer.block.LoopCondenserBlockEntity && parent != sideB))
+                result.setReturnValue(Math.max(0, result.getReturnValue() - 1));
+        }
     }
 }
