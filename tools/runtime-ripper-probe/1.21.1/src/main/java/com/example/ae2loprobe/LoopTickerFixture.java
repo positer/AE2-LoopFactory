@@ -42,6 +42,12 @@ public final class LoopTickerFixture {
         level.setBlockAndUpdate(tickerPos,
                 ModBlocks.LOOP_TICKER.get().defaultBlockState()
                         .setValue(com.example.ae2lightoptimizer.block.LoopTickerBlock.FACING, Direction.DOWN));
+        // A powered network next to the ticker: controller plus a creative energy cell.
+        level.setBlockAndUpdate(tickerPos.east(1), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+        level.setBlockAndUpdate(tickerPos.west(1),
+                appeng.core.definitions.AEBlocks.CONTROLLER.block().defaultBlockState());
+        level.setBlockAndUpdate(tickerPos.west(2),
+                appeng.core.definitions.AEBlocks.CREATIVE_ENERGY_CELL.block().defaultBlockState());
         if (level.getBlockEntity(tickerPos) instanceof LoopTickerBlockEntity ticker) {
             ticker.setRate(4);
         }

@@ -143,7 +143,8 @@ public final class RuntimeRipperProbe {
             report.put("probe", "real-serverlevel-ae2-grid-ring-whole-job-ripper");
             report.put("minecraft", "1.21.1");
             report.put("orderPerRun", ToolComponentFixture.ENABLED ? 12 : ExactComponentFixture.ENABLED ? 3000 : NativeCatalogFixture.ENABLED ? 3 : CatalogAuditFixture.ENABLED || PackRecipeReloadFixture.ENABLED ? 0 : ORDER);
-            report.put("chain", LoopTickerFixture.ENABLED ? "loop_ticker"
+            report.put("chain", LoopCondenserOfflineFixture.ENABLED ? "loop_condenser_offline"
+                    : LoopTickerFixture.ENABLED ? "loop_ticker"
                     : LoopCondenserFixture.ENABLED ? "loop_condenser"
                     : ExactComponentFixture.ENABLED ? "exact_components"
                     : ToolComponentFixture.ENABLED ? "tool_components"
@@ -211,10 +212,24 @@ public final class RuntimeRipperProbe {
                     if (LoopCondenserFixture.ENABLED) {
                         ProbeState.phase = "loop_condenser_wait";
                     }
+                    if (LoopCondenserOfflineFixture.ENABLED) {
+                        LoopCondenserOfflineFixture.start(level, new BlockPos(8, 100, 8));
+                        ProbeState.phase = "loop_condenser_offline";
+                    }
                     if (LoopTickerFixture.ENABLED) {
                         LoopTickerFixture.bind(level);
                         LoopTickerFixture.start(level, new BlockPos(4, 100, 4));
                         ProbeState.phase = "loop_ticker";
+                    }
+                }
+                case "loop_condenser_offline" -> {
+                    LoopCondenserOfflineFixture.tick();
+                    if (LoopCondenserOfflineFixture.isFinished()) {
+                        report.put("passed", LoopCondenserOfflineFixture.passed());
+                        report.put("loopCondenserOffline", LoopCondenserOfflineFixture.summary());
+                        ProbeState.phase = LoopCondenserOfflineFixture.passed() ? "passed" : "failed";
+                        writeReport();
+                        ProbeState.finished = true;
                     }
                 }
                 case "loop_ticker" -> {

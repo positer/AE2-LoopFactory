@@ -3,7 +3,7 @@ package com.example.ae2lightoptimizer.block;
 import appeng.api.upgrades.IUpgradeInventory;
 import appeng.api.upgrades.IUpgradeableObject;
 import appeng.api.upgrades.UpgradeInventories;
-import appeng.blockentity.AEBaseBlockEntity;
+import appeng.blockentity.grid.AENetworkedBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -17,9 +17,10 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 /**
  * Accelerates the block it faces: every server tick it runs that block's ticker and random ticks
- * {@link #rate()} times. Speed cards raise the cap; the player's chosen rate is remembered.
+ * {@link #rate()} times. It draws no power of its own, but only runs while the grid is powered and
+ * the network has energy left.
  */
-public final class LoopTickerBlockEntity extends AEBaseBlockEntity implements IUpgradeableObject {
+public final class LoopTickerBlockEntity extends AENetworkedBlockEntity implements IUpgradeableObject {
     public static final int MAX_CARDS = 4;
     private static final int BASE_CAP = 4;
 
@@ -29,21 +30,9 @@ public final class LoopTickerBlockEntity extends AEBaseBlockEntity implements IU
 
     public LoopTickerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.LOOP_TICKER.get(), pos, state);
+        // No idle draw: the accelerator itself is free, it only needs a live network.
+        getMainNode().setIdlePowerUsage(0);
         this.upgrades = UpgradeInventories.forMachine(ModBlocks.LOOP_TICKER.get(), MAX_CARDS, this::saveChanges);
-    }
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        if (level != null && !level.isClientSide()) {
-            com.example.ae2lightoptimizer.integration.LoopTickerService.register(this);
-        }
-    }
-
-    @Override
-    public void setRemoved() {
-        com.example.ae2lightoptimizer.integration.LoopTickerService.unregister(this);
-        super.setRemoved();
     }
 
     @Override
@@ -90,9 +79,19 @@ public final class LoopTickerBlockEntity extends AEBaseBlockEntity implements IU
                 ? state.getValue(BlockStateProperties.FACING) : Direction.NORTH;
     }
 
+    /** True only while the node is online and the grid still holds energy. */
+    public boolean powered() {
+        if (!getMainNode().isActive() || getMainNode().getNode() == null) return false;
+        var grid = getMainNode().getGrid();
+        if (grid == null) return false;
+        var energy = grid.getEnergyService();
+        return energy != null && energy.getStoredPower() > 0;
+    }
+
     /** Runs the facing block's own ticker and random tick {@link #rate()} times. */
     public void accelerate() {
         if (!(level instanceof ServerLevel server)) return;
+        if (!powered()) return;
         BlockPos target = getBlockPos().relative(facing());
         BlockState targetState = server.getBlockState(target);
         if (targetState.isAir()) return;
