@@ -24,11 +24,6 @@ import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 public final class Ae2LightOptimizerClient {
     private static final Map<String, ResourceLocation> LOOP_STORAGE_DRIVE_MODELS = createDriveModels();
 
-    private static void registerPartModels(net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent event) {
-        appeng.api.parts.PartModels.registerModels(
-                net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("ae2lightoptimizer", "part/loop_ticker_base"));
-    }
-
     private static void registerScreens(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent event) {
         appeng.init.client.InitScreens.register(event, com.example.ae2lightoptimizer.omni.OmniConnectorMenu.TYPE.get(), OmniConnectorScreen::new, "/screens/ae2lightoptimizer_omni_connector.json");
         appeng.init.client.InitScreens.register(event, com.example.ae2lightoptimizer.factory.FactoryPanelRecipeMenu.TYPE.get(), FactoryPanelRecipeScreen::new, "/screens/ae2lightoptimizer_factory_panel_recipe.json");
@@ -67,6 +62,9 @@ public final class Ae2LightOptimizerClient {
     private static void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
         LOOP_STORAGE_DRIVE_MODELS.values().forEach(model ->
                 event.register(ModelResourceLocation.standalone(model)));
+        var tickerPart = ResourceLocation.fromNamespaceAndPath("ae2lightoptimizer", "part/loop_ticker_base");
+        appeng.api.parts.PartModels.registerModels(tickerPart);
+        event.register(ModelResourceLocation.standalone(tickerPart));
     }
 
     private static void registerItemColors(RegisterColorHandlersEvent.Item event) {
