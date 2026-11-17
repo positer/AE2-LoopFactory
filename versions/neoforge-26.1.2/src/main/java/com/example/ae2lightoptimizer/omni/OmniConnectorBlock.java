@@ -100,13 +100,13 @@ public final class OmniConnectorBlock extends AEBaseEntityBlock<OmniConnectorBlo
     }
     /** Copies the selected link into an AE2 memory card, or applies the card's link to this connector. */
     @Override
-    protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
+    protected InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
             BlockState state, Level level, BlockPos pos, Player player,
             net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
         if (stack.is(appeng.core.definitions.AEItems.MEMORY_CARD.asItem())
                 && level.getBlockEntity(pos) instanceof OmniConnectorBlockEntity connector) {
             if (level.isClientSide()) {
-                return net.minecraft.world.ItemInteractionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
             var tag = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA,
                     net.minecraft.world.item.component.CustomData.EMPTY).copyTag();
@@ -114,15 +114,15 @@ public final class OmniConnectorBlock extends AEBaseEntityBlock<OmniConnectorBlo
                 tag.putString("ae2lfOmniLink", connector.linkId());
                 stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA,
                         net.minecraft.world.item.component.CustomData.of(tag));
-                player.displayClientMessage(net.minecraft.network.chat.Component.translatable(
-                        "message.ae2lightoptimizer.omni.link_copied", connector.linkId()), true);
+                player.sendSystemMessage(net.minecraft.network.chat.Component.translatable(
+                        "message.ae2lightoptimizer.omni.link_copied", connector.linkId()));
             } else {
-                String copied = tag.getString("ae2lfOmniLink");
+                String copied = tag.getString("ae2lfOmniLink").orElse("");
                 connector.selectLink(copied);
-                player.displayClientMessage(net.minecraft.network.chat.Component.translatable(
-                        "message.ae2lightoptimizer.omni.link_pasted", copied), true);
+                player.sendSystemMessage(net.minecraft.network.chat.Component.translatable(
+                        "message.ae2lightoptimizer.omni.link_pasted", copied));
             }
-            return net.minecraft.world.ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
         return super.useItemOn(stack, state, level, pos, player, hand, hit);
     }
