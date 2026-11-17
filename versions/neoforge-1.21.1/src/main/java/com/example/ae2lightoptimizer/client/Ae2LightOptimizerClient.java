@@ -41,7 +41,14 @@ public final class Ae2LightOptimizerClient {
                 LoopTickerScreen::new, "/screens/ae2lightoptimizer_loop_ticker.json");
     }
 
+    /** Part models must be known before AE2 freezes its registry during pre-initialization. */
+    private static void registerPartModelsEarly() {
+        appeng.api.parts.PartModels.registerModels(
+                ResourceLocation.fromNamespaceAndPath("ae2lightoptimizer", "part/loop_ticker_base"));
+    }
+
     public Ae2LightOptimizerClient(IEventBus modEventBus) {
+        registerPartModelsEarly();
         modEventBus.addListener(OmniWhiteSprite::register);
         modEventBus.addListener(OmniPulseParticle::register);
         modEventBus.addListener(OmniOrbitParticle::register);
@@ -65,9 +72,8 @@ public final class Ae2LightOptimizerClient {
     private static void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
         LOOP_STORAGE_DRIVE_MODELS.values().forEach(model ->
                 event.register(ModelResourceLocation.standalone(model)));
-        var tickerPart = ResourceLocation.fromNamespaceAndPath("ae2lightoptimizer", "part/loop_ticker_base");
-        appeng.api.parts.PartModels.registerModels(tickerPart);
-        event.register(ModelResourceLocation.standalone(tickerPart));
+        event.register(ModelResourceLocation.standalone(
+                ResourceLocation.fromNamespaceAndPath("ae2lightoptimizer", "part/loop_ticker_base")));
     }
 
     private static void registerItemColors(RegisterColorHandlersEvent.Item event) {

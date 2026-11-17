@@ -153,8 +153,9 @@ public final class LoopTickerPart extends AEBasePart
     /** Runs the block behind the face this part is mounted on. */
     private void accelerate() {
         if (!(getLevel() instanceof ServerLevel server) || !networkPowered()) return;
+        // The part is mounted on one face of the cable; the block it acts on is the one that face points at.
         Direction side = getSide();
-        BlockPos target = getBlockEntity().getBlockPos().relative(side.getOpposite());
+        BlockPos target = getBlockEntity().getBlockPos().relative(side);
         BlockState targetState = server.getBlockState(target);
         if (targetState.isAir()) return;
         BlockEntity targetEntity = server.getBlockEntity(target);

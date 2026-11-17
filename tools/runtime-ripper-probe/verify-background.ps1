@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory=$true)][ValidateSet('1.21.1','26.1.2')][string]$Generation,
-    [Parameter(Mandatory=$true)][ValidateSet('omni','omni_access','ae2lt_capacity','factory_wireless','template','channel_capacity','smithing','layered','core256m','catalog_audit','native_catalog','exact_components','pack_catalog','tool_components','loop_condenser','loop_ticker','machine_audit','omni_memory_card')][string]$Chain,
+    [Parameter(Mandatory=$true)][ValidateSet('omni','omni_access','ae2lt_capacity','factory_wireless','template','channel_capacity','smithing','layered','core256m','catalog_audit','native_catalog','exact_components','pack_catalog','tool_components','loop_condenser','loop_ticker','machine_audit','omni_memory_card','loop_ticker_part')][string]$Chain,
     [Parameter(Mandatory=$true)][ValidatePattern('^ripper-[A-Za-z0-9_.-]+$')][string]$EvidenceName,
     [string]$EvidenceRoot,
     [switch]$PrepareOnly,
@@ -98,7 +98,7 @@ function Assert-RuntimeMatchesProduction {
 function Assert-GameplayEvidence([string]$world) {
     $report = Read-PassingFixture 'report.json'
     if ($report.minecraft -ne $Generation -or $report.world -ne $world) { throw 'Report generation/world is not this run' }
-    $chainNames = @{omni='omni_connector';omni_access='omni_access';ae2lt_capacity='ae2lt_capacity';factory_wireless='factory_wireless';channel_capacity='channel_capacity';template='template_growth';smithing='template_growth_then_netherite_pickaxe_smithing';layered='logs_planks_sticks_tool_and_template_growth_then_smithing';core256m='all_ten_core_tiers_crystal_growth_and_netherite_ingots';native_catalog='native_catalog_map_extension';exact_components='exact_components';catalog_audit='catalog_audit';pack_catalog='pack_catalog';loop_condenser='loop_condenser';loop_ticker='loop_ticker';machine_audit='machine_audit';omni_memory_card='omni_memory_card';tool_components='tool_components'}
+    $chainNames = @{omni='omni_connector';omni_access='omni_access';ae2lt_capacity='ae2lt_capacity';factory_wireless='factory_wireless';channel_capacity='channel_capacity';template='template_growth';smithing='template_growth_then_netherite_pickaxe_smithing';layered='logs_planks_sticks_tool_and_template_growth_then_smithing';core256m='all_ten_core_tiers_crystal_growth_and_netherite_ingots';native_catalog='native_catalog_map_extension';exact_components='exact_components';catalog_audit='catalog_audit';pack_catalog='pack_catalog';loop_condenser='loop_condenser';loop_ticker='loop_ticker';machine_audit='machine_audit';omni_memory_card='omni_memory_card';loop_ticker_part='loop_ticker_part';tool_components='tool_components'}
     if ($report.chain -ne $chainNames[$Chain]) { throw 'The requested chain is not the completed fixture' }
     # 0.0.6 removed the ripper's own idle drain; older evidence keeps its recorded 5 AE/t.
     if ($Chain -notin @('omni','omni_access','ae2lt_capacity','factory_wireless','machine_audit') -and $report.ripperConfiguredIdleAEPerTick -ne 0) { throw 'Ripper idle drain is not zero' }
