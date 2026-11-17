@@ -20,7 +20,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
  * {@link #rate()} times. It draws no power of its own, but only runs while the grid is powered and
  * the network has energy left.
  */
-public final class LoopTickerBlockEntity extends AENetworkedBlockEntity implements IUpgradeableObject {
+public final class LoopTickerBlockEntity extends AENetworkedBlockEntity
+        implements IUpgradeableObject, com.example.ae2lightoptimizer.api.LoopTickerHost {
     public static final int MAX_CARDS = 4;
     private static final int BASE_CAP = 4;
 
@@ -53,6 +54,11 @@ public final class LoopTickerBlockEntity extends AENetworkedBlockEntity implemen
 
     public int cardMultiplier() {
         return 1 << Math.min(MAX_CARDS, upgrades.getInstalledUpgrades(appeng.core.definitions.AEItems.SPEED_CARD));
+    }
+
+    @Override
+    public void saveRate() {
+        saveChanges();
     }
 
     public int maxRate() { return BASE_CAP * cardMultiplier(); }

@@ -30,7 +30,8 @@ import net.minecraft.world.level.block.state.BlockState;
  * and accelerates whatever block sits behind that face. It draws no power of its own but only runs
  * while the grid is powered.
  */
-public final class LoopTickerPart extends AEBasePart implements IGridTickable, IUpgradeableObject {
+public final class LoopTickerPart extends AEBasePart
+        implements IGridTickable, IUpgradeableObject, com.example.ae2lightoptimizer.api.LoopTickerHost {
     private static final int BASE_CAP = 4;
     private static final int MAX_CARDS = 4;
 
@@ -77,6 +78,24 @@ public final class LoopTickerPart extends AEBasePart implements IGridTickable, I
 
     public void setRate(int value) {
         rate = Math.max(1, Math.min(value, maxRate()));
+        if (getHost() != null && getHost().getBlockEntity() != null) {
+            getHost().getBlockEntity().setChanged();
+        }
+    }
+
+    @Override
+    public boolean onUseItemOn(net.minecraft.world.item.ItemStack stack, net.minecraft.world.entity.player.Player player,
+            net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.Vec3 pos) {
+        if (stack.isEmpty() && !isClientSide()) {
+            appeng.menu.MenuOpener.open(com.example.ae2lightoptimizer.menu.LoopTickerMenu.PART_TYPE.get(), player,
+                    appeng.menu.locator.MenuLocators.forPart(this));
+            return true;
+        }
+        return super.onUseItemOn(stack, player, hand, pos);
+    }
+
+    @Override
+    public void saveRate() {
         if (getHost() != null && getHost().getBlockEntity() != null) {
             getHost().getBlockEntity().setChanged();
         }
