@@ -142,7 +142,8 @@ public final class RuntimeRipperProbe {
             report.put("probe", "real-serverlevel-ae2-grid-ring-whole-job-ripper");
             report.put("minecraft", "26.1.2");
             report.put("orderPerRun", ToolComponentFixture.ENABLED ? 12 : ExactComponentFixture.ENABLED ? 3000 : NativeCatalogFixture.ENABLED ? 3 : CatalogAuditFixture.ENABLED || PackRecipeReloadFixture.ENABLED ? 0 : ORDER);
-            report.put("chain", ExactComponentFixture.ENABLED ? "exact_components"
+            report.put("chain", OmniMemoryCardFixture.ENABLED ? "omni_memory_card"
+                    : ExactComponentFixture.ENABLED ? "exact_components"
                     : ToolComponentFixture.ENABLED ? "tool_components"
                     : PackRecipeReloadFixture.ENABLED ? "pack_catalog"
                     : NativeCatalogFixture.ENABLED ? "native_catalog_map_extension"
@@ -195,7 +196,23 @@ public final class RuntimeRipperProbe {
         try {
             if (tick() - startedTick > (ChannelCapacityFixture.ENABLED ? 5000 : 2400)) throw new IllegalStateException("Probe timeout in " + ProbeState.phase);
             switch (ProbeState.phase) {
-                case "network_boot" -> bootNetwork();
+                case "network_boot" -> {
+                    bootNetwork();
+                    if (OmniMemoryCardFixture.ENABLED) {
+                        OmniMemoryCardFixture.start(level);
+                        ProbeState.phase = "omni_memory_card";
+                    }
+                }
+                case "omni_memory_card" -> {
+                    OmniMemoryCardFixture.tick();
+                    if (OmniMemoryCardFixture.isFinished()) {
+                        report.put("passed", OmniMemoryCardFixture.passed());
+                        report.put("omniMemoryCard", OmniMemoryCardFixture.summary());
+                        ProbeState.phase = OmniMemoryCardFixture.passed() ? "passed" : "failed";
+                        writeReport();
+                        ProbeState.finished = true;
+                    }
+                }
                 case "tool_components" -> {
                     ToolComponentFixture.tick();
                     if (ToolComponentFixture.isFinished()) {
