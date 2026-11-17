@@ -6,6 +6,7 @@ import appeng.menu.guisync.GuiSync;
 import appeng.menu.implementations.MenuTypeBuilder;
 import com.example.ae2lightoptimizer.Ae2LightOptimizer;
 import com.example.ae2lightoptimizer.api.LoopTickerHost;
+import com.example.ae2lightoptimizer.block.LoopTickerBlockEntity;
 import com.example.ae2lightoptimizer.part.LoopTickerPart;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -19,6 +20,9 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public final class LoopTickerMenu extends AEBaseMenu {
     public static final DeferredRegister<MenuType<?>> MENUS =
             DeferredRegister.create(Registries.MENU, Ae2LightOptimizer.MOD_ID);
+    public static final DeferredHolder<MenuType<?>, MenuType<LoopTickerMenu>> TYPE = MENUS.register(
+            "loop_ticker", () -> MenuTypeBuilder.create(LoopTickerMenu::new, LoopTickerBlockEntity.class)
+                    .buildUnregistered(ResourceLocation.fromNamespaceAndPath(Ae2LightOptimizer.MOD_ID, "loop_ticker")));
     public static final DeferredHolder<MenuType<?>, MenuType<LoopTickerMenu>> PART_TYPE = MENUS.register(
             "loop_ticker_part", () -> MenuTypeBuilder.create(LoopTickerMenu::new, LoopTickerPart.class)
                     .buildUnregistered(ResourceLocation.fromNamespaceAndPath(Ae2LightOptimizer.MOD_ID, "loop_ticker_part")));

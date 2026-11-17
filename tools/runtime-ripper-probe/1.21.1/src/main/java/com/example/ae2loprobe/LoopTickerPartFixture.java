@@ -81,20 +81,56 @@ public final class LoopTickerPartFixture {
         }
     }
 
+    private static int phase;
+    private static int isolatedOutput = -1;
+
     public static void tick() {
         if (!started || finished) return;
         if (++waited < WAIT_TICKS) return;
-        finished = true;
-        int plain = count(controlFurnace);
-        int fast = count(fastFurnace);
-        if (lastPart != null) {
-            summary.put("tickCount", lastPart.tickCount);
-            summary.put("nodeActiveAtEnd", lastPart.isActive());
+        if (phase == 0) {
+            int plain = count(controlFurnace);
+            int fast = count(fastFurnace);
+            if (lastPart != null) {
+                summary.put("tickCount", lastPart.tickCount);
+                summary.put("nodeActiveAtEnd", lastPart.isActive());
+            }
+            summary.put("controlOutput", plain);
+            summary.put("acceleratedOutput", fast);
+            // Phase 1: the same part on an isolated, unpowered cable must not accelerate.
+            BlockPos isolated = new BlockPos(20, 100, 20);
+            level.setBlockAndUpdate(isolated, AEBlocks.CABLE_BUS.block().defaultBlockState());
+            if (level.getBlockEntity(isolated) instanceof IPartHost isolatedHost) {
+                BlockPos furnacePos = isolated.above();
+                level.setBlockAndUpdate(furnacePos, Blocks.FURNACE.defaultBlockState());
+                if (level.getBlockEntity(furnacePos) instanceof AbstractFurnaceBlockEntity fed) {
+                    fed.setItem(0, new ItemStack(Items.RAW_IRON, 16));
+                    fed.setItem(1, new ItemStack(Items.COAL, 8));
+                }
+                isolatedHost.addPart(com.example.ae2lightoptimizer.item.ModItems.LOOP_TICKER_PART.get(),
+                        Direction.UP, null);
+                if (isolatedHost.getPart(Direction.UP) instanceof LoopTickerPart unpowered) {
+                    unpowered.setRate(4);
+                }
+                isolatedFurnace = furnacePos;
+                phase = 1;
+                waited = 0;
+            } else {
+                passed = false;
+                finished = true;
+                summary.put("failure", "isolated cable bus missing");
+            }
+            return;
         }
-        summary.put("controlOutput", plain);
-        summary.put("acceleratedOutput", fast);
-        passed = fast > plain;
+        finished = true;
+        isolatedOutput = count(isolatedFurnace);
+        summary.put("isolatedOutput", isolatedOutput);
+        int plain = count(controlFurnace);
+        summary.put("controlOutputAfterSecondPhase", plain);
+        passed = ((int) summary.get("acceleratedOutput")) > ((int) summary.get("controlOutput"))
+                && isolatedOutput <= plain;
     }
+
+    private static BlockPos isolatedFurnace;
 
     private static int count(BlockPos pos) {
         if (level != null && level.getBlockEntity(pos) instanceof AbstractFurnaceBlockEntity furnace) {

@@ -29,6 +29,9 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> LOOP_CONDENSER = ITEMS.register(
             "loop_condenser", () -> new BlockItem(ModBlocks.LOOP_CONDENSER.get(), new Item.Properties()));
 
+    public static final DeferredItem<BlockItem> LOOP_TICKER = ITEMS.register(
+            "loop_ticker", () -> new BlockItem(ModBlocks.LOOP_TICKER.get(), new Item.Properties()));
+
     public static final DeferredItem<appeng.items.parts.PartItem<com.example.ae2lightoptimizer.part.LoopTickerPart>>
             LOOP_TICKER_PART = ITEMS.register("loop_ticker_part",
                     () -> new appeng.items.parts.PartItem<>(new Item.Properties(),

@@ -34,6 +34,9 @@ public final class Ae2LightOptimizerClient {
                 com.example.ae2lightoptimizer.menu.CraftingRipperMenu.TYPE.get(),
                 CraftingRipperScreen::new, "/screens/ae2lightoptimizer_crafting_ripper.json");
         appeng.init.client.InitScreens.register(event,
+                com.example.ae2lightoptimizer.menu.LoopTickerMenu.TYPE.get(),
+                LoopTickerScreen::new, "/screens/ae2lightoptimizer_loop_ticker.json");
+        appeng.init.client.InitScreens.register(event,
                 com.example.ae2lightoptimizer.menu.LoopTickerMenu.PART_TYPE.get(),
                 LoopTickerScreen::new, "/screens/ae2lightoptimizer_loop_ticker.json");
     }

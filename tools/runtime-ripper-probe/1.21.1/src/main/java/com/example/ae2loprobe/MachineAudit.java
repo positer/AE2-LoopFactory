@@ -289,7 +289,14 @@ public final class MachineAudit {
         furnace(compatTarget);
         // Dedicated combined machine: own loop ticker, a native JDT time entity and real torch.
         BlockPos extraTickerPos = compatTarget.above();
-        level.setBlockAndUpdate(extraTickerPos, ModBlocks.LOOP_TICKER.get().defaultBlockState().setValue(LoopTickerBlock.FACING, Direction.DOWN));
+        // The loop ticker is a cable part now: mount it on a cable bus facing down at the target.
+        level.setBlockAndUpdate(extraTickerPos, AEBlocks.CABLE_BUS.block().defaultBlockState());
+        if (level.getBlockEntity(extraTickerPos) instanceof appeng.api.parts.IPartHost tickerHost) {
+            tickerHost.addPart(appeng.core.definitions.AEParts.GLASS_CABLE.item(appeng.api.util.AEColor.TRANSPARENT),
+                    Direction.WEST, null);
+            tickerHost.addPart(com.example.ae2lightoptimizer.item.ModItems.LOOP_TICKER_PART.get(),
+                    Direction.DOWN, null);
+        }
         // An actual second physical network; no synthetic GridConnection is constructed.
         level.setBlockAndUpdate(extraTickerPos.west(), AEBlocks.CONTROLLER.block().defaultBlockState());
         level.setBlockAndUpdate(extraTickerPos.west(2), AEBlocks.CREATIVE_ENERGY_CELL.block().defaultBlockState());
