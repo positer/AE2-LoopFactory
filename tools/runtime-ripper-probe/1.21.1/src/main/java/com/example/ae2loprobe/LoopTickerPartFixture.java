@@ -25,6 +25,7 @@ public final class LoopTickerPartFixture {
     private static boolean passed;
     private static int waited;
     private static Level level;
+    private static LoopTickerPart lastPart;
     private static BlockPos controlFurnace;
     private static BlockPos fastFurnace;
     private static final Map<String, Object> summary = new LinkedHashMap<>();
@@ -41,35 +42,20 @@ public final class LoopTickerPartFixture {
         fastFurnace = base.east(4);
         placeFurnace(controlFurnace);
         placeFurnace(fastFurnace);
-        // Mount the part on a cable bus that already belongs to the probe's powered network.
-        IPartHost host = null;
-        BlockPos cablePos = null;
-        Direction mountSide = null;
-        outer:
-        for (int dx = -12; dx <= 12; dx++) {
-            for (int dy = -4; dy <= 4; dy++) {
-                for (int dz = -12; dz <= 12; dz++) {
-                    BlockPos probePos = base.offset(dx, dy, dz);
-                    if (level.getBlockEntity(probePos) instanceof IPartHost candidate) {
-                        for (Direction side : Direction.values()) {
-                            if (candidate.getPart(side) == null
-                                    && level.getBlockState(probePos.relative(side)).isAir()) {
-                                host = candidate;
-                                cablePos = probePos;
-                                mountSide = side;
-                                break outer;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (host == null) {
-            fail("no free cable bus in the probe network");
+        // A real cable: cable bus host, glass cable on both ends, controller and creative energy.
+        BlockPos cablePos = base.below();
+        level.setBlockAndUpdate(cablePos, AEBlocks.CABLE_BUS.block().defaultBlockState());
+        if (!(level.getBlockEntity(cablePos) instanceof IPartHost host)) {
+            fail("cable bus did not create a part host");
             return;
         }
-        summary.put("mountPos", cablePos.toShortString());
-        summary.put("mountSide", String.valueOf(mountSide));
+        host.addPart(appeng.core.definitions.AEParts.GLASS_CABLE.item(appeng.api.util.AEColor.TRANSPARENT),
+                Direction.WEST, null);
+        host.addPart(appeng.core.definitions.AEParts.GLASS_CABLE.item(appeng.api.util.AEColor.TRANSPARENT),
+                Direction.EAST, null);
+        level.setBlockAndUpdate(cablePos.west(1), AEBlocks.CONTROLLER.block().defaultBlockState());
+        level.setBlockAndUpdate(cablePos.east(1), AEBlocks.CREATIVE_ENERGY_CELL.block().defaultBlockState());
+        Direction mountSide = Direction.UP;
         BlockPos targetPos = cablePos.relative(mountSide);
         level.setBlockAndUpdate(targetPos, Blocks.FURNACE.defaultBlockState());
         if (level.getBlockEntity(targetPos) instanceof AbstractFurnaceBlockEntity fed) {
@@ -87,6 +73,9 @@ public final class LoopTickerPartFixture {
         summary.put("partInstalled", true);
         summary.put("partClass", part.getClass().getSimpleName());
         summary.put("partSide", String.valueOf(part.getSide()));
+        lastPart = ticker;
+        summary.put("nodeActive", ticker.isActive());
+        summary.put("nodePowered", ticker.isPowered());
     }
 
     private static void placeFurnace(BlockPos pos) {
@@ -103,6 +92,9 @@ public final class LoopTickerPartFixture {
         finished = true;
         int plain = count(controlFurnace);
         int fast = count(fastFurnace);
+        if (lastPart != null) {
+            summary.put("tickCount", lastPart.tickCount);
+        }
         summary.put("controlOutput", plain);
         summary.put("acceleratedOutput", fast);
         passed = fast > plain;

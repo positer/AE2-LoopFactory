@@ -149,8 +149,12 @@ public final class LoopTickerPart extends AEBasePart
         return new TickingRequest(1, 1, false);
     }
 
+    /** Diagnostic: how often the grid ticked this part. */
+    public int tickCount;
+
     @Override
     public TickRateModulation tickingRequest(IGridNode node, int ticksSinceLastCall) {
+        tickCount++;
         accelerate();
         return TickRateModulation.SAME;
     }
