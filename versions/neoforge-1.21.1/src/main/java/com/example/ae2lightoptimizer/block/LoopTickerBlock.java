@@ -16,6 +16,29 @@ public final class LoopTickerBlock extends AEBaseEntityBlock<LoopTickerBlockEnti
         registerDefaultState(defaultBlockState().setValue(FACING, net.minecraft.core.Direction.NORTH));
     }
 
+    /** Shift-right-click with a speed card fills every free upgrade slot at once. */
+    @Override
+    protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
+            BlockState state, net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos,
+            net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
+            net.minecraft.world.phys.BlockHitResult hit) {
+        if (player.isShiftKeyDown() && stack.is(appeng.core.definitions.AEItems.SPEED_CARD.asItem())
+                && level.getBlockEntity(pos) instanceof LoopTickerBlockEntity host) {
+            if (!level.isClientSide()) {
+                var upgrades = host.getUpgrades();
+                for (int slot = 0; slot < upgrades.size() && !stack.isEmpty(); slot++) {
+                    if (upgrades.getStackInSlot(slot).isEmpty()) {
+                        upgrades.setItemDirect(slot, stack.copyWithCount(1));
+                        stack.shrink(1);
+                    }
+                }
+                host.saveRate();
+            }
+            return net.minecraft.world.ItemInteractionResult.SUCCESS;
+        }
+        return super.useItemOn(stack, state, level, pos, player, hand, hit);
+    }
+
     @Override
     protected net.minecraft.world.InteractionResult useWithoutItem(BlockState state, net.minecraft.world.level.Level level,
             net.minecraft.core.BlockPos pos, net.minecraft.world.entity.player.Player player,

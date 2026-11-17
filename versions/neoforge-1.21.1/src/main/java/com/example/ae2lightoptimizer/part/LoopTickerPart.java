@@ -86,6 +86,19 @@ public final class LoopTickerPart extends AEBasePart
     @Override
     public boolean onUseItemOn(net.minecraft.world.item.ItemStack stack, net.minecraft.world.entity.player.Player player,
             net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.Vec3 pos) {
+        if (player.isShiftKeyDown() && stack.is(appeng.core.definitions.AEItems.SPEED_CARD.asItem())) {
+            if (!isClientSide()) {
+                var inventory = getUpgrades();
+                for (int slot = 0; slot < inventory.size() && !stack.isEmpty(); slot++) {
+                    if (inventory.getStackInSlot(slot).isEmpty()) {
+                        inventory.setItemDirect(slot, stack.copyWithCount(1));
+                        stack.shrink(1);
+                    }
+                }
+                saveRate();
+            }
+            return true;
+        }
         if (stack.isEmpty() && !isClientSide()) {
             appeng.menu.MenuOpener.open(com.example.ae2lightoptimizer.menu.LoopTickerMenu.PART_TYPE.get(), player,
                     appeng.menu.locator.MenuLocators.forPart(this));
