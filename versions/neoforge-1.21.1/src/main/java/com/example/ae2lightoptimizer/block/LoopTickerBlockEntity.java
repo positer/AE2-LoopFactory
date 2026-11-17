@@ -79,13 +79,16 @@ public final class LoopTickerBlockEntity extends AENetworkedBlockEntity implemen
                 ? state.getValue(BlockStateProperties.FACING) : Direction.NORTH;
     }
 
-    /** True only while the node is online and the grid still holds energy. */
+    /** True only while the node is online and the grid can still hand out power. */
     public boolean powered() {
         if (!getMainNode().isActive() || getMainNode().getNode() == null) return false;
         var grid = getMainNode().getGrid();
         if (grid == null) return false;
         var energy = grid.getEnergyService();
-        return energy != null && energy.getStoredPower() > 0;
+        if (energy == null || !energy.isNetworkPowered()) return false;
+        // A zero-amount simulation is the accepted availability probe: it never draws power.
+        return energy.extractAEPower(0.0, appeng.api.config.Actionable.SIMULATE,
+                appeng.api.config.PowerMultiplier.ONE) >= 0;
     }
 
     /** Runs the facing block's own ticker and random tick {@link #rate()} times. */
