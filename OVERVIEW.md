@@ -1,5 +1,18 @@
 # AE2-LoopFactory (AE2LF) Project Overview
 
+## 2026-11-17 循环机器独立验收树
+
+- `docs/loop-machines.md`：聚合器的网络与离线流程、磁盘分区、回网背压，进刻器的倍率、卡槽、追加 tick 与共存边界；包含两代复现命令。
+- 两代 `block/LoopCondenserBlockEntity.java`：原生聚合器加单频道节点的创建、保存和销毁；`integration/CondenserLoopService.java`：每 5 tick 的过滤、物料折算和按实际接收数量结算；`mixin/LoopCondenserMenuMixin.java`：仅循环聚合器原生模板槽接受循环磁盘；`CondenserStorageSlotAccessor.java`：原生模板槽与余额写入桥。
+- 两代 `block/LoopTickerBlock.java`、`LoopTickerBlockEntity.java`：朝向与原生总线碰撞形状、节点和升级库存、倍率持久化、保护追加 tick；`menu/LoopTickerMenu.java` 与 `client/LoopTickerScreen.java`：原生四卡槽、升级面板、数值输入与滑条。
+- 两代 `client/LoopRateSlider.java`：横向复用 AE2 原生滑块与轨道，并反向映射鼠标事件；紧凑界面只在输入框显示一份倍率数字。
+- 两代 `storage/LoopStorageCellItem.java`：工作台标记与两个持久化原生升级槽；`Ae2LightOptimizer.java`：注册机器与磁盘升级卡、原生输入能力和拆卸代表物品。
+- 两代 `mixin/OmniNodeEnergyMixin.java`、`OmniConnectionEnergyMixin.java`、`OmniAdHocEnergyMixin.java`：在已有零能耗路由桥中额外去除聚合器自身的能耗计数，保留原生频道分配与普通下游开销。
+- `tools/runtime-ripper-probe/<generation>/.../MachineAudit.java`：独立物理网络与精确库存/余额断言、原生熔炉/作物/水晶、真实 JDT 与 Torcherino 共存；`MachineAuditClient.java`：实际界面数值与滑条响应及原生 C2S 消息；`RuntimeRipperProbe.java`、`ClientBootstrap.java`、`verify-background.ps1`：`machine_audit` 场景、帧捕获与退出/制品门禁。
+- `tools/verify_loop_machine_assets.py`：使用对应 AE2 JAR 检查核心灰白、156 个外框像素、蓝转绿像素及世界/物品几何；可按显式灰度调色板重建聚合器贴图。
+- `.gitattributes`：原生复制的磁盘模型 JSON 固定 LF，避免 Windows 新 worktree 破坏字节一致性门禁。
+- 证据位于显式同级枢纽 `../Minecraft Forge Workspace/archive/20261117-220000-ae2lf-machine-audit-worktree/`，不写入其他人的开发运行目录。
+
 ## 2026-11-16 工厂终端与手持终端贴图
 
 - 两代 `textures/block/loop_factory_terminal_side.png`：16px 侧面检修板与三道散热栅；新增 `loop_factory_terminal_back.png`：16px 背部接口。`models/block/loop_factory_network_terminal.json` 分别将东西面、南面引用这两张图，正面与顶底引用保持。

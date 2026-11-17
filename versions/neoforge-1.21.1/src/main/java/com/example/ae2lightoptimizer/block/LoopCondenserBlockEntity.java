@@ -37,13 +37,35 @@ public final class LoopCondenserBlockEntity extends appeng.blockentity.misc.Cond
     }
 
     @Override
-    public void onLoad() {
-        super.onLoad();
+    public void clearRemoved() {
+        super.clearRemoved();
+        scheduleInit();
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        com.example.ae2lightoptimizer.integration.CondenserLoopService.unregister(this);
+        mainNode.destroy();
+        super.onChunkUnloaded();
+    }
+
+    @Override
+    public void onReady() {
+        super.onReady();
         if (level != null && !level.isClientSide()) {
-            // Creation is deferred to the server tick loop: the block entity is not ticked itself and
-            // onLoad runs before the block entity is reachable through the level.
+            mainNode.create(level, getBlockPos());
             com.example.ae2lightoptimizer.integration.CondenserLoopService.register(this);
         }
+    }
+
+    @Override
+    public double getStorage() {
+        var cell = ((com.example.ae2lightoptimizer.mixin.CondenserStorageSlotAccessor) (Object) this)
+                .ae2lf$storageSlot().getStackInSlot(0);
+        if (cell.getItem() instanceof com.example.ae2lightoptimizer.storage.LoopStorageCellItem loop) {
+            return loop.tier().capacityBytes() * 8.0;
+        }
+        return super.getStorage();
     }
 
     @Override
@@ -53,8 +75,17 @@ public final class LoopCondenserBlockEntity extends appeng.blockentity.misc.Cond
         super.setRemoved();
     }
 
-    /** Diagnostic: how often the grid asked this host for its node. */
-    public static volatile int gridNodeQueries;
+    @Override
+    public void saveAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        mainNode.saveToNBT(tag);
+    }
+
+    @Override
+    public void loadTag(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadTag(tag, registries);
+        mainNode.loadFromNBT(tag);
+    }
 
     public IManagedGridNode mainNode() {
         return mainNode;
@@ -63,7 +94,6 @@ public final class LoopCondenserBlockEntity extends appeng.blockentity.misc.Cond
     @Override
     @Nullable
     public IGridNode getGridNode(Direction side) {
-        gridNodeQueries++;
         return mainNode.getNode();
     }
 }

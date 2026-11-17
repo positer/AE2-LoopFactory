@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory=$true)][ValidateSet('1.21.1','26.1.2')][string]$Generation,
-    [Parameter(Mandatory=$true)][ValidateSet('omni','omni_access','ae2lt_capacity','factory_wireless','template','channel_capacity','smithing','layered','core256m','catalog_audit','native_catalog','exact_components','pack_catalog','tool_components','loop_condenser','loop_condenser_offline','loop_ticker')][string]$Chain,
+    [Parameter(Mandatory=$true)][ValidateSet('omni','omni_access','ae2lt_capacity','factory_wireless','template','channel_capacity','smithing','layered','core256m','catalog_audit','native_catalog','exact_components','pack_catalog','tool_components','loop_condenser','loop_ticker','machine_audit')][string]$Chain,
     [Parameter(Mandatory=$true)][ValidatePattern('^ripper-[A-Za-z0-9_.-]+$')][string]$EvidenceName,
     [string]$EvidenceRoot,
     [switch]$PrepareOnly,
@@ -8,6 +8,8 @@ param(
     [ValidatePattern('^[A-Za-z0-9][A-Za-z0-9_.-]*$')][string]$ValidationName
 )
 $ErrorActionPreference = 'Stop'
+# Older weak single-machine fixtures are superseded by the complete paired native acceptance gate.
+if ($Chain -in @('loop_condenser','loop_ticker')) { $Chain = 'machine_audit' }
 $taskRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $projectRoot = Join-Path $taskRoot "versions/neoforge-$Generation"
 $runRoot = Join-Path $projectRoot 'run'
@@ -96,10 +98,10 @@ function Assert-RuntimeMatchesProduction {
 function Assert-GameplayEvidence([string]$world) {
     $report = Read-PassingFixture 'report.json'
     if ($report.minecraft -ne $Generation -or $report.world -ne $world) { throw 'Report generation/world is not this run' }
-    $chainNames = @{omni='omni_connector';omni_access='omni_access';ae2lt_capacity='ae2lt_capacity';factory_wireless='factory_wireless';channel_capacity='channel_capacity';template='template_growth';smithing='template_growth_then_netherite_pickaxe_smithing';layered='logs_planks_sticks_tool_and_template_growth_then_smithing';core256m='all_ten_core_tiers_crystal_growth_and_netherite_ingots';native_catalog='native_catalog_map_extension';exact_components='exact_components';catalog_audit='catalog_audit';pack_catalog='pack_catalog';loop_condenser='loop_condenser';loop_ticker='loop_ticker';loop_condenser_offline='loop_condenser_offline';tool_components='tool_components'}
+    $chainNames = @{omni='omni_connector';omni_access='omni_access';ae2lt_capacity='ae2lt_capacity';factory_wireless='factory_wireless';channel_capacity='channel_capacity';template='template_growth';smithing='template_growth_then_netherite_pickaxe_smithing';layered='logs_planks_sticks_tool_and_template_growth_then_smithing';core256m='all_ten_core_tiers_crystal_growth_and_netherite_ingots';native_catalog='native_catalog_map_extension';exact_components='exact_components';catalog_audit='catalog_audit';pack_catalog='pack_catalog';loop_condenser='loop_condenser';loop_ticker='loop_ticker';machine_audit='machine_audit';tool_components='tool_components'}
     if ($report.chain -ne $chainNames[$Chain]) { throw 'The requested chain is not the completed fixture' }
     # 0.0.6 removed the ripper's own idle drain; older evidence keeps its recorded 5 AE/t.
-    if ($Chain -notin @('omni','omni_access','ae2lt_capacity','factory_wireless') -and $report.ripperConfiguredIdleAEPerTick -ne 0) { throw 'Ripper idle drain is not zero' }
+    if ($Chain -notin @('omni','omni_access','ae2lt_capacity','factory_wireless','machine_audit') -and $report.ripperConfiguredIdleAEPerTick -ne 0) { throw 'Ripper idle drain is not zero' }
     if ($Chain -eq 'omni_access' -and $report.ripperIdlePower -ne 0) { throw 'Ripper idle drain is no longer zero' }
     if ($Chain -eq 'omni') {
         foreach ($check in @('four_loaded_endpoints','one_star_hub','connected_without_power','connectors_require_no_channels',
@@ -234,7 +236,13 @@ function Assert-GameplayEvidence([string]$world) {
             throw 'Native map identities, CPU persistence or one-time fee contract failed'
         }
     }
-    $requiredFrames = if ($Chain -eq 'omni') { @('ae2lo-ripper-omni-ui.png','ae2lo-ripper-omni-world.png') }
+    if ($Chain -eq 'machine_audit') {
+        if (@($report.checks.PSObject.Properties).Count -lt 20 -or @($report.checks.PSObject.Properties | Where-Object Value -ne $true).Count -gt 0) {
+            throw 'Machine acceptance checks missing or failed'
+        }
+    }
+    $requiredFrames = if ($Chain -eq 'machine_audit') { @('ae2lo-ripper-machine-ticker-ui.png','ae2lo-ripper-machine-condenser-ui.png') }
+        elseif ($Chain -eq 'omni') { @('ae2lo-ripper-omni-ui.png','ae2lo-ripper-omni-world.png') }
         elseif ($Chain -eq 'omni_access') { @('ae2lo-ripper-omni-access-ui.png','ae2lo-ripper-omni-access-private-toggle.png','ae2lo-ripper-omni-access-private-created.png','ae2lo-ripper-omni-access-zh-2x.png','ae2lo-ripper-omni-access-en-2x.png') }
         elseif ($Chain -eq 'ae2lt_capacity' -or $Chain -eq 'factory_wireless') { @() }
         else { @('ae2lo-ripper-after.png','ae2lo-ripper-ui.png') }

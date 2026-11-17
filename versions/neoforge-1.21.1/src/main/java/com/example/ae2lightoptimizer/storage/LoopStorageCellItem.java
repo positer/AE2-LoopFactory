@@ -30,6 +30,11 @@ public final class LoopStorageCellItem extends Item implements LoopStorageTierPr
         return tier;
     }
 
+    @Override
+    public appeng.api.upgrades.IUpgradeInventory getUpgrades(ItemStack stack) {
+        return appeng.api.upgrades.UpgradeInventories.forItem(stack, 2);
+    }
+
     /** The Cell Workbench partition, so a condenser can tell a marked cell from an unmarked one. */
     @Override
     public ConfigInventory getConfigInventory(ItemStack stack) {

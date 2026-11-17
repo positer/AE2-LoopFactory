@@ -1,10 +1,11 @@
 {
   "includes": [
-    "common/common.json"
+    "common/common.json",
+    "common/player_inventory.json"
   ],
   "generatedBackground": {
     "width": 176,
-    "height": 166
+    "height": 136
   },
   "text": {
     "dialog_title": {
@@ -15,6 +16,32 @@
         "left": 8,
         "top": 6
       }
+    },
+    "rate_label": {
+      "text": {
+        "translate": "gui.ae2lightoptimizer.loop_ticker.rate"
+      },
+      "position": {
+        "left": 8,
+        "top": 27
+      }
+    },
+    "unit": {
+      "text": {
+        "text": "×"
+      },
+      "position": {
+        "left": 162,
+        "top": 27
+      }
+    }
+  },
+  "widgets": {
+    "rateSlider": {
+      "left": 34,
+      "top": 25,
+      "width": 80,
+      "height": 12
     }
   }
 }

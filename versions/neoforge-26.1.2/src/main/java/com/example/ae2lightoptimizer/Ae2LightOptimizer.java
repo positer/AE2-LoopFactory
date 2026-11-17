@@ -66,11 +66,16 @@ public final class Ae2LightOptimizer {
                     com.example.ae2lightoptimizer.block.LoopTickerBlockEntity.class, tickerType26, null, null);
             ModBlocks.LOOP_CONDENSER.get().setBlockEntity(
                     appeng.blockentity.misc.CondenserBlockEntity.class, condenserType, null, null);
-            // The Matter Condenser accepts the Loop Card in its upgrade slot once it becomes a network member.
-            Upgrades.add(ModItems.LOOP_CARD.get(), appeng.core.definitions.AEBlocks.CONDENSER.block(), 1);
+            Upgrades.add(AEItems.SPEED_CARD, ModBlocks.LOOP_TICKER.get(), 4);
+            appeng.blockentity.AEBaseBlockEntity.registerBlockEntityItem(ModBlockEntities.LOOP_CONDENSER.get(), ModItems.LOOP_CONDENSER.get());
+            appeng.blockentity.AEBaseBlockEntity.registerBlockEntityItem(ModBlockEntities.LOOP_TICKER.get(), ModItems.LOOP_TICKER.get());
             net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(com.example.ae2lightoptimizer.integration.CondenserLoopService::onServerTick);
             net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(com.example.ae2lightoptimizer.integration.LoopTickerService::onServerTick);
             StorageCells.addCellHandler(LoopStorageCellHandler.INSTANCE);
+            for (var cell : java.util.List.of(ModItems.LOOP_STORAGE_CELL_1K, ModItems.LOOP_STORAGE_CELL_4K, ModItems.LOOP_STORAGE_CELL_16K, ModItems.LOOP_STORAGE_CELL_64K, ModItems.LOOP_STORAGE_CELL_256K, ModItems.LOOP_STORAGE_CELL_1M, ModItems.LOOP_STORAGE_CELL_4M, ModItems.LOOP_STORAGE_CELL_16M, ModItems.LOOP_STORAGE_CELL_64M, ModItems.LOOP_STORAGE_CELL_256M, ModItems.INFINITE_LOOP_STORAGE_CELL)) {
+                Upgrades.add(AEItems.FUZZY_CARD, cell.get(), 1);
+                Upgrades.add(AEItems.INVERTER_CARD, cell.get(), 1);
+            }
             for (var cell : ModItems.PORTABLE_LOOP_STORAGE_CELLS) {
                 var item = cell.get();
                 Upgrades.add(ModItems.LOOP_CARD.get(), item, 1);
@@ -102,6 +107,10 @@ public final class Ae2LightOptimizer {
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, com.example.ae2lightoptimizer.omni.OmniContent.ENTITY.get(), (host, context) -> host);
         com.example.ae2lightoptimizer.storage.PortableLoopEnergy.registerCapabilities(event);
+        event.registerBlockEntity(net.neoforged.neoforge.capabilities.Capabilities.Item.BLOCK,
+                ModBlockEntities.LOOP_CONDENSER.get(), (host, side) -> host.getExternalInv().toResourceHandler());
+        event.registerBlockEntity(net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK,
+                ModBlockEntities.LOOP_CONDENSER.get(), (host, side) -> host.getFluidHandler());
         event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, com.example.ae2lightoptimizer.factory.FactoryContent.ENTITY.get(), (host, side) -> host);
         event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST,
                 ModBlockEntities.CRAFTING_RIPPER.get(), (ripper, side) -> ripper);
@@ -117,6 +126,8 @@ public final class Ae2LightOptimizer {
                 AECapabilities.IN_WORLD_GRID_NODE_HOST,
                 ModBlockEntities.LOOP_CONDENSER.get(),
                 (condenser, ignoredContext) -> condenser);
+        event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST,
+                ModBlockEntities.LOOP_TICKER.get(), (ticker, ignoredContext) -> ticker);
     }
 
     private static void addCreativeTabContents(BuildCreativeModeTabContentsEvent event) {

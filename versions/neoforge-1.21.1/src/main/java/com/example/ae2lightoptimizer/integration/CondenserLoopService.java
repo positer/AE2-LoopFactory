@@ -23,7 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /**
- * Drives the Loop Card on a Matter Condenser. Every five ticks it drains the marked keys from the
+ * Drives a marked loop storage cell on the loop condenser. Every five ticks it drains the marked keys from the
  * network into the condenser's own power balance and settles the output directly, so the native
  * output slot never throttles the conversion.
  */
@@ -63,26 +63,20 @@ public final class CondenserLoopService {
     
     private static void drive(LoopCondenserBlockEntity condenser) {
         if (condenser.getLevel() == null || condenser.getLevel().isClientSide()) return;
-        // Create the node from the server tick loop: the condenser block entity is not ticked, so a
-        // first-tick callback would never run and an onLoad create is too early to join the grid.
-        if (condenser.mainNode().getNode() == null) {
-            condenser.mainNode().create(condenser.getLevel(), condenser.getBlockPos());
-        }
-        // The condenser has no upgrade inventory of its own yet; the card is looked up in whatever
-        // inventory it exposes so the driver works the moment an insertion path exists.
-
+        if (!condenser.mainNode().isActive()) return;
+        if (!condenser.getLevel().shouldTickBlocksAt(condenser.getBlockPos())) return;
         IGrid grid = condenser.mainNode().getGrid();
         if (grid == null) return;
-
         ItemStack cell = ((com.example.ae2lightoptimizer.mixin.CondenserStorageSlotAccessor) (Object) condenser)
                 .ae2lf$storageSlot().getStackInSlot(0);
-        if (cell.isEmpty() || !(cell.getItem() instanceof ICellWorkbenchItem workbench)) return;
+        if (!(cell.getItem() instanceof com.example.ae2lightoptimizer.storage.LoopStorageCellItem workbench)) return;
         var config = workbench.getConfigInventory(cell);
         if (config.keySet().isEmpty()) return; // Unmarked cell: no behaviour at all.
 
         boolean inverted = workbench.getUpgrades(cell).isInstalled(AEItems.INVERTER_CARD);
         var builder = IPartitionList.builder();
-        builder.fuzzyMode(workbench.getFuzzyMode(cell));
+        if (workbench.getUpgrades(cell).isInstalled(AEItems.FUZZY_CARD))
+            builder.fuzzyMode(workbench.getFuzzyMode(cell));
         builder.addAll(config.keySet());
         IPartitionList partition = builder.build();
         IncludeExclude mode = inverted ? IncludeExclude.BLACKLIST : IncludeExclude.WHITELIST;
@@ -94,10 +88,13 @@ public final class CondenserLoopService {
         storage.getAvailableStacks(available);
         for (var entry : available) {
             AEKey key = entry.getKey();
-            if (!partition.matchesFilter(key, mode)) continue;
+            if (!(key instanceof AEItemKey) || !partition.matchesFilter(key, mode)) continue;
             long extracted = storage.extract(key, entry.getLongValue(), Actionable.MODULATE, source);
             if (extracted > 0) {
-                condenser.addPower(extracted * (double) key.getAmountPerOperation());
+                // AE2 native CondenserMEStorage divides by amount-per-operation.
+                double credit = extracted / (double) key.getAmountPerOperation();
+                ((com.example.ae2lightoptimizer.mixin.CondenserStorageSlotAccessor) (Object) condenser)
+                        .ae2lf$setStoredPower(condenser.getStoredPower() + credit);
             }
         }
 
@@ -111,19 +108,21 @@ public final class CondenserLoopService {
         CondenserOutput output = condenser.getConfigManager().getSetting(Settings.CONDENSER_OUTPUT);
         double stored = condenser.getStoredPower();
         if (output == CondenserOutput.TRASH) {
-            if (stored > 0) condenser.addPower(-stored);
+            if (stored > 0) ((com.example.ae2lightoptimizer.mixin.CondenserStorageSlotAccessor) (Object) condenser)
+                    .ae2lf$setStoredPower(0);
             return;
         }
         double required = condenser.getRequiredPower();
         if (required <= 0) return;
         long produced = (long) (stored / required);
         if (produced <= 0) return;
-        double spent = produced * required;
-        condenser.addPower(-spent);
         var item = output == CondenserOutput.SINGULARITY ? AEItems.SINGULARITY : AEItems.MATTER_BALL;
         AEItemKey key = AEItemKey.of(item.asItem());
         if (key != null) {
-            storage.insert(key, produced, Actionable.MODULATE, source);
+            long accepted = storage.insert(key, produced, Actionable.MODULATE, source);
+            // Backpressure retains every unaccepted product as matter credit.
+            ((com.example.ae2lightoptimizer.mixin.CondenserStorageSlotAccessor) (Object) condenser)
+                    .ae2lf$setStoredPower(stored - accepted * required);
         }
     }
 }
