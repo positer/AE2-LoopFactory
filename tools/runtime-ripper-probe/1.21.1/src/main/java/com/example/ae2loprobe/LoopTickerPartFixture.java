@@ -42,19 +42,15 @@ public final class LoopTickerPartFixture {
         fastFurnace = base.east(4);
         placeFurnace(controlFurnace);
         placeFurnace(fastFurnace);
-        // A real cable: cable bus host, glass cable on both ends, controller and creative energy.
-        BlockPos cablePos = base.below();
+        // Attach a cable bus to the probe's own powered network (next to the drive), then mount the part.
+        BlockPos cablePos = new BlockPos(-2, 100, 0);
         level.setBlockAndUpdate(cablePos, AEBlocks.CABLE_BUS.block().defaultBlockState());
         if (!(level.getBlockEntity(cablePos) instanceof IPartHost host)) {
             fail("cable bus did not create a part host");
             return;
         }
         host.addPart(appeng.core.definitions.AEParts.GLASS_CABLE.item(appeng.api.util.AEColor.TRANSPARENT),
-                Direction.WEST, null);
-        host.addPart(appeng.core.definitions.AEParts.GLASS_CABLE.item(appeng.api.util.AEColor.TRANSPARENT),
                 Direction.EAST, null);
-        level.setBlockAndUpdate(cablePos.west(1), AEBlocks.CONTROLLER.block().defaultBlockState());
-        level.setBlockAndUpdate(cablePos.east(1), AEBlocks.CREATIVE_ENERGY_CELL.block().defaultBlockState());
         Direction mountSide = Direction.UP;
         BlockPos targetPos = cablePos.relative(mountSide);
         level.setBlockAndUpdate(targetPos, Blocks.FURNACE.defaultBlockState());
