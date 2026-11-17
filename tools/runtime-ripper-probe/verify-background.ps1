@@ -362,8 +362,9 @@ try {
     Copy-Item -LiteralPath $helper -Destination $staged
     if ((Get-Sha256 $staged) -ne $helperHash) { throw 'Staged ripper helper hash differs' }
     Write-EvidenceJson 'run-mods-active.json' @(Get-ModSnapshot)
+    $orderArg = if ($env:AE2LO_CORE_ORDER) { ' -Dae2lo.probe.core.order=' + $env:AE2LO_CORE_ORDER } else { '' }
     $env:JAVA_TOOL_OPTIONS = '"-javaagent:' + $agent.Replace('\','/') + '" -Dae2lf.probe=false -Dae2lo.probe=true -Dae2lo.probe.background=true -Dae2lo.probe.autoExit=true' +
-        ' -Dae2lo.probe.chain=' + $Chain + ' -Dae2lo.probe.world=' + $world +
+        ' -Dae2lo.probe.chain=' + $Chain + ' -Dae2lo.probe.world=' + $world + $orderArg +
         ' "-Dae2lo.probe.reportDir=' + $evidence.Replace('\','/') + '"'
     Write-EvidenceJson 'launch.json' ([ordered]@{generation=$Generation;chain=$Chain;world=$world;javaToolOptions=$env:JAVA_TOOL_OPTIONS;launcher=(Join-Path $taskRoot "build-$Generation.ps1");arguments=@('--offline','--no-daemon','runClient');usesPcl=$false})
     Write-EvidenceJson 'background-summary.json' $summary

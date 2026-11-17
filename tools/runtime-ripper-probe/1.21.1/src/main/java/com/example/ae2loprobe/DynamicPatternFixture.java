@@ -89,8 +89,20 @@ public final class DynamicPatternFixture {
         require(grid.getStorageService().getInventory().insert(AEItemKey.of(item),n,Actionable.MODULATE,new MachineSource(grid::getPivot))==n,"Fixture insert failed");
     }
     private static long count(net.minecraft.world.item.Item item) {return grid.getStorageService().getInventory().getAvailableStacks().get(AEItemKey.of(item));}
+    private static long calcStartedNanos;
     private static void calculate(net.minecraft.world.item.Item item) {
+        calcStartedNanos = System.nanoTime();
         future=grid.getCraftingService().beginCraftingCalculation(level,()->new MachineSource(grid::getPivot),AEItemKey.of(item),4,CalculationStrategy.REPORT_MISSING_ITEMS);
+    }
+    /** Waits for the native planner and logs its wall time, so vanilla and AE2LF numbers share one clock. */
+    private static appeng.api.networking.crafting.ICraftingPlan await() throws Exception {
+        var plan = future.get();
+        if (calcStartedNanos != 0) {
+            org.slf4j.LoggerFactory.getLogger("AE2LO-Runtime-Probe").info(
+                    "Native planner elapsedMillis={}", (System.nanoTime() - calcStartedNanos) / 1_000_000.0);
+            calcStartedNanos = 0;
+        }
+        return plan;
     }
     private static void submit(ICraftingPlan plan) {
         require(!plan.simulation() && plan.missingItems().isEmpty(),"Unexpected missing materials");
@@ -105,16 +117,16 @@ public final class DynamicPatternFixture {
         if(level.getGameTime()-began>800) throw new IllegalStateException("Dynamic policy fixture timeout phase "+phase);
         switch(phase) {
             case 0 -> {if(level.getGameTime()-began<35)return false; calculate(Items.OAK_PLANKS);phase=1;}
-            case 1 -> {if(!future.isDone())return false;var plan=future.get();
+            case 1 -> {if(!future.isDone())return false;var plan=await();
                 require(plan.simulation() && plan.missingItems().get(AEItemKey.of(Items.OAK_LOG))>0,"Manual oak recipe must remain missing instead of using available oak wood");
                 require(count(Items.OAK_WOOD)==4,"Missing plan consumed alternative input");
                 checks.put("missingManualNeverFallsBack",true);calculate(Items.BIRCH_PLANKS);phase=2;}
-            case 2 -> {if(!future.isDone())return false;submit(future.get());phase=3;}
+            case 2 -> {if(!future.isDone())return false;submit(await());phase=3;}
             case 3 -> {if(count(Items.BIRCH_PLANKS)<4)return false;
                 require(count(Items.BIRCH_LOG)==3,"Uncovered automatic recipe balance differs");
                 checks.put("uncoveredAutoCpu",true);insert(Items.OAK_LOG,2);settled=level.getGameTime();phase=31;}
             case 31 -> {if(level.getGameTime()-settled<25)return false;calculate(Items.OAK_PLANKS);phase=4;}
-            case 4 -> {if(!future.isDone())return false;var plan=future.get();
+            case 4 -> {if(!future.isDone())return false;var plan=await();
                 require(plan.usedItems().get(AEItemKey.of(Items.OAK_LOG))==1 && plan.usedItems().get(AEItemKey.of(Items.OAK_WOOD))==0,"Native planner manual input differs: used="+plan.usedItems()+" missing="+plan.missingItems()+" simulation="+plan.simulation());submit(plan);phase=5;}
             case 5 -> {if(count(Items.OAK_PLANKS)<4)return false;
                 require(count(Items.OAK_LOG)==1 && count(Items.OAK_WOOD)==4,"Manual CPU resource balance differs");
@@ -124,7 +136,7 @@ public final class DynamicPatternFixture {
                 require(grid.getStorageService().getInventory().extract(AEItemKey.of(Items.OAK_LOG),1,Actionable.MODULATE,source)==1,"Input isolation failed");
                 host.getLogic().getPatternInv().clear(); began=level.getGameTime();phase=6;}
             case 6 -> {if(level.getGameTime()-began<35)return false;calculate(Items.OAK_PLANKS);phase=7;}
-            case 7 -> {if(!future.isDone())return false;var plan=future.get();
+            case 7 -> {if(!future.isDone())return false;var plan=await();
                 require(plan.usedItems().get(AEItemKey.of(Items.OAK_WOOD))==1,"Removing manual pattern did not restore automatic alternative");submit(plan);phase=8;}
             case 8 -> {if(count(Items.OAK_PLANKS)<4)return false;
                 require(count(Items.OAK_WOOD)==3,"Restored automatic CPU resource balance differs");

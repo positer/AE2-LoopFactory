@@ -17,7 +17,8 @@ import net.minecraft.world.item.Items;
 /** Actual automatic-catalog order; external materials exclude every crafting-table intermediate. */
 final class Core256MFixture {
     static final boolean ENABLED = "core256m".equals(System.getProperty("ae2lo.probe.chain", "template"));
-    static final long ORDER = 3_000L;
+    /** Scaling knob: same graph, different output magnitude, so time-vs-size can be fitted. */
+    static final long ORDER = Long.getLong("ae2lo.probe.core.order", 3_000L);
     static final long RAW = 3_000_000_000L;
     static final long ESTIMATED_BYTES = 769_888_153L;
     private static final String[] TIERS = { "1k", "4k", "16k", "64k", "256k", "1m", "4m", "16m", "64m", "256m" };
