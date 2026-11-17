@@ -144,7 +144,8 @@ public final class RuntimeRipperProbe {
             report.put("probe", "real-serverlevel-ae2-grid-ring-whole-job-ripper");
             report.put("minecraft", "1.21.1");
             report.put("orderPerRun", ToolComponentFixture.ENABLED ? 12 : ExactComponentFixture.ENABLED ? 3000 : NativeCatalogFixture.ENABLED ? 3 : CatalogAuditFixture.ENABLED || PackRecipeReloadFixture.ENABLED ? 0 : ORDER);
-            report.put("chain", LoopCondenserOfflineFixture.ENABLED ? "loop_condenser_offline"
+            report.put("chain", OmniMemoryCardFixture.ENABLED ? "omni_memory_card"
+                    : LoopCondenserOfflineFixture.ENABLED ? "loop_condenser_offline"
                     : LoopTickerFixture.ENABLED ? "loop_ticker"
                     : LoopCondenserFixture.ENABLED ? "loop_condenser"
                     : ExactComponentFixture.ENABLED ? "exact_components"
@@ -214,6 +215,10 @@ public final class RuntimeRipperProbe {
                     if (LoopCondenserFixture.ENABLED) {
                         ProbeState.phase = "loop_condenser_wait";
                     }
+                    if (OmniMemoryCardFixture.ENABLED) {
+                        OmniMemoryCardFixture.start(level);
+                        ProbeState.phase = "omni_memory_card";
+                    }
                     if (LoopCondenserOfflineFixture.ENABLED) {
                         LoopCondenserOfflineFixture.start(level, new BlockPos(8, 100, 8));
                         ProbeState.phase = "loop_condenser_offline";
@@ -222,6 +227,16 @@ public final class RuntimeRipperProbe {
                         LoopTickerFixture.bind(level);
                         LoopTickerFixture.start(level, new BlockPos(4, 100, 4));
                         ProbeState.phase = "loop_ticker";
+                    }
+                }
+                case "omni_memory_card" -> {
+                    OmniMemoryCardFixture.tick();
+                    if (OmniMemoryCardFixture.isFinished()) {
+                        report.put("passed", OmniMemoryCardFixture.passed());
+                        report.put("omniMemoryCard", OmniMemoryCardFixture.summary());
+                        ProbeState.phase = OmniMemoryCardFixture.passed() ? "passed" : "failed";
+                        writeReport();
+                        ProbeState.finished = true;
                     }
                 }
                 case "loop_condenser_offline" -> {

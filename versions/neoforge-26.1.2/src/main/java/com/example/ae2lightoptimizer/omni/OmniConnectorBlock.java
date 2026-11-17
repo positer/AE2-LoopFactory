@@ -108,16 +108,12 @@ public final class OmniConnectorBlock extends AEBaseEntityBlock<OmniConnectorBlo
             if (level.isClientSide()) {
                 return InteractionResult.SUCCESS;
             }
-            var tag = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA,
-                    net.minecraft.world.item.component.CustomData.EMPTY).copyTag();
             if (player.isShiftKeyDown()) {
-                tag.putString("ae2lfOmniLink", connector.linkId());
-                stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA,
-                        net.minecraft.world.item.component.CustomData.of(tag));
+                OmniMemoryCard.write(stack, connector.linkId());
                 player.sendSystemMessage(net.minecraft.network.chat.Component.translatable(
                         "message.ae2lightoptimizer.omni.link_copied", connector.linkId()));
             } else {
-                String copied = tag.getString("ae2lfOmniLink").orElse("");
+                String copied = OmniMemoryCard.read(stack);
                 connector.selectLink(copied);
                 player.sendSystemMessage(net.minecraft.network.chat.Component.translatable(
                         "message.ae2lightoptimizer.omni.link_pasted", copied));
