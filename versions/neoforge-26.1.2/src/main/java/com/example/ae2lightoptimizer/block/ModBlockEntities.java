@@ -28,6 +28,11 @@ public final class ModBlockEntities {
             CRAFTING_RIPPER = BLOCK_ENTITIES.register("crafting_ripper",
                     () -> new BlockEntityType<>(CraftingRipperBlockEntity::new, ModBlocks.CRAFTING_RIPPER.get()));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<LoopCondenserBlockEntity>>
+            LOOP_CONDENSER = BLOCK_ENTITIES.register("loop_condenser",
+                    () -> BlockEntityType.Builder.of(LoopCondenserBlockEntity::new,
+                            ModBlocks.LOOP_CONDENSER.get()).build(null));
+
     private ModBlockEntities() {
     }
 }
