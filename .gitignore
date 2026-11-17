@@ -23,3 +23,4 @@ tools/__pycache__/
 
 tools/runtime-factory-probe/background-agent/*.jar
 tools/runtime-factory-probe/dependencies/*.jar
+tools/runtime-ripper-probe/mod-downloads/
