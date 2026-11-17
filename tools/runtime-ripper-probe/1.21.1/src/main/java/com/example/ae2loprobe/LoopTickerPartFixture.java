@@ -41,17 +41,44 @@ public final class LoopTickerPartFixture {
         fastFurnace = base.east(4);
         placeFurnace(controlFurnace);
         placeFurnace(fastFurnace);
-        BlockPos cablePos = fastFurnace.below();
-        level.setBlockAndUpdate(cablePos, AEBlocks.CABLE_BUS.block().defaultBlockState());
-        // A small powered network next to the cable so the part's node can become active.
-        level.setBlockAndUpdate(cablePos.west(1), AEBlocks.CREATIVE_ENERGY_CELL.block().defaultBlockState());
-        level.setBlockAndUpdate(cablePos.west(2), AEBlocks.CONTROLLER.block().defaultBlockState());
-        if (!(level.getBlockEntity(cablePos) instanceof IPartHost host)) {
-            fail("cable bus did not create a part host");
+        // Mount the part on a cable bus that already belongs to the probe's powered network.
+        IPartHost host = null;
+        BlockPos cablePos = null;
+        Direction mountSide = null;
+        outer:
+        for (int dx = -12; dx <= 12; dx++) {
+            for (int dy = -4; dy <= 4; dy++) {
+                for (int dz = -12; dz <= 12; dz++) {
+                    BlockPos probePos = base.offset(dx, dy, dz);
+                    if (level.getBlockEntity(probePos) instanceof IPartHost candidate) {
+                        for (Direction side : Direction.values()) {
+                            if (candidate.getPart(side) == null
+                                    && level.getBlockState(probePos.relative(side)).isAir()) {
+                                host = candidate;
+                                cablePos = probePos;
+                                mountSide = side;
+                                break outer;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (host == null) {
+            fail("no free cable bus in the probe network");
             return;
         }
+        summary.put("mountPos", cablePos.toShortString());
+        summary.put("mountSide", String.valueOf(mountSide));
+        BlockPos targetPos = cablePos.relative(mountSide);
+        level.setBlockAndUpdate(targetPos, Blocks.FURNACE.defaultBlockState());
+        if (level.getBlockEntity(targetPos) instanceof AbstractFurnaceBlockEntity fed) {
+            fed.setItem(0, new ItemStack(Items.RAW_IRON, 16));
+            fed.setItem(1, new ItemStack(Items.COAL, 8));
+        }
+        fastFurnace = targetPos;
         var part = host.addPart(com.example.ae2lightoptimizer.item.ModItems.LOOP_TICKER_PART.get(),
-                Direction.UP, null);
+                mountSide, null);
         if (!(part instanceof LoopTickerPart ticker)) {
             fail("part was not installed");
             return;
