@@ -28,6 +28,9 @@ public final class ModItems {
                     "supercomputing_crafting_optimizer_interface",
                     ModBlocks.SUPERCOMPUTING_CRAFTING_OPTIMIZER_INTERFACE);
 
+    public static final DeferredItem<BlockItem> LOOP_TICKER =
+            ITEMS.registerSimpleBlockItem("loop_ticker", ModBlocks.LOOP_TICKER);
+
     public static final DeferredItem<BlockItem> CRAFTING_RIPPER =
             ITEMS.registerSimpleBlockItem("crafting_ripper", ModBlocks.CRAFTING_RIPPER);
 

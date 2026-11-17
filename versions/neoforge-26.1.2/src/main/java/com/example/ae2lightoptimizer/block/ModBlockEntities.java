@@ -34,6 +34,10 @@ public final class ModBlockEntities {
                             LoopCondenserBlockEntity::new,
                             ModBlocks.LOOP_CONDENSER.get()));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<LoopTickerBlockEntity>>
+            LOOP_TICKER = BLOCK_ENTITIES.register("loop_ticker",
+                    () -> new BlockEntityType<>(LoopTickerBlockEntity::new, ModBlocks.LOOP_TICKER.get()));
+
     private ModBlockEntities() {
     }
 }
