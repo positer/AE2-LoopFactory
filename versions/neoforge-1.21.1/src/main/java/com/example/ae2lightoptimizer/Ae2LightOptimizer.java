@@ -41,6 +41,7 @@ public final class Ae2LightOptimizer {
         com.example.ae2lightoptimizer.factory.FactoryPatternData.COMPONENTS.register(modEventBus);
         CREATIVE_TABS.register(modEventBus);
         com.example.ae2lightoptimizer.menu.CraftingRipperMenu.MENUS.register(modEventBus);
+        com.example.ae2lightoptimizer.menu.LoopTickerMenu.MENUS.register(modEventBus);
         ModBlockEntities.BLOCK_ENTITIES.register(modEventBus);
         modEventBus.addListener(Ae2LightOptimizer::registerCapabilities);
         modEventBus.addListener(Ae2LightOptimizer::addCreativeTabContents);
