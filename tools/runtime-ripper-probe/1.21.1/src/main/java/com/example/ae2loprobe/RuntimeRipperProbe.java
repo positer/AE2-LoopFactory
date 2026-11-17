@@ -143,7 +143,8 @@ public final class RuntimeRipperProbe {
             report.put("probe", "real-serverlevel-ae2-grid-ring-whole-job-ripper");
             report.put("minecraft", "1.21.1");
             report.put("orderPerRun", ToolComponentFixture.ENABLED ? 12 : ExactComponentFixture.ENABLED ? 3000 : NativeCatalogFixture.ENABLED ? 3 : CatalogAuditFixture.ENABLED || PackRecipeReloadFixture.ENABLED ? 0 : ORDER);
-            report.put("chain", LoopCondenserFixture.ENABLED ? "loop_condenser"
+            report.put("chain", LoopTickerFixture.ENABLED ? "loop_ticker"
+                    : LoopCondenserFixture.ENABLED ? "loop_condenser"
                     : ExactComponentFixture.ENABLED ? "exact_components"
                     : ToolComponentFixture.ENABLED ? "tool_components"
                     : PackRecipeReloadFixture.ENABLED ? "pack_catalog"
@@ -209,6 +210,22 @@ public final class RuntimeRipperProbe {
                     bootNetwork();
                     if (LoopCondenserFixture.ENABLED) {
                         ProbeState.phase = "loop_condenser_wait";
+                    }
+                    if (LoopTickerFixture.ENABLED) {
+                        LoopTickerFixture.bind(level);
+                        LoopTickerFixture.start(level, new BlockPos(4, 100, 4));
+                        ProbeState.phase = "loop_ticker";
+                    }
+                }
+                case "loop_ticker" -> {
+                    LoopTickerFixture.tick();
+                    if (LoopTickerFixture.isFinished()) {
+                        report.put("passed", LoopTickerFixture.passed());
+                        report.put("loopTicker", LoopTickerFixture.summary());
+                        ProbeState.status = "Loop ticker: " + LoopTickerFixture.summary();
+                        ProbeState.phase = LoopTickerFixture.passed() ? "passed" : "failed";
+                        writeReport();
+                        ProbeState.finished = true;
                     }
                 }
                 case "loop_condenser_wait" -> {
