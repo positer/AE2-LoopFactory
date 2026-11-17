@@ -143,7 +143,8 @@ public final class RuntimeRipperProbe {
             report.put("probe", "real-serverlevel-ae2-grid-ring-whole-job-ripper");
             report.put("minecraft", "1.21.1");
             report.put("orderPerRun", ToolComponentFixture.ENABLED ? 12 : ExactComponentFixture.ENABLED ? 3000 : NativeCatalogFixture.ENABLED ? 3 : CatalogAuditFixture.ENABLED || PackRecipeReloadFixture.ENABLED ? 0 : ORDER);
-            report.put("chain", ExactComponentFixture.ENABLED ? "exact_components"
+            report.put("chain", LoopCondenserFixture.ENABLED ? "loop_condenser"
+                    : ExactComponentFixture.ENABLED ? "exact_components"
                     : ToolComponentFixture.ENABLED ? "tool_components"
                     : PackRecipeReloadFixture.ENABLED ? "pack_catalog"
                     : NativeCatalogFixture.ENABLED ? "native_catalog_map_extension"
@@ -171,7 +172,9 @@ public final class RuntimeRipperProbe {
             }
             level.setBlockAndUpdate(RIPPER, ModBlocks.CRAFTING_RIPPER.get().defaultBlockState());
             level.setBlockAndUpdate(RING, ModBlocks.RECIPE_RING_SOLVER_TERMINAL.get().defaultBlockState());
-            if (Core256MFixture.ENABLED || ChannelCapacityFixture.ENABLED) level.setBlockAndUpdate(OPTIMIZER,
+            if (LoopCondenserFixture.ENABLED) level.setBlockAndUpdate(OPTIMIZER,
+                com.example.ae2lightoptimizer.block.ModBlocks.LOOP_CONDENSER.get().defaultBlockState());
+        if (Core256MFixture.ENABLED || ChannelCapacityFixture.ENABLED) level.setBlockAndUpdate(OPTIMIZER,
                     ModBlocks.SUPERCOMPUTING_CRAFTING_OPTIMIZER_INTERFACE.get().defaultBlockState());
             var drive = (DriveBlockEntity) level.getBlockEntity(DRIVE);
             drive.getInternalInventory().setItemDirect(0, ModItems.INFINITE_LOOP_STORAGE_CELL.get().getDefaultInstance());
@@ -197,7 +200,24 @@ public final class RuntimeRipperProbe {
         try {
             if (tick() - startedTick > (ChannelCapacityFixture.ENABLED ? 5000 : 2400)) throw new IllegalStateException("Probe timeout in " + ProbeState.phase);
             switch (ProbeState.phase) {
-                case "network_boot" -> bootNetwork();
+                case "network_boot" -> {
+                    bootNetwork();
+                    if (LoopCondenserFixture.ENABLED) {
+                        LoopCondenserFixture.start(level, grid, OPTIMIZER);
+                        ProbeState.phase = "loop_condenser";
+                    }
+                }
+                case "loop_condenser" -> {
+                    LoopCondenserFixture.tick();
+                    if (LoopCondenserFixture.isFinished()) {
+                        report.put("passed", LoopCondenserFixture.passed());
+                        report.put("loopCondenser", LoopCondenserFixture.summary());
+                        ProbeState.status = "Loop condenser: " + LoopCondenserFixture.summary();
+                        ProbeState.phase = LoopCondenserFixture.passed() ? "passed" : "failed";
+                        writeReport();
+                        ProbeState.finished = true;
+                    }
+                }
                 case "tool_components" -> {
                     ToolComponentFixture.tick();
                     if (ToolComponentFixture.isFinished()) {
