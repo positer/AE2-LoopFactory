@@ -69,7 +69,8 @@ public final class CondenserLoopService {
         IGrid grid = condenser.mainNode().getGrid();
         if (grid == null) return;
 
-        ItemStack cell = condenser.getInternalInventory().getStackInSlot(0);
+        ItemStack cell = ((com.example.ae2lightoptimizer.mixin.CondenserStorageSlotAccessor) (Object) condenser)
+                .ae2lf$storageSlot().getStackInSlot(0);
         if (cell.isEmpty() || !(cell.getItem() instanceof ICellWorkbenchItem workbench)) return;
         var config = workbench.getConfigInventory(cell);
         if (config.keySet().isEmpty()) return; // Unmarked cell: no behaviour at all.
