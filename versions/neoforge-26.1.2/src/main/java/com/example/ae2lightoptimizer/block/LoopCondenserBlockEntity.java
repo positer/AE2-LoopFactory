@@ -39,13 +39,16 @@ public final class LoopCondenserBlockEntity extends appeng.blockentity.misc.Cond
     public void onLoad() {
         super.onLoad();
         if (level != null && !level.isClientSide()) {
-            GridHelper.onFirstTick(this, owner ->
-                    owner.mainNode.create(owner.getLevel(), owner.getBlockPos()));
+            GridHelper.onFirstTick(this, owner -> {
+                owner.mainNode.create(owner.getLevel(), owner.getBlockPos());
+                com.example.ae2lightoptimizer.integration.CondenserLoopService.register(owner);
+            });
         }
     }
 
     @Override
     public void setRemoved() {
+        com.example.ae2lightoptimizer.integration.CondenserLoopService.unregister(this);
         mainNode.destroy();
         super.setRemoved();
     }

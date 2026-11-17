@@ -13,8 +13,7 @@ import appeng.core.definitions.AEItems;
 import appeng.me.helpers.BaseActionSource;
 import appeng.util.prioritylist.IPartitionList;
 import com.example.ae2lightoptimizer.item.ModItems;
-import com.example.ae2lightoptimizer.mixin.CondenserLoopNode;
-import com.example.ae2lightoptimizer.mixin.CondenserStorageSlotAccessor;
+import com.example.ae2lightoptimizer.block.LoopCondenserBlockEntity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,18 +28,18 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  * output slot never throttles the conversion.
  */
 public final class CondenserLoopService {
-    private static final Set<CondenserBlockEntity> LOADED = Collections.newSetFromMap(new WeakHashMap<>());
+    private static final Set<LoopCondenserBlockEntity> LOADED = Collections.newSetFromMap(new WeakHashMap<>());
     private static final int INTERVAL_TICKS = 5;
     private static int tickCounter;
 
     private CondenserLoopService() {
     }
 
-    public static void register(CondenserBlockEntity condenser) {
+    public static void register(LoopCondenserBlockEntity condenser) {
         LOADED.add(condenser);
     }
 
-    public static void unregister(CondenserBlockEntity condenser) {
+    public static void unregister(LoopCondenserBlockEntity condenser) {
         LOADED.remove(condenser);
     }
 
@@ -48,7 +47,7 @@ public final class CondenserLoopService {
         if (++tickCounter % INTERVAL_TICKS != 0 || LOADED.isEmpty()) {
             return;
         }
-        for (CondenserBlockEntity condenser : new ArrayList<>(LOADED)) {
+        for (LoopCondenserBlockEntity condenser : new ArrayList<>(LOADED)) {
             if (condenser.isRemoved()) {
                 LOADED.remove(condenser);
                 continue;
@@ -61,26 +60,16 @@ public final class CondenserLoopService {
         }
     }
 
-    private static boolean ae2lf$hasLoopCard(CondenserBlockEntity condenser) {
-        var inventory = condenser.getInternalInventory();
-        for (int slot = 0; slot < inventory.size(); slot++) {
-            var stack = inventory.getStackInSlot(slot);
-            if (!stack.isEmpty() && stack.is(ModItems.LOOP_CARD.get())) return true;
-        }
-        return false;
-    }
-
-    private static void drive(CondenserBlockEntity condenser) {
+    
+    private static void drive(LoopCondenserBlockEntity condenser) {
         if (condenser.getLevel() == null || condenser.getLevel().isClientSide()) return;
         // The condenser has no upgrade inventory of its own yet; the card is looked up in whatever
         // inventory it exposes so the driver works the moment an insertion path exists.
-        if (!ae2lf$hasLoopCard(condenser)) return;
 
-        var node = ((CondenserLoopNode) condenser).ae2lf$node();
-        IGrid grid = node == null ? null : node.getGrid();
+        IGrid grid = condenser.mainNode().getGrid();
         if (grid == null) return;
 
-        ItemStack cell = ((CondenserStorageSlotAccessor) condenser).ae2lf$storageSlot().getStackInSlot(0);
+        ItemStack cell = condenser.getInternalInventory().getStackInSlot(0);
         if (cell.isEmpty() || !(cell.getItem() instanceof ICellWorkbenchItem workbench)) return;
         var config = workbench.getConfigInventory(cell);
         if (config.keySet().isEmpty()) return; // Unmarked cell: no behaviour at all.

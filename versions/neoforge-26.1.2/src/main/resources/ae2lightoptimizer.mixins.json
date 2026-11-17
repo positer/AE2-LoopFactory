@@ -28,9 +28,7 @@
     "OptimizerChannelConnectionMixin",
     "OmniNodeEnergyMixin",
     "OmniConnectionEnergyMixin",
-    "OmniAdHocEnergyMixin",
-    "CondenserLoopMixin",
-    "CondenserStorageSlotAccessor"
+    "OmniAdHocEnergyMixin"
   ],
   "injectors": {
     "defaultRequire": 1
