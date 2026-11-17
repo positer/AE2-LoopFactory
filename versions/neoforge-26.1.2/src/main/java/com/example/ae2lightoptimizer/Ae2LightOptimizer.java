@@ -55,6 +55,8 @@ public final class Ae2LightOptimizer {
                     com.example.ae2lightoptimizer.block.CraftingRipperBlockEntity.class,
                     ModBlockEntities.CRAFTING_RIPPER.get(), null, null);
             Upgrades.add(ModItems.LOOP_CARD.get(), ModBlocks.CRAFTING_RIPPER.get(), 1);
+            // The Matter Condenser accepts the Loop Card in its upgrade slot once it becomes a network member.
+            Upgrades.add(ModItems.LOOP_CARD.get(), appeng.core.definitions.AEBlocks.CONDENSER.block(), 1);
             StorageCells.addCellHandler(LoopStorageCellHandler.INSTANCE);
             for (var cell : ModItems.PORTABLE_LOOP_STORAGE_CELLS) {
                 var item = cell.get();
