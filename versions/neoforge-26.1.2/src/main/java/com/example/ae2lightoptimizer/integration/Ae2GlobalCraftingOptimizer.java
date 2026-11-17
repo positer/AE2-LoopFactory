@@ -31,6 +31,8 @@ import org.jetbrains.annotations.Nullable;
 
 /** Bridges the compressed shared planner into AE2's network-wide crafting calculation. */
 public final class Ae2GlobalCraftingOptimizer {
+    /** Passive timing for the acceptance harness. */
+    public static volatile long phaseAdapterNanos;
     private static final GlobalCraftingPlanner PLANNER = new GlobalCraftingPlanner();
     private static final long RESERVED_CYCLE_ROUNDS = 16;
 
@@ -55,7 +57,9 @@ public final class Ae2GlobalCraftingOptimizer {
             if (!takeoverPolicy.hasActiveService()) {
                 return OptimizationAttempt.notHandled();
             }
+            long adapterStarted = System.nanoTime();
             GraphAdapter adapter = collectReachableGraph(grid, networkInventory, requestedKey);
+            phaseAdapterNanos = System.nanoTime() - adapterStarted;
             if (adapter.patterns().isEmpty()) {
                 return OptimizationAttempt.notHandled();
             }

@@ -12,14 +12,21 @@ import java.util.Map;
 import java.util.Set;
 
 public final class GlobalCraftingPlanner {
+    /** Passive phase timings for the acceptance harness; never read by production logic. */
+    public static volatile long phaseGraphNanos, phaseBalanceNanos, phaseSelectNanos, phaseComponentsNanos, phaseScheduleNanos;
     public GlobalCraftingPlan plan(GlobalPlanRequest request) {
         try {
+            long t0 = System.nanoTime();
             Graph graph = buildRelevantGraph(request.target(), request.patterns());
+            long t1 = System.nanoTime();
+            phaseGraphNanos = t1 - t0;
             // The reserve is a runtime seed-retention policy, not a deduction from the
             // current order's inventory. Subtracting it here made every finite order
             // falsely report the fixed reserve as missing external inputs.
             Map<String, Long> usableStock = new LinkedHashMap<>(request.availableStock());
             BalanceResult balance = solveBalances(request, graph, usableStock);
+            long t2 = System.nanoTime();
+            phaseBalanceNanos = t2 - t1;
             if (balance.status() != GlobalPlanStatus.SOLVED) {
                 return failed(balance.status(), false, 0, balance.iterations(), 0);
             }
@@ -27,7 +34,11 @@ public final class GlobalCraftingPlanner {
             // Ownership follows the recipes this order actually uses. Automatic
             // catalogs contain unused reverse recipes even for ordinary DAG jobs.
             Graph selected = selectedGraph(graph, balance.patternCounts());
+            long t3 = System.nanoTime();
+            phaseSelectNanos = t3 - t2;
             Components components = findComponents(selected);
+            long t4 = System.nanoTime();
+            phaseComponentsNanos = t4 - t3;
             boolean cyclic = !components.cyclicComponents().isEmpty();
             if (cyclic && !request.ringTerminalOnline()) {
                 return failed(GlobalPlanStatus.CYCLE_TERMINAL_REQUIRED, true,
@@ -39,7 +50,8 @@ public final class GlobalCraftingPlanner {
 
             ScheduleResult schedule = buildCompressedSchedule(
                     graph, balance.patternCounts(), request.target(),
-                    request.emittableResources(), usableStock, request.budget());
+                    request.emittableResources(), usableStock, request.budget(), selected, components);
+            phaseScheduleNanos = System.nanoTime() - t4;
             if (schedule.status() != GlobalPlanStatus.SOLVED) {
                 return failed(schedule.status(), cyclic, components.count(),
                         balance.iterations(), schedule.batches());
@@ -317,10 +329,10 @@ public final class GlobalCraftingPlanner {
     private static ScheduleResult buildCompressedSchedule(
             Graph graph, Map<String, Long> patternCounts, String preferredSeedResource,
             Set<String> emittable, Map<String, Long> availableStock,
-            GlobalPlanningBudget budget) {
+            GlobalPlanningBudget budget, Graph selected, Components components) {
         Map<String, GlobalPattern> byId = new LinkedHashMap<>();
         graph.patterns().forEach(pattern -> byId.put(pattern.id(), pattern));
-        Map<String, Long> remaining = dependencyOrderedCounts(graph, patternCounts);
+        Map<String, Long> remaining = dependencyOrderedCounts(selected, components, patternCounts);
         Map<String, Long> stock = new LinkedHashMap<>();
         Map<String, Long> required = new LinkedHashMap<>();
         Map<String, Long> emitted = new LinkedHashMap<>();
@@ -386,12 +398,13 @@ public final class GlobalCraftingPlanner {
         return new ScheduleResult(GlobalPlanStatus.SOLVED, schedule, required, emitted, schedule.size());
     }
 
-    private static Map<String, Long> dependencyOrderedCounts(Graph graph, Map<String, Long> patternCounts) {
-        Graph selectedGraph = selectedGraph(graph, patternCounts);
+    /**
+     * Orders the selected recipes by their strongly connected component. The selected graph and its
+     * components are computed once by the caller: recomputing them here doubled the SCC cost.
+     */
+    private static Map<String, Long> dependencyOrderedCounts(Graph selectedGraph, Components components,
+                                                             Map<String, Long> patternCounts) {
         List<GlobalPattern> selected = selectedGraph.patterns();
-        // Only selected recipes constrain this schedule. An unused reverse recipe
-        // must not merge a consumer with the growth component feeding it.
-        Components components = findComponents(selectedGraph);
         Map<String, Integer> order = new HashMap<>();
         for (GlobalPattern pattern : selected) {
             // Tarjan visits output -> input edges, so dependency components finish

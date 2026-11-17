@@ -2,6 +2,7 @@ package com.example.ae2loprobe;
 
 import appeng.api.stacks.AEKey;
 import com.example.ae2lightoptimizer.crafting.GlobalCraftingPlan;
+import com.example.ae2lightoptimizer.crafting.GlobalCraftingPlanner;
 import com.example.ae2lightoptimizer.crafting.GlobalPlanRequest;
 import com.example.ae2lightoptimizer.integration.Ae2GlobalCraftingOptimizer;
 import com.google.gson.Gson;
@@ -47,13 +48,20 @@ public final class PlannerDiagnostic {
         write("planner-result-" + context.id + ".json", plan);
         double elapsedMillis = context.startedNanos == 0 ? -1
                 : (System.nanoTime() - context.startedNanos) / 1_000_000.0;
-        write("planner-timing-" + context.id + ".json", Map.of(
-                "status", String.valueOf(plan.status()),
-                "cyclic", plan.cyclic(),
-                "balanceIterations", plan.balanceIterations(),
-                "scheduleBatches", plan.scheduleBatches(),
-                "patternKinds", plan.patternCounts().size(),
-                "elapsedMillis", elapsedMillis));
+        var timing = new LinkedHashMap<String, Object>();
+        timing.put("status", String.valueOf(plan.status()));
+        timing.put("cyclic", plan.cyclic());
+        timing.put("balanceIterations", plan.balanceIterations());
+        timing.put("scheduleBatches", plan.scheduleBatches());
+        timing.put("patternKinds", plan.patternCounts().size());
+        timing.put("adapterMillis", com.example.ae2lightoptimizer.integration.Ae2GlobalCraftingOptimizer.phaseAdapterNanos / 1_000_000.0);
+        timing.put("graphMillis", GlobalCraftingPlanner.phaseGraphNanos / 1_000_000.0);
+        timing.put("balanceMillis", GlobalCraftingPlanner.phaseBalanceNanos / 1_000_000.0);
+        timing.put("selectMillis", GlobalCraftingPlanner.phaseSelectNanos / 1_000_000.0);
+        timing.put("componentsMillis", GlobalCraftingPlanner.phaseComponentsNanos / 1_000_000.0);
+        timing.put("scheduleMillis", GlobalCraftingPlanner.phaseScheduleNanos / 1_000_000.0);
+        timing.put("elapsedMillis", elapsedMillis);
+        write("planner-timing-" + context.id + ".json", timing);
         LoggerFactory.getLogger("AE2LO-Runtime-Probe").info(
                 "Shared planner attempt {} status={} cyclic={} balanceIterations={} scheduleBatches={} elapsedMillis={}",
                 context.id, plan.status(), plan.cyclic(), plan.balanceIterations(), plan.scheduleBatches(), elapsedMillis);
