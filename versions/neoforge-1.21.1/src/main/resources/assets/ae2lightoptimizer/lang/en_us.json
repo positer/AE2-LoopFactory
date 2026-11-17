@@ -193,5 +193,7 @@
   "gui.ae2lightoptimizer.omni.links": "Visible channels (endpoints)",
   "gui.ae2lightoptimizer.omni.private": "Private",
   "gui.ae2lightoptimizer.omni.visibility": "Channel visibility",
-  "gui.ae2lightoptimizer.omni.visibility.hint": "Locked: only you can see and join this channel"
+  "gui.ae2lightoptimizer.omni.visibility.hint": "Locked: only you can see and join this channel",
+  "message.ae2lightoptimizer.omni.link_copied": "Copied link: %s",
+  "message.ae2lightoptimizer.omni.link_pasted": "Applied link: %s"
 }

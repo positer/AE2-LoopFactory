@@ -193,5 +193,7 @@
   "gui.ae2lightoptimizer.omni.links": "可见频道（括号内为端点数）",
   "gui.ae2lightoptimizer.omni.private": "私有",
   "gui.ae2lightoptimizer.omni.visibility": "频道可见性",
-  "gui.ae2lightoptimizer.omni.visibility.hint": "锁定：仅你可查看与加入该频道"
+  "gui.ae2lightoptimizer.omni.visibility.hint": "锁定：仅你可查看与加入该频道",
+  "message.ae2lightoptimizer.omni.link_copied": "已复制连接：%s",
+  "message.ae2lightoptimizer.omni.link_pasted": "已应用连接：%s"
 }

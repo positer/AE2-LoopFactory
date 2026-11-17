@@ -98,6 +98,35 @@ public final class OmniConnectorBlock extends AEBaseEntityBlock<OmniConnectorBlo
         level.addParticle(OmniContent.PULSE.get(), pos.getX() + 0.5 + dx * 0.06,
                 pos.getY() + 0.5 + dy * 0.06, pos.getZ() + 0.5 + dz * 0.06, dx * speed, dy * speed, dz * speed);
     }
+    /** Copies the selected link into an AE2 memory card, or applies the card's link to this connector. */
+    @Override
+    protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
+            BlockState state, Level level, BlockPos pos, Player player,
+            net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        if (stack.is(appeng.core.definitions.AEItems.MEMORY_CARD.asItem())
+                && level.getBlockEntity(pos) instanceof OmniConnectorBlockEntity connector) {
+            if (level.isClientSide()) {
+                return net.minecraft.world.ItemInteractionResult.SUCCESS;
+            }
+            var tag = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+                    net.minecraft.world.item.component.CustomData.EMPTY).copyTag();
+            if (player.isShiftKeyDown()) {
+                tag.putString("ae2lfOmniLink", connector.linkId());
+                stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+                        net.minecraft.world.item.component.CustomData.of(tag));
+                player.displayClientMessage(net.minecraft.network.chat.Component.translatable(
+                        "message.ae2lightoptimizer.omni.link_copied", connector.linkId()), true);
+            } else {
+                String copied = tag.getString("ae2lfOmniLink");
+                connector.selectLink(copied);
+                player.displayClientMessage(net.minecraft.network.chat.Component.translatable(
+                        "message.ae2lightoptimizer.omni.link_pasted", copied), true);
+            }
+            return net.minecraft.world.ItemInteractionResult.SUCCESS;
+        }
+        return super.useItemOn(stack, state, level, pos, player, hand, hit);
+    }
+
     @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (player.isShiftKeyDown()) return super.useWithoutItem(state, level, pos, player, hit);
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof OmniConnectorBlockEntity endpoint) {

@@ -82,6 +82,10 @@ public final class Ae2LightOptimizer {
                 AECapabilities.IN_WORLD_GRID_NODE_HOST,
                 ModBlockEntities.LOOP_CONDENSER.get(),
                 (condenser, ignoredContext) -> condenser);
+        event.registerBlockEntity(
+                AECapabilities.IN_WORLD_GRID_NODE_HOST,
+                ModBlockEntities.LOOP_TICKER.get(),
+                (ticker, ignoredContext) -> ticker);
     }
 
     private static void addCreativeTabContents(BuildCreativeModeTabContentsEvent event) {
