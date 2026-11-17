@@ -55,7 +55,11 @@ final class Core256MFixture {
                 "singularity", 363_000L, "loop_crystal_powder", 29_160_000L);
     }
 
+    private static IGrid gridRef;
+    private static net.minecraft.world.level.Level gridLevelRef;
     static Map<String, Object> prepare(IGrid grid, CraftingRipperBlockEntity ripper) {
+        gridRef = grid;
+        gridLevelRef = ripper.getLevel();
         ripper.getUpgrades().setItemDirect(0, ModItems.LOOP_CARD.get().getDefaultInstance());
         check(ripper.isLoopCardInstalled(), "Core fixture Loop Card did not install");
         var keys = keys();
@@ -74,7 +78,6 @@ final class Core256MFixture {
         }
         var result = new LinkedHashMap<String, Object>();
         result.put("mode", "loop_card_catalog");
-        try { startNative(grid, ripper.getLevel()); } catch (Throwable ignored) { }
         result.put("estimatedPlanBytes", ESTIMATED_BYTES);
         result.put("rawStockPerKey", RAW);
         result.put("externalMaterials", consumption().keySet());
@@ -95,6 +98,10 @@ final class Core256MFixture {
     }
 
     static void verifyPlan(ICraftingPlan plan) {
+        // Submit the vanilla control only after the AE2LF plan is validated, so the two never overlap.
+        if (!"false".equals(System.getProperty("ae2lo.probe.native"))) {
+            try { startNative(gridRef, gridLevelRef); } catch (Throwable ignored) { }
+        }
         var byKey = new LinkedHashMap<AEItemKey, String>();
         keys().forEach((name, key) -> byKey.put(key, name));
         var observed = new LinkedHashMap<String, Long>();

@@ -55,7 +55,11 @@ final class Core256MFixture {
                 "singularity", 363_000L, "loop_crystal_powder", 29_160_000L);
     }
 
+    private static IGrid gridRef;
+    private static net.minecraft.world.level.Level gridLevelRef;
     static Map<String, Object> prepare(IGrid grid, CraftingRipperBlockEntity ripper) {
+        gridRef = grid;
+        gridLevelRef = ripper.getLevel();
         ripper.getUpgrades().setItemDirect(0, ModItems.LOOP_CARD.get().getDefaultInstance());
         check(ripper.isLoopCardInstalled(), "Core fixture Loop Card did not install");
         var keys = keys();
@@ -94,6 +98,10 @@ final class Core256MFixture {
     }
 
     static void verifyPlan(ICraftingPlan plan) {
+        // Submit the vanilla control only after the AE2LF plan is validated, so the two never overlap.
+        if (!"false".equals(System.getProperty("ae2lo.probe.native"))) {
+            try { startNative(gridRef, gridLevelRef); } catch (Throwable ignored) { }
+        }
         var byKey = new LinkedHashMap<AEItemKey, String>();
         keys().forEach((name, key) -> byKey.put(key, name));
         var observed = new LinkedHashMap<String, Long>();
@@ -146,5 +154,49 @@ final class Core256MFixture {
 
     private static void check(boolean condition, String message) {
         if (!condition) throw new IllegalStateException(message);
+    }
+
+    // --- Native AE2 planner on the same ring target: evidence that vanilla cannot settle it ---
+    private static java.util.concurrent.Future<appeng.api.networking.crafting.ICraftingPlan> nativeFuture;
+    private static long nativeStartedNanos;
+    private static Map<String, Object> nativeAttempt;
+
+    static void startNative(appeng.api.networking.IGrid grid, net.minecraft.world.level.Level level) {
+        try {
+            nativeStartedNanos = System.nanoTime();
+            nativeFuture = grid.getCraftingService().beginCraftingCalculation(level,
+                    () -> new MachineSource(grid::getPivot), keys().get("core_256m"), ORDER,
+                    appeng.api.networking.crafting.CalculationStrategy.REPORT_MISSING_ITEMS);
+        } catch (Throwable failure) {
+            nativeAttempt = Map.of("submitted", false, "exception", failure.getClass().getName() + ": " + failure.getMessage());
+        }
+    }
+
+    static void pollNative() {
+        if (nativeAttempt != null || nativeFuture == null) return;
+        double elapsedMillis = (System.nanoTime() - nativeStartedNanos) / 1_000_000.0;
+        try {
+            if (nativeFuture.isDone()) {
+                var plan = nativeFuture.get();
+                nativeAttempt = Map.of("submitted", true, "done", true, "elapsedMillis", elapsedMillis,
+                        "simulation", plan.simulation(), "missing", plan.missingItems().size(),
+                        "used", plan.usedItems().size(), "patternTimes", plan.patternTimes().size());
+            } else if (elapsedMillis > 20_000) {
+                nativeAttempt = Map.of("submitted", true, "done", false, "elapsedMillis", elapsedMillis,
+                        "outcome", "not finished within 20 s of server ticks");
+                nativeFuture.cancel(true);
+            }
+        } catch (Throwable failure) {
+            nativeAttempt = Map.of("submitted", true, "done", true, "elapsedMillis", elapsedMillis,
+                    "exception", failure.getClass().getName() + ": " + String.valueOf(failure.getMessage()));
+        }
+    }
+
+    static Map<String, Object> nativeAttempt() {
+        if (nativeAttempt != null) return nativeAttempt;
+        if (nativeFuture == null) return Map.of("submitted", false);
+        return Map.of("submitted", true, "done", nativeFuture.isDone(),
+                "elapsedMillis", (System.nanoTime() - nativeStartedNanos) / 1_000_000.0,
+                "outcome", "not finished when the job completed");
     }
 }
