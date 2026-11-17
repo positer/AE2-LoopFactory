@@ -201,10 +201,25 @@ public final class RuntimeRipperProbe {
             if (tick() - startedTick > (ChannelCapacityFixture.ENABLED ? 5000 : 2400)) throw new IllegalStateException("Probe timeout in " + ProbeState.phase);
             switch (ProbeState.phase) {
                 case "network_boot" -> {
+                    var be = level.getBlockEntity(OPTIMIZER);
+                    report.put("probeDebug", Map.of(
+                            "gridPresent", grid != null,
+                            "blockEntity", be == null ? "null" : be.getClass().getName(),
+                            "phaseBeforeBoot", ProbeState.phase));
                     bootNetwork();
                     if (LoopCondenserFixture.ENABLED) {
+                        ProbeState.phase = "loop_condenser_wait";
+                    }
+                }
+                case "loop_condenser_wait" -> {
+                    if (grid == null || grid.getStorageService() == null) return;
+                    try {
                         LoopCondenserFixture.start(level, grid, OPTIMIZER);
+                        report.put("loopCondenserStarted", true);
                         ProbeState.phase = "loop_condenser";
+                    } catch (Throwable failure) {
+                        report.put("loopCondenserStartFailure", String.valueOf(failure));
+                        ProbeState.phase = "failed";
                     }
                 }
                 case "loop_condenser" -> {

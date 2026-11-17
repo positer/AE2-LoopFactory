@@ -29,6 +29,9 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> LOOP_CONDENSER = ITEMS.register(
             "loop_condenser", () -> new BlockItem(ModBlocks.LOOP_CONDENSER.get(), new Item.Properties()));
 
+    public static final DeferredItem<BlockItem> LOOP_TICKER = ITEMS.register(
+            "loop_ticker", () -> new BlockItem(ModBlocks.LOOP_TICKER.get(), new Item.Properties()));
+
     public static final DeferredItem<BlockItem> CRAFTING_RIPPER = ITEMS.register(
             "crafting_ripper", () -> new BlockItem(ModBlocks.CRAFTING_RIPPER.get(), new Item.Properties()));
     public static final DeferredItem<com.example.ae2lightoptimizer.factory.FactoryPatternItem> LOOP_FACTORY_PATTERN = ITEMS.register("loop_factory_pattern", () -> new com.example.ae2lightoptimizer.factory.FactoryPatternItem(new Item.Properties()));

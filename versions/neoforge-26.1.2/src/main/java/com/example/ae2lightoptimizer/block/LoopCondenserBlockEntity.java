@@ -27,6 +27,7 @@ public final class LoopCondenserBlockEntity extends appeng.blockentity.misc.Cond
 
     private final IManagedGridNode mainNode = GridHelper.createManagedNode(this, NODE_LISTENER)
             .setFlags(GridFlags.REQUIRE_CHANNEL)
+            .setExposedOnSides(java.util.EnumSet.allOf(Direction.class))
             .setIdlePowerUsage(0.0)
             .setInWorldNode(true)
             .setTagName("mainNode");
@@ -39,10 +40,9 @@ public final class LoopCondenserBlockEntity extends appeng.blockentity.misc.Cond
     public void onLoad() {
         super.onLoad();
         if (level != null && !level.isClientSide()) {
-            GridHelper.onFirstTick(this, owner -> {
-                owner.mainNode.create(owner.getLevel(), owner.getBlockPos());
-                com.example.ae2lightoptimizer.integration.CondenserLoopService.register(owner);
-            });
+            // Creation is deferred to the server tick loop: the block entity is not ticked itself and
+            // onLoad runs before the block entity is reachable through the level.
+            com.example.ae2lightoptimizer.integration.CondenserLoopService.register(this);
         }
     }
 
@@ -53,6 +53,9 @@ public final class LoopCondenserBlockEntity extends appeng.blockentity.misc.Cond
         super.setRemoved();
     }
 
+    /** Diagnostic: how often the grid asked this host for its node. */
+    public static volatile int gridNodeQueries;
+
     public IManagedGridNode mainNode() {
         return mainNode;
     }
@@ -60,6 +63,7 @@ public final class LoopCondenserBlockEntity extends appeng.blockentity.misc.Cond
     @Override
     @Nullable
     public IGridNode getGridNode(Direction side) {
+        gridNodeQueries++;
         return mainNode.getNode();
     }
 }

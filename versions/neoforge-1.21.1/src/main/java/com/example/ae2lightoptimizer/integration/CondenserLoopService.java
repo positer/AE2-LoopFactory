@@ -63,6 +63,11 @@ public final class CondenserLoopService {
     
     private static void drive(LoopCondenserBlockEntity condenser) {
         if (condenser.getLevel() == null || condenser.getLevel().isClientSide()) return;
+        // Create the node from the server tick loop: the condenser block entity is not ticked, so a
+        // first-tick callback would never run and an onLoad create is too early to join the grid.
+        if (condenser.mainNode().getNode() == null) {
+            condenser.mainNode().create(condenser.getLevel(), condenser.getBlockPos());
+        }
         // The condenser has no upgrade inventory of its own yet; the card is looked up in whatever
         // inventory it exposes so the driver works the moment an insertion path exists.
 

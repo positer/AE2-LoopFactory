@@ -7,6 +7,10 @@ import org.jetbrains.annotations.Nullable;
 
 /** Condenser block whose block entity can also join the ME network. */
 public final class LoopCondenserBlock extends appeng.block.misc.CondenserBlock {
+    public LoopCondenserBlock(net.minecraft.world.level.block.state.BlockBehaviour.Properties properties) {
+        super(properties);
+    }
+
     @Override
     @Nullable
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {

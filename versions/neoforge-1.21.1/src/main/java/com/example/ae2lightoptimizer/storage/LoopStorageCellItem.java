@@ -1,5 +1,6 @@
 package com.example.ae2lightoptimizer.storage;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -8,9 +9,15 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import appeng.api.config.FuzzyMode;
+import appeng.api.ids.AEComponents;
+import appeng.api.stacks.AEKeyTypes;
+import appeng.api.storage.cells.ICellWorkbenchItem;
+import appeng.items.contents.CellConfig;
+import appeng.util.ConfigInventory;
 
 /** Identifies a cyclic storage cell and its loader-independent capacity tier. */
-public final class LoopStorageCellItem extends Item implements LoopStorageTierProvider {
+public final class LoopStorageCellItem extends Item implements LoopStorageTierProvider, ICellWorkbenchItem {
     private final LoopStorageTier tier;
 
     public LoopStorageCellItem(LoopStorageTier tier, Properties properties) {
@@ -21,6 +28,22 @@ public final class LoopStorageCellItem extends Item implements LoopStorageTierPr
     @Override
     public LoopStorageTier tier() {
         return tier;
+    }
+
+    /** The Cell Workbench partition, so a condenser can tell a marked cell from an unmarked one. */
+    @Override
+    public ConfigInventory getConfigInventory(ItemStack stack) {
+        return CellConfig.create(new LinkedHashSet<>(AEKeyTypes.getAll()), stack);
+    }
+
+    @Override
+    public FuzzyMode getFuzzyMode(ItemStack stack) {
+        return stack.getOrDefault(AEComponents.STORAGE_CELL_FUZZY_MODE, FuzzyMode.IGNORE_ALL);
+    }
+
+    @Override
+    public void setFuzzyMode(ItemStack stack, FuzzyMode mode) {
+        stack.set(AEComponents.STORAGE_CELL_FUZZY_MODE, mode);
     }
 
     @Override

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "ae2lightoptimizer:block/loop_ticker",
+    "down": "ae2lightoptimizer:block/loop_ticker_sides",
+    "up": "ae2lightoptimizer:block/loop_ticker_sides",
+    "north": "ae2lightoptimizer:block/loop_ticker",
+    "south": "ae2lightoptimizer:block/loop_ticker_sides",
+    "west": "ae2lightoptimizer:block/loop_ticker_sides",
+    "east": "ae2lightoptimizer:block/loop_ticker_sides"
+  }
+}

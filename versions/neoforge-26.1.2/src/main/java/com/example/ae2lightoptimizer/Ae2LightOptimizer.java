@@ -55,6 +55,11 @@ public final class Ae2LightOptimizer {
                     com.example.ae2lightoptimizer.block.CraftingRipperBlockEntity.class,
                     ModBlockEntities.CRAFTING_RIPPER.get(), null, null);
             Upgrades.add(ModItems.LOOP_CARD.get(), ModBlocks.CRAFTING_RIPPER.get(), 1);
+            @SuppressWarnings({"unchecked", "rawtypes"})
+            var condenserType = (net.minecraft.world.level.block.entity.BlockEntityType)
+                    ModBlockEntities.LOOP_CONDENSER.get();
+            ModBlocks.LOOP_CONDENSER.get().setBlockEntity(
+                    appeng.blockentity.misc.CondenserBlockEntity.class, condenserType, null, null);
             // The Matter Condenser accepts the Loop Card in its upgrade slot once it becomes a network member.
             Upgrades.add(ModItems.LOOP_CARD.get(), appeng.core.definitions.AEBlocks.CONDENSER.block(), 1);
             net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(com.example.ae2lightoptimizer.integration.CondenserLoopService::onServerTick);
@@ -101,6 +106,10 @@ public final class Ae2LightOptimizer {
                 AECapabilities.IN_WORLD_GRID_NODE_HOST,
                 ModBlockEntities.SUPERCOMPUTING_CRAFTING_OPTIMIZER_INTERFACE.get(),
                 (optimizer, ignoredContext) -> optimizer);
+        event.registerBlockEntity(
+                AECapabilities.IN_WORLD_GRID_NODE_HOST,
+                ModBlockEntities.LOOP_CONDENSER.get(),
+                (condenser, ignoredContext) -> condenser);
     }
 
     private static void addCreativeTabContents(BuildCreativeModeTabContentsEvent event) {

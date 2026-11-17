@@ -43,6 +43,25 @@ public final class LoopCondenserFixture {
             fail("block entity missing");
             return;
         }
+        // A drive right next to the condenser joins the same grid without any cable part.
+        var drivePos = pos.east(1);
+        level.setBlockAndUpdate(drivePos, appeng.core.definitions.AEBlocks.DRIVE.block().defaultBlockState());
+        // A controller plus a creative energy cell make the little network channel-capable.
+        level.setBlockAndUpdate(pos.west(1), appeng.core.definitions.AEBlocks.CONTROLLER.block().defaultBlockState());
+        level.setBlockAndUpdate(pos.west(2), appeng.core.definitions.AEBlocks.CREATIVE_ENERGY_CELL.block().defaultBlockState());
+        var driveCell = ModItems.INFINITE_LOOP_STORAGE_CELL.get().getDefaultInstance();
+        try {
+            var cellInv = appeng.api.storage.StorageCells.getCellInventory(driveCell, null);
+            if (cellInv != null) {
+                cellInv.insert(AEItemKey.of(Items.OAK_PLANKS), 64, appeng.api.config.Actionable.MODULATE,
+                        new appeng.me.helpers.BaseActionSource());
+            }
+        } catch (Throwable ignored) { }
+        if (level.getBlockEntity(drivePos) instanceof appeng.blockentity.storage.DriveBlockEntity drive) {
+            drive.getInternalInventory().setItemDirect(0, driveCell);
+        }
+        var testGrid = condenser.mainNode().getGrid() != null ? condenser.mainNode().getGrid() : grid;
+        LoopCondenserFixture.grid = testGrid;
         ItemStack cell = new ItemStack(ModItems.LOOP_STORAGE_CELL_64K.get());
         if (cell.getItem() instanceof ICellWorkbenchItem workbench) {
             var config = workbench.getConfigInventory(cell);
@@ -52,8 +71,18 @@ public final class LoopCondenserFixture {
             return;
         }
         condenser.getInternalInventory().setItemDirect(0, cell);
-        grid.getStorageService().getInventory().insert(AEItemKey.of(Items.OAK_PLANKS), 64, appeng.api.config.Actionable.MODULATE, new appeng.me.helpers.BaseActionSource());
+        long inserted = grid.getStorageService().getInventory()
+                .insert(AEItemKey.of(Items.OAK_PLANKS), 64, appeng.api.config.Actionable.MODULATE,
+                        new appeng.me.helpers.BaseActionSource());
         beforePlanks = count(AEItemKey.of(Items.OAK_PLANKS));
+        summary.put("inserted", inserted);
+        summary.put("nodeActive", condenser.mainNode().isActive());
+        summary.put("gridNodeQueries", com.example.ae2lightoptimizer.block.LoopCondenserBlockEntity.gridNodeQueries);
+        summary.put("drivePresent", level.getBlockEntity(pos.east(1)) != null);
+        summary.put("driveClass", String.valueOf(level.getBlockEntity(pos.east(1)) == null ? null
+                : level.getBlockEntity(pos.east(1)).getClass().getSimpleName()));
+        summary.put("sameGrid", condenser.mainNode().getGrid() == grid);
+        summary.put("condenserGridPresent", condenser.mainNode().getGrid() != null);
         beforeBalls = count(AEItemKey.of(AEItems.MATTER_BALL.asItem()));
     }
 

@@ -30,6 +30,9 @@ public final class ModItems {
 
     public static final DeferredItem<BlockItem> CRAFTING_RIPPER =
             ITEMS.registerSimpleBlockItem("crafting_ripper", ModBlocks.CRAFTING_RIPPER);
+
+    public static final DeferredItem<BlockItem> LOOP_CONDENSER =
+            ITEMS.registerSimpleBlockItem("loop_condenser", ModBlocks.LOOP_CONDENSER);
     public static final DeferredItem<com.example.ae2lightoptimizer.factory.FactoryPatternItem> LOOP_FACTORY_PATTERN = ITEMS.registerItem("loop_factory_pattern", com.example.ae2lightoptimizer.factory.FactoryPatternItem::new);
 
     public static final DeferredItem<Item> LOOP_CARD =
