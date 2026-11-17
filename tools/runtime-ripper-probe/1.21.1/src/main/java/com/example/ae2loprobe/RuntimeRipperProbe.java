@@ -469,6 +469,7 @@ public final class RuntimeRipperProbe {
     }
 
     private static void pollPlan() throws Exception {
+        if (Core256MFixture.ENABLED) Core256MFixture.pollNative();
         if (!future.isDone()) return;
         var plan = future.get();
         if (plan != null) event("plan_received", Map.of("run", run, "simulation", plan.simulation(),
@@ -487,6 +488,7 @@ public final class RuntimeRipperProbe {
         toolApplications = 0;
         if (Core256MFixture.ENABLED) {
             Core256MFixture.verifyPlan(plan);
+            report.put("nativeRingAttempt", Core256MFixture.nativeAttempt());
         } else {
             for (var entry : plan.patternTimes().entrySet()) {
                 var produced = entry.getKey().getPrimaryOutput().what();

@@ -74,6 +74,7 @@ final class Core256MFixture {
         }
         var result = new LinkedHashMap<String, Object>();
         result.put("mode", "loop_card_catalog");
+        try { startNative(grid, ripper.getLevel()); } catch (Throwable ignored) { }
         result.put("estimatedPlanBytes", ESTIMATED_BYTES);
         result.put("rawStockPerKey", RAW);
         result.put("externalMaterials", consumption().keySet());
@@ -146,5 +147,59 @@ final class Core256MFixture {
 
     private static void check(boolean condition, String message) {
         if (!condition) throw new IllegalStateException(message);
+    }
+
+    // --- Native AE2 planner on the same ring target: evidence that vanilla cannot settle it ---
+    private static java.util.concurrent.Future<appeng.api.networking.crafting.ICraftingPlan> nativeFuture;
+    private static long nativeStartedNanos;
+    private static Map<String, Object> nativeAttempt;
+
+    static void startNative(appeng.api.networking.IGrid grid, net.minecraft.world.level.Level level) {
+        try {
+            nativeStartedNanos = System.nanoTime();
+            nativeFuture = grid.getCraftingService().beginCraftingCalculation(level,
+                    () -> new MachineSource(grid::getPivot), keys().get("core_256m"), ORDER,
+                    appeng.api.networking.crafting.CalculationStrategy.REPORT_MISSING_ITEMS);
+        } catch (Throwable failure) {
+            nativeAttempt = Map.of("submitted", false, "exception", failure.getClass().getName() + ": " + failure.getMessage());
+        }
+    }
+
+    /** Polled once per server tick; records completion, missing inputs, or the bounded-timeout outcome. */
+    static void pollNative() {
+        if (nativeAttempt != null || nativeFuture == null) return;
+        double elapsedMillis = (System.nanoTime() - nativeStartedNanos) / 1_000_000.0;
+        try {
+            if (nativeFuture.isDone()) {
+                var plan = nativeFuture.get();
+                nativeAttempt = Map.of(
+                        "submitted", true,
+                        "done", true,
+                        "elapsedMillis", elapsedMillis,
+                        "simulation", plan.simulation(),
+                        "missing", plan.missingItems().size(),
+                        "used", plan.usedItems().size(),
+                        "patternTimes", plan.patternTimes().size());
+            } else if (elapsedMillis > 20_000) {
+                nativeAttempt = Map.of(
+                        "submitted", true,
+                        "done", false,
+                        "elapsedMillis", elapsedMillis,
+                        "outcome", "not finished within 20 s of server ticks");
+                nativeFuture.cancel(true);
+            }
+        } catch (Throwable failure) {
+            nativeAttempt = Map.of("submitted", true, "done", true, "elapsedMillis", elapsedMillis,
+                    "exception", failure.getClass().getName() + ": " + String.valueOf(failure.getMessage()));
+        }
+    }
+
+    static Map<String, Object> nativeAttempt() {
+        if (nativeAttempt != null) return nativeAttempt;
+        if (nativeFuture == null) return Map.of("submitted", false);
+        // Still pending when the job finished: the native planner had not settled the ring.
+        return Map.of("submitted", true, "done", nativeFuture.isDone(),
+                "elapsedMillis", (System.nanoTime() - nativeStartedNanos) / 1_000_000.0,
+                "outcome", "not finished when the job completed");
     }
 }
