@@ -31,6 +31,12 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> LOOP_TICKER =
             ITEMS.registerSimpleBlockItem("loop_ticker", ModBlocks.LOOP_TICKER);
 
+    public static final DeferredItem<appeng.items.parts.PartItem<com.example.ae2lightoptimizer.part.LoopTickerPart>>
+            LOOP_TICKER_PART = ITEMS.register("loop_ticker_part",
+                    () -> new appeng.items.parts.PartItem<>(new Item.Properties(),
+                            com.example.ae2lightoptimizer.part.LoopTickerPart.class,
+                            com.example.ae2lightoptimizer.part.LoopTickerPart::new));
+
     public static final DeferredItem<BlockItem> CRAFTING_RIPPER =
             ITEMS.registerSimpleBlockItem("crafting_ripper", ModBlocks.CRAFTING_RIPPER);
 

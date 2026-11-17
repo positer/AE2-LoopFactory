@@ -24,6 +24,9 @@ public final class Ae2LightOptimizerClient {
         appeng.client.InitScreens.register(event,
                 com.example.ae2lightoptimizer.menu.LoopTickerMenu.TYPE.get(),
                 LoopTickerScreen::new, "/screens/ae2lightoptimizer_loop_ticker.json");
+        appeng.client.InitScreens.register(event,
+                com.example.ae2lightoptimizer.menu.LoopTickerMenu.PART_TYPE.get(),
+                LoopTickerScreen::new, "/screens/ae2lightoptimizer_loop_ticker.json");
     }
 
     public Ae2LightOptimizerClient(IEventBus modEventBus) {
