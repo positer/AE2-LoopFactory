@@ -1,0 +1,6 @@
+{
+  "parent": "ae2:block/wireless_access_point_chassis",
+  "textures": {
+    "base": "ae2lpt:block/omni_white"
+  }
+}

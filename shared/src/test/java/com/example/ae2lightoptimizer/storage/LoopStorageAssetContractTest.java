@@ -18,9 +18,9 @@ import org.junit.jupiter.api.Test;
 
 class LoopStorageAssetContractTest {
     private static final Path TEXTURES = Path.of(
-            "src/main/resources/assets/ae2lightoptimizer/textures/item");
+            "src/main/resources/assets/ae2lpt/textures/item");
     private static final Path DRIVE_MODELS = Path.of(
-            "src/main/resources/assets/ae2lightoptimizer/models/block/drive/cells");
+            "src/main/resources/assets/ae2lpt/models/block/drive/cells");
 
     private static final List<TierAsset> TIERS = List.of(
             new TierAsset("1k", "1k", false,

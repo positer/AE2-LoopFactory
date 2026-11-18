@@ -32,7 +32,7 @@ import net.minecraft.world.level.Level;
 
 /** Exact smithing inputs for recipes with genuinely absent optional slots. */
 public final class CatalogSmithingPattern implements IMolecularAssemblerSupportedPattern {
-    private static final String MARKER = "ae2lightoptimizer:optional_smithing";
+    private static final String MARKER = "ae2lpt:optional_smithing";
     private static final String[] SLOT_NAMES = {"template", "base", "addition"};
     private static boolean decoderRegistered;
 

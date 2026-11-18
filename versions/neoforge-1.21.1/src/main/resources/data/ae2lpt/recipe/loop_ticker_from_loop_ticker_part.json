@@ -1,0 +1,13 @@
+{
+  "category": "misc",
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "ae2lpt:loop_ticker_part"
+    }
+  ],
+  "result": {
+    "id": "ae2lpt:loop_ticker",
+    "count": 1
+  }
+}

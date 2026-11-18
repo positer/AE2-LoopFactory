@@ -102,34 +102,34 @@ class LoopStorageCellContractTest {
     @Test
     void packagesModelsLanguagesAndRecipesForEveryTier() throws IOException {
         ClassLoader loader = getClass().getClassLoader();
-        assertNotNull(loader.getResource("assets/ae2lightoptimizer/items/loop_storage_cell_housing.json"));
-        assertNotNull(loader.getResource("assets/ae2lightoptimizer/models/item/loop_storage_cell_housing.json"));
-        assertNotNull(loader.getResource("assets/ae2lightoptimizer/textures/item/loop_storage_cell_housing.png"));
+        assertNotNull(loader.getResource("assets/ae2lpt/items/loop_storage_cell_housing.json"));
+        assertNotNull(loader.getResource("assets/ae2lpt/models/item/loop_storage_cell_housing.json"));
+        assertNotNull(loader.getResource("assets/ae2lpt/textures/item/loop_storage_cell_housing.png"));
 
-        String zh = read("src/main/resources/assets/ae2lightoptimizer/lang/zh_cn.json");
-        String en = read("src/main/resources/assets/ae2lightoptimizer/lang/en_us.json");
+        String zh = read("src/main/resources/assets/ae2lpt/lang/zh_cn.json");
+        String en = read("src/main/resources/assets/ae2lpt/lang/en_us.json");
         for (String tier : TIERS) {
             String core = tier + "_loop_storage_core";
             String cell = tier + "_loop_storage_cell";
-            assertNotNull(loader.getResource("assets/ae2lightoptimizer/textures/item/" + core + ".png"), core);
-            assertNotNull(loader.getResource("assets/ae2lightoptimizer/textures/item/" + cell + ".png"), cell);
-            assertNotNull(loader.getResource("data/ae2lightoptimizer/recipe/" + core + ".json"), core);
-            assertNotNull(loader.getResource("data/ae2lightoptimizer/recipe/" + cell + ".json"), cell);
-            assertNotNull(loader.getResource("data/ae2lightoptimizer/recipe/" + cell + "_from_housing.json"), cell);
-            assertTrue(zh.contains("item.ae2lightoptimizer." + core));
-            assertTrue(zh.contains("item.ae2lightoptimizer." + cell));
-            assertTrue(en.contains("item.ae2lightoptimizer." + core));
-            assertTrue(en.contains("item.ae2lightoptimizer." + cell));
+            assertNotNull(loader.getResource("assets/ae2lpt/textures/item/" + core + ".png"), core);
+            assertNotNull(loader.getResource("assets/ae2lpt/textures/item/" + cell + ".png"), cell);
+            assertNotNull(loader.getResource("data/ae2lpt/recipe/" + core + ".json"), core);
+            assertNotNull(loader.getResource("data/ae2lpt/recipe/" + cell + ".json"), cell);
+            assertNotNull(loader.getResource("data/ae2lpt/recipe/" + cell + "_from_housing.json"), cell);
+            assertTrue(zh.contains("item.ae2lpt." + core));
+            assertTrue(zh.contains("item.ae2lpt." + cell));
+            assertTrue(en.contains("item.ae2lpt." + core));
+            assertTrue(en.contains("item.ae2lpt." + cell));
         }
-        assertNotNull(loader.getResource("assets/ae2lightoptimizer/textures/item/infinite_loop_storage_cell.png"));
-        assertNotNull(loader.getResource("data/ae2lightoptimizer/recipe/infinite_loop_storage_cell.json"));
+        assertNotNull(loader.getResource("assets/ae2lpt/textures/item/infinite_loop_storage_cell.png"));
+        assertNotNull(loader.getResource("data/ae2lpt/recipe/infinite_loop_storage_cell.json"));
     }
 
     @Test
     void infiniteCellUsesAe2ExplosionTransformAndConsumesExactlySixtyFourCoresAndOneHousing()
             throws IOException {
         JsonObject recipe = JsonParser.parseString(read(
-                "src/main/resources/data/ae2lightoptimizer/recipe/infinite_loop_storage_cell.json"))
+                "src/main/resources/data/ae2lpt/recipe/infinite_loop_storage_cell.json"))
                 .getAsJsonObject();
 
         assertEquals("ae2:transform", recipe.get("type").getAsString());
@@ -138,15 +138,15 @@ class LoopStorageCellContractTest {
         assertEquals(65, ingredients.size());
         long coreCount = ingredients.asList().stream()
                 .filter(element -> element.getAsString()
-                        .equals("ae2lightoptimizer:256m_loop_storage_core"))
+                        .equals("ae2lpt:256m_loop_storage_core"))
                 .count();
         long housingCount = ingredients.asList().stream()
                 .filter(element -> element.getAsString()
-                        .equals("ae2lightoptimizer:loop_storage_cell_housing"))
+                        .equals("ae2lpt:loop_storage_cell_housing"))
                 .count();
         assertEquals(64, coreCount);
         assertEquals(1, housingCount);
-        assertEquals("ae2lightoptimizer:infinite_loop_storage_cell",
+        assertEquals("ae2lpt:infinite_loop_storage_cell",
                 recipe.getAsJsonObject("result").get("id").getAsString());
     }
 
@@ -166,9 +166,9 @@ class LoopStorageCellContractTest {
     @Test
     void correctedSixteenKCellRecipeUsesTheSixteenKCore() throws IOException {
         JsonObject recipe = JsonParser.parseString(read(
-                "src/main/resources/data/ae2lightoptimizer/recipe/16k_loop_storage_cell.json"))
+                "src/main/resources/data/ae2lpt/recipe/16k_loop_storage_cell.json"))
                 .getAsJsonObject();
-        assertEquals("ae2lightoptimizer:16k_loop_storage_core",
+        assertEquals("ae2lpt:16k_loop_storage_core",
                 recipe.getAsJsonObject("key").get("C").getAsString());
         assertFalse(recipe.toString().contains("13k_loop_storage_core"));
     }

@@ -16,7 +16,7 @@ p.add_argument('--generation', choices=['1.21.1', '26.1.2'], required=True)
 p.add_argument('--restore-frame', action='store_true')
 a = p.parse_args()
 root = Path(__file__).resolve().parents[1]
-assets = root / f'versions/neoforge-{a.generation}/src/main/resources/assets/ae2lightoptimizer'
+assets = root / f'versions/neoforge-{a.generation}/src/main/resources/assets/ae2lpt'
 with zipfile.ZipFile(a.ae2_jar) as z:
     native = Image.open(io.BytesIO(z.read('assets/ae2/textures/block/condenser.png'))).convert('RGBA')
     path = assets / 'textures/block/loop_condenser.png'
@@ -67,7 +67,7 @@ with zipfile.ZipFile(a.ae2_jar) as z:
     workbench = json.loads(z.read('assets/ae2/models/block/cell_workbench.json'))
     assert block['parent'] == workbench['parent'] == 'minecraft:block/cube_bottom_top'
     assert block['textures']['bottom'] == workbench['textures']['bottom']
-    assert asset('models/item/loop_ticker.json') == {'parent':'ae2lightoptimizer:block/loop_ticker'}
+    assert asset('models/item/loop_ticker.json') == {'parent':'ae2lpt:block/loop_ticker'}
     palette = {(112,140,186):(112,186,140), (125,169,210):(125,210,169),
                (156,211,255):(156,255,211), (218,255,255):(218,255,218)}
     for face in ('top', 'side'):
@@ -82,15 +82,15 @@ with zipfile.ZipFile(a.ae2_jar) as z:
     for direction, angles in {'up':(0,0), 'down':(180,0), 'north':(90,0), 'south':(90,180),
                               'east':(90,90), 'west':(90,270)}.items():
         variant = variants['facing=' + direction]
-        assert variant['model'] == 'ae2lightoptimizer:block/loop_ticker'
+        assert variant['model'] == 'ae2lpt:block/loop_ticker'
         assert (variant.get('x', 0), variant.get('y', 0)) == angles
     for language in ['en_us', 'zh_cn']:
         names = json.loads((assets/('lang/'+language+'.json')).read_text(encoding='utf-8'))
         for machine in ['loop_ticker', 'loop_condenser']:
-            assert names['block.ae2lightoptimizer.'+machine], 'machine name is missing'
+            assert names['block.ae2lpt.'+machine], 'machine name is missing'
     if a.generation == '26.1.2':
         for machine in ['loop_ticker', 'loop_condenser']:
             entry = json.loads((assets/('items/'+machine+'.json')).read_text(encoding='utf-8'))
-            assert entry['model'] == {'type':'minecraft:model','model':'ae2lightoptimizer:item/'+machine}
+            assert entry['model'] == {'type':'minecraft:model','model':'ae2lpt:item/'+machine}
     print(json.dumps({'generation':a.generation,'outerFramePixelsIdentical':len(outer),
                       'coreGrayscale':True,'tickerOnlyBlueToGreen':True,'nativeWorldGeometry':True,'nativeItemGeometry':True}))

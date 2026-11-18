@@ -29,7 +29,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 
 /** Examines actual published objects; all serialized and tampered stacks stay detached from the grid. */
 public final class CatalogPatternPersistenceFixture {
-    private static final String MARKER = "ae2lightoptimizer:catalog_crafting";
+    private static final String MARKER = "ae2lpt:catalog_crafting";
     private static final Codec<List<List<AEItemKey>>> CHOICES = AEItemKey.CODEC.listOf().listOf();
 
     private CatalogPatternPersistenceFixture() {}

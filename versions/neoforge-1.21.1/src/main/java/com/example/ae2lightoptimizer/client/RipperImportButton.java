@@ -13,18 +13,18 @@ public final class RipperImportButton extends IconButton {
     public RipperImportButton(CraftingRipperMenu menu) {
         super(button -> menu.importPatterns());
         this.menu = menu;
-        setMessage(Component.translatable("gui.ae2lightoptimizer.ripper.import"));
+        setMessage(Component.translatable("gui.ae2lpt.ripper.import"));
     }
     @Override protected Icon getIcon() { return Icon.ARROW_DOWN; }
     @Override public List<Component> getTooltipMessage() {
         var lines = new ArrayList<Component>();
         lines.add(getMessage());
-        lines.add(Component.translatable("gui.ae2lightoptimizer.ripper.import.sources"));
-        lines.add(Component.translatable("gui.ae2lightoptimizer.ripper.import.types"));
-        lines.add(Component.translatable("gui.ae2lightoptimizer.ripper.import.close"));
-        if (!menu.networkAvailable) lines.add(Component.translatable("gui.ae2lightoptimizer.ripper.import.offline"));
-        else if (menu.importingPatterns) lines.add(Component.translatable("gui.ae2lightoptimizer.ripper.import.running", menu.importedPatterns));
-        else lines.add(Component.translatable("gui.ae2lightoptimizer.ripper.import.result", menu.importedPatterns));
+        lines.add(Component.translatable("gui.ae2lpt.ripper.import.sources"));
+        lines.add(Component.translatable("gui.ae2lpt.ripper.import.types"));
+        lines.add(Component.translatable("gui.ae2lpt.ripper.import.close"));
+        if (!menu.networkAvailable) lines.add(Component.translatable("gui.ae2lpt.ripper.import.offline"));
+        else if (menu.importingPatterns) lines.add(Component.translatable("gui.ae2lpt.ripper.import.running", menu.importedPatterns));
+        else lines.add(Component.translatable("gui.ae2lpt.ripper.import.result", menu.importedPatterns));
         return lines;
     }
 }

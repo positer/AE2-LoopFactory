@@ -24,15 +24,15 @@ public final class FactoryEditorScreen extends AEBaseScreen<FactoryEditorMenu> {
         super(menu, inventory, title, style);
         if(menu.isPanel()) {
             var recipeTab = new appeng.client.gui.widgets.TabButton(appeng.client.gui.Icon.TAB_PROCESSING,
-                    Component.translatable("gui.ae2lightoptimizer.factory.recipe_page"), button -> menu.recipePage());
+                    Component.translatable("gui.ae2lpt.factory.recipe_page"), button -> menu.recipePage());
             recipeTab.setStyle(appeng.client.gui.widgets.TabButton.Style.HORIZONTAL);
             widgets.add("recipePage", recipeTab);
-            widgets.add("upload", uploadButton = new FactoryIconButton(appeng.client.gui.Icon.ARROW_UP, "gui.ae2lightoptimizer.factory.upload", () -> {
+            widgets.add("upload", uploadButton = new FactoryIconButton(appeng.client.gui.Icon.ARROW_UP, "gui.ae2lpt.factory.upload", () -> {
                 if(editor!=null) menu.saveCode(editor.getValue());
                 minecraft.setScreen(new FactoryUploadScreen(this,menu));
             }));
         }
-        widgets.add("save", saveButton = new FactoryIconButton(appeng.client.gui.Icon.ENTER, "gui.ae2lightoptimizer.factory.save", () -> {
+        widgets.add("save", saveButton = new FactoryIconButton(appeng.client.gui.Icon.ENTER, "gui.ae2lpt.factory.save", () -> {
             if (editor != null) menu.saveCode(editor.getValue());
         }));
     }
@@ -41,7 +41,7 @@ public final class FactoryEditorScreen extends AEBaseScreen<FactoryEditorMenu> {
         String previous = editor == null ? menu.code() : editor.getValue();
         super.init();
         editor = new MultiLineEditBox(font, leftPos + 8, topPos + 30, 344, 96,
-                Component.literal("import A\nget minecraft::item from A"), Component.translatable("gui.ae2lightoptimizer.factory.code_page"));
+                Component.literal("import A\nget minecraft::item from A"), Component.translatable("gui.ae2lpt.factory.code_page"));
         editor.setCharacterLimit(FactoryCompiler.MAX_SOURCE_LENGTH);
         editor.setValue(previous);
         addRenderableWidget(editor);

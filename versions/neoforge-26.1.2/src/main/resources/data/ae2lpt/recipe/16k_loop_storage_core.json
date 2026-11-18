@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "IPI",
+    "PCP",
+    "IFI"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "P": "ae2lpt:4k_loop_storage_core",
+    "C": "ae2:certus_quartz_crystal",
+    "F": "ae2lpt:loop_crystal_powder"
+  },
+  "result": {
+    "id": "ae2lpt:16k_loop_storage_core",
+    "count": 1
+  }
+}

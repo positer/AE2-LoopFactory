@@ -4,7 +4,7 @@ import appeng.api.inventories.InternalInventory;
 import appeng.api.networking.IGrid;
 
 public interface FactoryEditorHost {
-    default String editorTitleKey() { return "block.ae2lightoptimizer.loop_factory_network_terminal"; }
+    default String editorTitleKey() { return "block.ae2lpt.loop_factory_network_terminal"; }
     InternalInventory factoryPatterns();
     String factoryDraft();
     void setFactoryDraft(String draft);

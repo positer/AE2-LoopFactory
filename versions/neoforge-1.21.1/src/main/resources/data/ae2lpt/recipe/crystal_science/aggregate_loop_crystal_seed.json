@@ -1,0 +1,22 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ae2cs"
+    }
+  ],
+  "type": "ae2cs:crystal_aggregator_recipe_serializer",
+  "energy_cost": 51200,
+  "input_a": {
+    "count": 8,
+    "item": "ae2lpt:loop_crystal_powder"
+  },
+  "input_b": {
+    "count": 32,
+    "item": "minecraft:sand"
+  },
+  "result": {
+    "count": 32,
+    "id": "ae2lpt:loop_crystal_seed"
+  }
+}

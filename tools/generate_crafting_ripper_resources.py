@@ -3,14 +3,14 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-MOD = "ae2lightoptimizer"
+MOD = "ae2lpt"
 
 GUIDES = {
     "crafting_ripper": (
         "Crafting Ripper", "合成撕裂者",
-        """<BlockImage id="ae2lightoptimizer:crafting_ripper" scale="6" />
+        """<BlockImage id="ae2lpt:crafting_ripper" scale="6" />
 
-<RecipeFor id="ae2lightoptimizer:crafting_ripper" />
+<RecipeFor id="ae2lpt:crafting_ripper" />
 
 Connect the Crafting Ripper to an ME Network with an available channel and power,
 then right-click it. Its interface reuses AE2's Pattern Provider controls and
@@ -58,9 +58,9 @@ growth chains to preserve their seed while delivering only the requested gain.
 
 Click the down-arrow button beside the pattern area to move supported encoded patterns from ME storage and installed pattern slots on the same network, including other rippers. Processing, invalid and stale patterns stay in their source. Existing patterns in this ripper stay in place. Imports move the real items in batches; no patterns are created. Keep the screen open until import finishes. Closing the screen or losing the network stops further transfers; completed transfers remain in the ripper.
 """,
-        """<BlockImage id="ae2lightoptimizer:crafting_ripper" scale="6" />
+        """<BlockImage id="ae2lpt:crafting_ripper" scale="6" />
 
-<RecipeFor id="ae2lightoptimizer:crafting_ripper" />
+<RecipeFor id="ae2lpt:crafting_ripper" />
 
 将合成撕裂者接入有可用频道与电力的 ME 网络，右键打开界面。
 界面复用 AE2 样板供应器控件与优先级页面，使用四行可滚动窗口。
@@ -100,9 +100,9 @@ Click the down-arrow button beside the pattern area to move supported encoded pa
 """),
     "loop_card": (
         "Loop Card", "循环卡",
-        """<ItemImage id="ae2lightoptimizer:loop_card" scale="4" />
+        """<ItemImage id="ae2lpt:loop_card" scale="4" />
 
-<RecipeFor id="ae2lightoptimizer:loop_card" />
+<RecipeFor id="ae2lpt:loop_card" />
 
 Craft one Advanced Card and one Loop Crystal together in any arrangement.
 The Loop Card fits a [Crafting Ripper](crafting_ripper.md) or any
@@ -142,9 +142,9 @@ amount remains 64-bit; the newer energy interface reports long amounts directly.
 
 点击样板区右侧的向下箭头按钮，可将 ME 存储和同网络设备样板槽中的有效样板移入撕裂者，也包括其他撕裂者内的样板。仅接收合成台、锻造台和切石机样板，加工、失效或无效样板留在原处；当前撕裂者内的样板保持原位。导入分批移动真实物品，不生成新样板。请保持界面打开直到完成；关闭界面或网络断开会停止后续转移，已完成的部分保留。
 """,
-        """<ItemImage id="ae2lightoptimizer:loop_card" scale="4" />
+        """<ItemImage id="ae2lpt:loop_card" scale="4" />
 
-<RecipeFor id="ae2lightoptimizer:loop_card" />
+<RecipeFor id="ae2lpt:loop_card" />
 
 将一个高级卡与一个循环水晶任意摆放，即可无序合成循环卡。
 循环卡可安装在[合成撕裂者](crafting_ripper.md)或任意档位的
@@ -186,7 +186,7 @@ CRAFTING_RIPPER_SCREEN = {'includes': ['common/common.json', 'common/player_inve
            'STORAGE': {'hidden': True},
            'PLAYER_INVENTORY': {'left': 8, 'top': 129, 'grid': 'BREAK_AFTER_9COLS'},
            'PLAYER_HOTBAR': {'left': 8, 'top': 187, 'grid': 'HORIZONTAL'}},
- 'text': {'dialog_title': {'text': {'translate': 'block.ae2lightoptimizer.crafting_ripper'},
+ 'text': {'dialog_title': {'text': {'translate': 'block.ae2lpt.crafting_ripper'},
                            'position': {'left': 8, 'top': 6}},
           'interface_config': {'text': {'translate': 'gui.ae2.Patterns'}, 'position': {'left': 8, 'top': 34}},
           'player_inventory_title': {'text': {'translate': 'container.inventory'},
@@ -208,6 +208,7 @@ for generation in ("1.21.1", "26.1.2"):
     data = root / "data" / MOD
     write(root / "assets/ae2/screens/ae2lightoptimizer_crafting_ripper.json", CRAFTING_RIPPER_SCREEN)
     ingredient = (lambda item: {"item": item}) if generation == "1.21.1" else (lambda item: item)
+    loop_crystals = {'tag': 'c:gems/loop_crystal'} if generation == '1.21.1' else '#c:gems/loop_crystal'
     write(data / "recipe/crafting_ripper.json", {
         "type": "minecraft:crafting_shaped", "category": "misc",
         "pattern": ["ISI", "FCD", "ISI"],
@@ -218,7 +219,7 @@ for generation in ("1.21.1", "26.1.2"):
         "result": {"id": f"{MOD}:crafting_ripper", "count": 1}})
     write(data / "recipe/loop_card.json", {
         "type": "minecraft:crafting_shapeless", "category": "misc",
-        "ingredients": [ingredient("ae2:advanced_card"), ingredient(f"{MOD}:loop_crystal")],
+        "ingredients": [ingredient("ae2:advanced_card"), loop_crystals],
         "result": {"id": f"{MOD}:loop_card", "count": 1}})
     write(assets / "blockstates/crafting_ripper.json", {"variants": {
         f"connected={str(connected).lower()}": {

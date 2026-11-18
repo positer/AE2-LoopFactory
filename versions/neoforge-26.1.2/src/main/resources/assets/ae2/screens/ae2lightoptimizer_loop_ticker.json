@@ -10,7 +10,7 @@
   "text": {
     "dialog_title": {
       "text": {
-        "translate": "block.ae2lightoptimizer.loop_ticker"
+        "translate": "block.ae2lpt.loop_ticker"
       },
       "position": {
         "left": 8,
@@ -19,7 +19,7 @@
     },
     "rate_label": {
       "text": {
-        "translate": "gui.ae2lightoptimizer.loop_ticker.rate"
+        "translate": "gui.ae2lpt.loop_ticker.rate"
       },
       "position": {
         "left": 8,

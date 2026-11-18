@@ -14,7 +14,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ModItems {
     public static final DeferredRegister.Items ITEMS =
-            DeferredRegister.createItems(Ae2LightOptimizer.MOD_ID);
+            DeferredRegister.createItems(Ae2LightOptimizer.NAMESPACE);
 
     public static final DeferredItem<BlockItem> RECIPE_RING_SOLVER_TERMINAL = ITEMS.register(
             "recipe_ring_solver_terminal",

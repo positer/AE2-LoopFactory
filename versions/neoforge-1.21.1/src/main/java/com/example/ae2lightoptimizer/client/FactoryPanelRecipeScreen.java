@@ -11,7 +11,7 @@ public final class FactoryPanelRecipeScreen extends PatternEncodingTermScreen<Fa
     public FactoryPanelRecipeScreen(FactoryPanelRecipeMenu menu, Inventory inventory, Component title, ScreenStyle style) {
         super(menu, inventory, title, style);
         var codeTab = new TabButton(appeng.client.gui.Icon.TAB_CRAFTING,
-                Component.translatable("gui.ae2lightoptimizer.factory.code_page"), button -> menu.codePage());
+                Component.translatable("gui.ae2lpt.factory.code_page"), button -> menu.codePage());
         codeTab.setStyle(TabButton.Style.HORIZONTAL);
         widgets.add("factoryCodePage", codeTab);
     }

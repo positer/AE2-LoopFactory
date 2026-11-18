@@ -1,1 +1,10 @@
-{"replace":false,"values":["ae2lightoptimizer:loop_crystal"]}
+{
+  "replace": false,
+  "values": [
+    "ae2lpt:loop_crystal",
+    {
+      "id": "ae2lpt:purified_loop_crystal",
+      "required": false
+    }
+  ]
+}

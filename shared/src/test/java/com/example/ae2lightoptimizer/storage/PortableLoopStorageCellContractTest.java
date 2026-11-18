@@ -62,8 +62,8 @@ class PortableLoopStorageCellContractTest {
         String firstChest = null;
         for (String tier : TIERS) {
             String id = "portable_" + tier + "_loop_storage_cell";
-            assertNotNull(loader.getResource("assets/ae2lightoptimizer/models/item/" + id + ".json"), id);
-            assertNotNull(loader.getResource("assets/ae2lightoptimizer/textures/item/" + id + "_side.png"), id);
+            assertNotNull(loader.getResource("assets/ae2lpt/models/item/" + id + ".json"), id);
+            assertNotNull(loader.getResource("assets/ae2lpt/textures/item/" + id + "_side.png"), id);
 
             JsonObject fromCell = recipe(id);
             JsonArray cellIngredients = fromCell.getAsJsonArray("ingredients");
@@ -73,7 +73,7 @@ class PortableLoopStorageCellContractTest {
             firstChest = firstChest == null ? chest : firstChest;
             assertEquals(firstChest, chest);
             assertEquals("ae2:energy_cell", ingredientId(cellIngredients.get(1)));
-            assertEquals("ae2lightoptimizer:" + tier + "_loop_storage_cell",
+            assertEquals("ae2lpt:" + tier + "_loop_storage_cell",
                     ingredientId(cellIngredients.get(2)));
 
             JsonObject fromParts = recipe(id + "_from_parts");
@@ -81,21 +81,21 @@ class PortableLoopStorageCellContractTest {
             assertEquals(4, partIngredients.size(), id);
             assertEquals(firstChest, ingredientId(partIngredients.get(0)));
             assertEquals("ae2:energy_cell", ingredientId(partIngredients.get(1)));
-            assertEquals("ae2lightoptimizer:loop_storage_cell_housing",
+            assertEquals("ae2lpt:loop_storage_cell_housing",
                     ingredientId(partIngredients.get(2)));
-            assertEquals("ae2lightoptimizer:" + tier + "_loop_storage_core",
+            assertEquals("ae2lpt:" + tier + "_loop_storage_core",
                     ingredientId(partIngredients.get(3)));
 
             JsonObject disassembly = recipe(id + "_disassembly");
             assertEquals("ae2:storage_cell_disassembly", disassembly.get("type").getAsString());
-            assertEquals("ae2lightoptimizer:" + id, disassembly.get("cell").getAsString());
+            assertEquals("ae2lpt:" + id, disassembly.get("cell").getAsString());
             JsonArray returned = disassembly.getAsJsonArray("cell_disassembly_items");
             assertEquals(4, returned.size());
             assertEquals(firstChest, returned.get(0).getAsJsonObject().get("id").getAsString());
             assertEquals("ae2:energy_cell", returned.get(1).getAsJsonObject().get("id").getAsString());
-            assertEquals("ae2lightoptimizer:loop_storage_cell_housing",
+            assertEquals("ae2lpt:loop_storage_cell_housing",
                     returned.get(2).getAsJsonObject().get("id").getAsString());
-            assertEquals("ae2lightoptimizer:" + tier + "_loop_storage_core",
+            assertEquals("ae2lpt:" + tier + "_loop_storage_core",
                     returned.get(3).getAsJsonObject().get("id").getAsString());
         }
 
@@ -104,23 +104,23 @@ class PortableLoopStorageCellContractTest {
         assertEquals(3, infinite.size());
         assertEquals(firstChest, ingredientId(infinite.get(0)));
         assertEquals("ae2:energy_cell", ingredientId(infinite.get(1)));
-        assertEquals("ae2lightoptimizer:infinite_loop_storage_cell", ingredientId(infinite.get(2)));
+        assertEquals("ae2lpt:infinite_loop_storage_cell", ingredientId(infinite.get(2)));
         assertFalse(Files.exists(Path.of(
-                "src/main/resources/data/ae2lightoptimizer/recipe/portable_infinite_loop_storage_cell_from_parts.json")));
+                "src/main/resources/data/ae2lpt/recipe/portable_infinite_loop_storage_cell_from_parts.json")));
 
         JsonObject infiniteDisassembly = recipe("portable_infinite_loop_storage_cell_disassembly");
         assertEquals("ae2:storage_cell_disassembly",
                 infiniteDisassembly.get("type").getAsString());
         JsonArray infiniteReturned = infiniteDisassembly.getAsJsonArray("cell_disassembly_items");
         assertEquals(3, infiniteReturned.size());
-        assertEquals("ae2lightoptimizer:infinite_loop_storage_cell",
+        assertEquals("ae2lpt:infinite_loop_storage_cell",
                 infiniteReturned.get(2).getAsJsonObject().get("id").getAsString());
         assertFalse(infiniteDisassembly.toString().contains("loop_storage_core"));
     }
 
     private static JsonObject recipe(String id) throws IOException {
         return JsonParser.parseString(read(
-                "src/main/resources/data/ae2lightoptimizer/recipe/" + id + ".json"))
+                "src/main/resources/data/ae2lpt/recipe/" + id + ".json"))
                 .getAsJsonObject();
     }
 

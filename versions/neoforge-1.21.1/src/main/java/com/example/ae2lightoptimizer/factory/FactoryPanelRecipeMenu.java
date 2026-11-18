@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 public final class FactoryPanelRecipeMenu extends PatternEncodingTermMenu {
     public static final net.neoforged.neoforge.registries.DeferredHolder<MenuType<?>, MenuType<FactoryPanelRecipeMenu>> TYPE = FactoryEditorMenu.MENUS.register("factory_panel_recipe",
         () -> MenuTypeBuilder.create(FactoryPanelRecipeMenu::new, FactoryEncodingPanel.class)
-        .buildUnregistered(ResourceLocation.fromNamespaceAndPath("ae2lightoptimizer", "factory_panel_recipe")));
+        .buildUnregistered(ResourceLocation.fromNamespaceAndPath("ae2lpt", "factory_panel_recipe")));
     private final FactoryEncodingPanel panel;
     public FactoryPanelRecipeMenu(MenuType<?> type, int id, Inventory inventory, FactoryEncodingPanel panel) {
         super(type, id, inventory, panel, true); this.panel=panel; this.mode=EncodingMode.PROCESSING;

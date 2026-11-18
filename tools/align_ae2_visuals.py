@@ -12,7 +12,7 @@ import json
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
-MOD = 'ae2lightoptimizer'
+MOD = 'ae2lpt'
 FACES = ('down', 'up', 'north', 'south', 'west', 'east')
 
 

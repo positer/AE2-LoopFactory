@@ -12,10 +12,10 @@ import net.neoforged.neoforge.registries.*;
 import java.util.List;
 
 public final class OmniConnectorMenu extends AEBaseMenu {
-    public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, "ae2lightoptimizer");
+    public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, "ae2lpt");
     public static final DeferredHolder<MenuType<?>, MenuType<OmniConnectorMenu>> TYPE = MENUS.register("omnidirectional_connector",
             () -> MenuTypeBuilder.create(OmniConnectorMenu::new, OmniConnectorBlockEntity.class)
-                    .buildUnregistered(ResourceLocation.fromNamespaceAndPath("ae2lightoptimizer", "omnidirectional_connector")));
+                    .buildUnregistered(ResourceLocation.fromNamespaceAndPath("ae2lpt", "omnidirectional_connector")));
     public static final int PAGE_SIZE = 6;
     public record Entry(String id, String name, int endpoints, boolean privateLink) {}
     private static final com.google.gson.Gson JSON = new com.google.gson.Gson();

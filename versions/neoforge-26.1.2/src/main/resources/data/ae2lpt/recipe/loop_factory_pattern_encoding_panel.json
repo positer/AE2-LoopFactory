@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " K ",
+    " T ",
+    " C "
+  ],
+  "key": {
+    "K": "ae2:calculation_processor",
+    "T": "ae2:pattern_encoding_terminal",
+    "C": "#c:gems/loop_crystal"
+  },
+  "result": {
+    "id": "ae2lpt:loop_factory_pattern_encoding_panel",
+    "count": 1
+  }
+}

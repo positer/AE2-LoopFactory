@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "C": "ae2:calculation_processor",
+    "L": "ae2:logic_processor",
+    "R": "#c:gems/loop_crystal"
+  },
+  "pattern": [
+    "ICI",
+    "LRL",
+    "ICI"
+  ],
+  "result": {
+    "id": "ae2lpt:recipe_ring_solver_terminal"
+  }
+}

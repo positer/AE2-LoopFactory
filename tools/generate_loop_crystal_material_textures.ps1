@@ -66,7 +66,7 @@ try {
     $block = Read-ZipBitmap 'assets/ae2/textures/block/quartz_block.png'
     $powder = Read-ZipBitmap 'assets/ae2/textures/item/certus_quartz_dust.png'
     try {
-        $versionRoots = @('neoforge-1.21.1', 'neoforge-26.1.2') | ForEach-Object { Join-Path $workspace "versions\$_\src\main\resources\assets\ae2lightoptimizer\textures" }
+        $versionRoots = @('neoforge-1.21.1', 'neoforge-26.1.2') | ForEach-Object { Join-Path $workspace "versions\$_\src\main\resources\assets\ae2lpt\textures" }
         Convert-ToLoopGray $block $targetRange[0] $targetRange[1] @($versionRoots | ForEach-Object { Join-Path $_ 'block\loop_crystal_block.png' })
         Convert-ToLoopGray $powder $targetRange[0] $targetRange[1] @($versionRoots | ForEach-Object { Join-Path $_ 'item\loop_crystal_powder.png' })
     } finally { $block.Dispose(); $powder.Dispose() }

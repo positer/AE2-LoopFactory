@@ -18,7 +18,7 @@ def original(commit, path):
 
 
 def verify_terminal(gen, baseline):
-    prefix = f'versions/neoforge-{gen}/src/main/resources/assets/ae2lightoptimizer/'
+    prefix = f'versions/neoforge-{gen}/src/main/resources/assets/ae2lpt/'
     model_path = prefix+'models/block/loop_factory_network_terminal.json'
     model = json.loads((ROOT/model_path).read_bytes())
     old = json.loads(original(baseline, model_path))
@@ -57,7 +57,7 @@ def verify_terminal(gen, baseline):
 
 def verify(gen, version, baseline):
     from audit_runtime_resources import referenced_texture_keys
-    prefix = f'versions/neoforge-{gen}/src/main/resources/assets/ae2lightoptimizer/'
+    prefix = f'versions/neoforge-{gen}/src/main/resources/assets/ae2lpt/'
     assets = ROOT / prefix
     jar = next((ROOT / f'.gradle-user-home/{gen}/caches/modules-2/files-2.1/org.appliedenergistics/appliedenergistics2/{version}').rglob(f'appliedenergistics2-{version}.jar'))
     for name in ('recipe_ring_solver_terminal', 'supercomputing_crafting_optimizer_interface', 'crafting_ripper'):
@@ -87,7 +87,7 @@ def verify(gen, version, baseline):
         for path in (assets/'models').rglob('*.json'):
             data = json.loads(path.read_bytes())
             target = path.relative_to(assets/'models').with_suffix('').as_posix()
-            used = referenced_texture_keys(ae, assets.parents[1], 'ae2lightoptimizer', target,
+            used = referenced_texture_keys(ae, assets.parents[1], 'ae2lpt', target,
                                            not target.startswith('item/'))
             # Vanilla's generated-item and cube templates own layer0/all/side keys.
             if data.get('parent', '').startswith('minecraft:'):
@@ -137,7 +137,7 @@ if __name__ == '__main__':
                for gen, ver in [('1.21.1', '19.2.17'), ('26.1.2', '26.1.10-beta')]]
     generated = []
     for gen in ('1.21.1', '26.1.2'):
-        prefix = f'versions/neoforge-{gen}/src/main/resources/assets/ae2lightoptimizer/'
+        prefix = f'versions/neoforge-{gen}/src/main/resources/assets/ae2lpt/'
         names = [name+suffix for name in ('recipe_ring_solver_terminal', 'supercomputing_crafting_optimizer_interface',
                  'crafting_ripper') for suffix in ('', '_connected')]
         names += ['loop_factory_terminal', 'loop_factory_terminal_top', 'loop_factory_terminal_side',
@@ -154,7 +154,7 @@ if __name__ == '__main__':
                    + (['--only-terminal'] if args.terminal_only else []), cwd=ROOT, check=True)
     assert before == hashes(), 'generator is not idempotent'
     for asset in ('block/loop_factory_terminal_side', 'block/loop_factory_terminal_back', 'item/handheld_loop_factory_encoder'):
-        files = [ROOT/f'versions/neoforge-{g}/src/main/resources/assets/ae2lightoptimizer/textures/{asset}.png'
+        files = [ROOT/f'versions/neoforge-{g}/src/main/resources/assets/ae2lpt/textures/{asset}.png'
                  for g in ('1.21.1', '26.1.2')]
         assert files[0].read_bytes() == files[1].read_bytes(), asset
     report = dict(baseline=args.baseline, results=results, generatorIdempotent=True, generatedFiles=len(generated),

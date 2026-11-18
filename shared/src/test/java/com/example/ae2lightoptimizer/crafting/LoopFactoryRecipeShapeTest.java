@@ -20,24 +20,24 @@ import org.junit.jupiter.api.Test;
  * two-part conversions and the connector/card stay shapeless.
  */
 class LoopFactoryRecipeShapeTest {
-    private static final Path RECIPES = Path.of("src/main/resources/data/ae2lightoptimizer/recipe");
+    private static final Path RECIPES = Path.of("src/main/resources/data/ae2lpt/recipe");
     private static final String SHAPED = "minecraft:crafting_shaped";
     private static final String SHAPELESS = "minecraft:crafting_shapeless";
 
     @Test
     void machineRecipesAreOrderedAndKeepTheirExactMaterials() throws Exception {
         assertShaped("loop_factory_pattern_provider", List.of("E E", "LPL", " C "),
-                Map.of("E", "ae2:engineering_processor", "L", "ae2lightoptimizer:loop_crystal",
-                        "P", "ae2:pattern_provider", "C", "ae2lightoptimizer:4m_loop_storage_core"));
+                Map.of("E", "ae2:engineering_processor", "L", "#c:gems/loop_crystal",
+                        "P", "ae2:pattern_provider", "C", "ae2lpt:4m_loop_storage_core"));
         assertShaped("loop_factory_network_terminal", List.of("L L", "CIC", " Q "),
-                Map.of("L", "ae2:logic_processor", "C", "ae2lightoptimizer:loop_crystal",
+                Map.of("L", "ae2:logic_processor", "C", "#c:gems/loop_crystal",
                         "I", "ae2:interface", "Q", "ae2:quartz_glass"));
         assertShaped("loop_factory_pattern_encoding_panel", List.of(" K ", " T ", " C "),
                 Map.of("K", "ae2:calculation_processor", "T", "ae2:pattern_encoding_terminal",
-                        "C", "ae2lightoptimizer:loop_crystal"));
+                        "C", "#c:gems/loop_crystal"));
         assertShaped("handheld_loop_factory_encoder", List.of("I I", "KCQ", " R "),
                 Map.of("I", "minecraft:iron_ingot", "K", "ae2:calculation_processor",
-                        "C", "ae2lightoptimizer:loop_crystal", "Q", "ae2:quartz_glass",
+                        "C", "#c:gems/loop_crystal", "Q", "ae2:quartz_glass",
                         "R", "minecraft:redstone"));
     }
 
@@ -87,7 +87,7 @@ class LoopFactoryRecipeShapeTest {
         for (var entry : key.entrySet()) {
             assertEquals(entry.getValue(), ingredient(declared.get(entry.getKey())), id + ":" + entry.getKey());
         }
-        assertEquals("ae2lightoptimizer:" + id, recipe.getAsJsonObject("result").get("id").getAsString());
+        assertEquals("ae2lpt:" + id, recipe.getAsJsonObject("result").get("id").getAsString());
         assertEquals(1, recipe.getAsJsonObject("result").get("count").getAsInt());
     }
 
@@ -104,6 +104,8 @@ class LoopFactoryRecipeShapeTest {
     }
 
     private static String ingredient(JsonElement value) {
-        return value.isJsonPrimitive() ? value.getAsString() : value.getAsJsonObject().get("item").getAsString();
+        if (value.isJsonPrimitive()) return value.getAsString();
+        var object = value.getAsJsonObject();
+        return object.has("tag") ? "#" + object.get("tag").getAsString() : object.get("item").getAsString();
     }
 }

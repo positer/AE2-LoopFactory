@@ -15,11 +15,11 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class FactoryEditorMenu extends AEBaseMenu {
-    public static final SlotSemantic PATTERN = appeng.menu.SlotSemantics.register("AE2LT_FACTORY_PATTERN", false, 1);
-    public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, Ae2LightOptimizer.MOD_ID);
+    public static final SlotSemantic PATTERN = appeng.menu.SlotSemantics.register("AE2LpT_FACTORY_PATTERN", false, 1);
+    public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, Ae2LightOptimizer.NAMESPACE);
     public static final DeferredHolder<MenuType<?>, MenuType<FactoryEditorMenu>> TYPE = MENUS.register("factory_editor",
             () -> MenuTypeBuilder.create(FactoryEditorMenu::new, FactoryEditorHost.class)
-                    .buildUnregistered(ResourceLocation.fromNamespaceAndPath(Ae2LightOptimizer.MOD_ID, "factory_editor")));
+                    .buildUnregistered(ResourceLocation.fromNamespaceAndPath(Ae2LightOptimizer.NAMESPACE, "factory_editor")));
     private final FactoryEditorHost host;
     public String code = "";
     @GuiSync(20) public FactoryCodeText syncedCode=new FactoryCodeText("");
@@ -34,7 +34,7 @@ public final class FactoryEditorMenu extends AEBaseMenu {
     @GuiSync(27) public String runtimeError="";
     @GuiSync(28) public String runtimeWait="";
     public String displayStatus(){return status.isEmpty()||status.equals("Saved")?(!runtimeError.isEmpty()?runtimeError:!runtimeWait.isEmpty()?runtimeWait:status):status;}
-    @GuiSync(23) public String titleKey = "block.ae2lightoptimizer.loop_factory_network_terminal";
+    @GuiSync(23) public String titleKey = "block.ae2lpt.loop_factory_network_terminal";
     @GuiSync(22) public String factoryName = "";
     public FactoryEditorMenu(MenuType<?> type, int id, Inventory inventory, FactoryEditorHost host) {
         super(type, id, inventory, host);

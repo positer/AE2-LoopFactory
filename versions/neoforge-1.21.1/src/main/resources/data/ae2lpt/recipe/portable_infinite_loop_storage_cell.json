@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "ae2:chest"
+    },
+    {
+      "item": "ae2:energy_cell"
+    },
+    {
+      "item": "ae2lpt:infinite_loop_storage_cell"
+    }
+  ],
+  "result": {
+    "id": "ae2lpt:portable_infinite_loop_storage_cell",
+    "count": 1
+  }
+}

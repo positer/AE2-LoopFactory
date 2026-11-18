@@ -44,7 +44,7 @@ public final class Ae2LightOptimizerClient {
     /** Part models must be known before AE2 freezes its registry during pre-initialization. */
     private static void registerPartModelsEarly() {
         appeng.api.parts.PartModels.registerModels(
-                ResourceLocation.fromNamespaceAndPath("ae2lightoptimizer", "part/loop_ticker_base"));
+                ResourceLocation.fromNamespaceAndPath("ae2lpt", "part/loop_ticker_base"));
     }
 
     public Ae2LightOptimizerClient(IEventBus modEventBus) {
@@ -63,6 +63,9 @@ public final class Ae2LightOptimizerClient {
     }
 
     private static void clientSetup(FMLClientSetupEvent event) {
+        if (net.neoforged.fml.ModList.get().isLoaded("ae2cs")) {
+            event.enqueueWork(CrystalScienceClient::registerSeedAge);
+        }
         event.enqueueWork(() -> ModItems.LOOP_STORAGE_CELLS.forEach(cell -> {
             LoopStorageCellItem item = cell.get();
             StorageCellModels.registerModel(item, LOOP_STORAGE_DRIVE_MODELS.get(item.tier().id()));
@@ -73,7 +76,7 @@ public final class Ae2LightOptimizerClient {
         LOOP_STORAGE_DRIVE_MODELS.values().forEach(model ->
                 event.register(ModelResourceLocation.standalone(model)));
         event.register(ModelResourceLocation.standalone(
-                ResourceLocation.fromNamespaceAndPath("ae2lightoptimizer", "part/loop_ticker_base")));
+                ResourceLocation.fromNamespaceAndPath("ae2lpt", "part/loop_ticker_base")));
     }
 
     private static void registerItemColors(RegisterColorHandlersEvent.Item event) {
@@ -107,7 +110,7 @@ public final class Ae2LightOptimizerClient {
                 "1k", "4k", "16k", "64k", "256k", "1m", "4m", "16m", "64m", "256m", "infinite"
         }) {
             models.put(tier, ResourceLocation.fromNamespaceAndPath(
-                    Ae2LightOptimizer.MOD_ID, "block/drive/cells/" + tier + "_loop_storage_cell"));
+                    Ae2LightOptimizer.NAMESPACE, "block/drive/cells/" + tier + "_loop_storage_cell"));
         }
         return Map.copyOf(models);
     }

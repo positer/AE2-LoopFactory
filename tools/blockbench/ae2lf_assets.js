@@ -92,9 +92,9 @@
                     powered ? {neoforge_data: {block_light: 15, sky_light: 15}} : {})}
             });
             const textures = {
-                lightsBright: 'ae2lightoptimizer:part/' + names[0],
-                lightsMedium: 'ae2lightoptimizer:part/' + names[1],
-                lightsDark: 'ae2lightoptimizer:part/' + names[2]
+                lightsBright: 'ae2lpt:part/' + names[0],
+                lightsMedium: 'ae2lpt:part/' + names[1],
+                lightsDark: 'ae2lpt:part/' + names[2]
             };
             if (!powered) return {parent: 'ae2:part/display_off', textures};
             const on = {
@@ -112,9 +112,9 @@
                 parent: 'ae2:item/display_base',
                 textures: {
                     front: 'ae2:part/pattern_encoding_terminal',
-                    front_bright: 'ae2lightoptimizer:part/' + names[0],
-                    front_medium: 'ae2lightoptimizer:part/' + names[1],
-                    front_dark: 'ae2lightoptimizer:part/' + names[2]
+                    front_bright: 'ae2lpt:part/' + names[0],
+                    front_medium: 'ae2lpt:part/' + names[1],
+                    front_dark: 'ae2lpt:part/' + names[2]
                 }
             };
         }
@@ -122,7 +122,7 @@
             return {
                 model: {
                     type: 'minecraft:model',
-                    model: 'ae2lightoptimizer:item/loop_factory_pattern_encoding_panel',
+                    model: 'ae2lpt:item/loop_factory_pattern_encoding_panel',
                     tints: [
                         {type: 'minecraft:constant', value: -1},
                         {type: 'ae2:color', color: 'fluix', variant: 'dark'},
@@ -141,7 +141,7 @@
                 const category = shape === 'item' ? 'item' : shape === 'panel' ? 'part' : 'block';
                 const png = source.toDataURL();
                 write(assets + '/textures/' + category + '/' + name + '.png', Buffer.from(png.split(',')[1], 'base64'));
-                const tex = new Texture({name:name+'.png', namespace:'ae2lightoptimizer', folder:category});
+                const tex = new Texture({name:name+'.png', namespace:'ae2lpt', folder:category});
                 await new Promise(resolve => { tex.load_callback = resolve; tex.fromDataURL(png).add(false); });
                 textures[name]=tex;
             }
@@ -159,9 +159,9 @@
                             models: [
                                 {type: 'ae2:model', model: 'ae2:part/display_base'},
                                 {type: 'ae2:status_indicator',
-                                    active: 'ae2lightoptimizer:part/loop_factory_panel_on',
-                                    powered: 'ae2lightoptimizer:part/loop_factory_panel_on',
-                                    unpowered: 'ae2lightoptimizer:part/loop_factory_panel_off'},
+                                    active: 'ae2lpt:part/loop_factory_panel_on',
+                                    powered: 'ae2lpt:part/loop_factory_panel_on',
+                                    unpowered: 'ae2lpt:part/loop_factory_panel_off'},
                                 {type: 'ae2:status_indicator',
                                     active: 'ae2:part/display_status_has_channel',
                                     powered: 'ae2:part/display_status_on',
@@ -189,19 +189,19 @@
             cube.select();Canvas.updateAll();
             const model = Codecs.java_block.compile({raw:true});
             const kind = shape === 'item' ? 'item' : 'block';
-            if (shape !== 'item') { model.parent='minecraft:block/block'; model.textures.particle='ae2lightoptimizer:'+(shape==='panel'?'part':'block')+'/'+names[0]; }
+            if (shape !== 'item') { model.parent='minecraft:block/block'; model.textures.particle='ae2lpt:'+(shape==='panel'?'part':'block')+'/'+names[0]; }
             delete model.format_version;
             if (shape === 'item') {
                 model.parent='minecraft:item/generated'; delete model.elements;
-                model.textures={layer0:'ae2lightoptimizer:item/'+names[0]};
+                model.textures={layer0:'ae2lpt:item/'+names[0]};
             }
             json(assets+'/models/'+kind+'/'+id+'.json',model);
-            if (shape !== 'item') json(assets+'/models/item/'+id+'.json',{parent:'ae2lightoptimizer:block/'+id});
-            if (gen !== '1.21.1') json(assets+'/items/'+id+'.json',{model:{type:'minecraft:model',model:'ae2lightoptimizer:item/'+id}});
+            if (shape !== 'item') json(assets+'/models/item/'+id+'.json',{parent:'ae2lpt:block/'+id});
+            if (gen !== '1.21.1') json(assets+'/items/'+id+'.json',{model:{type:'minecraft:model',model:'ae2lpt:item/'+id}});
             if (shape === 'block') {
                 const variants={};
                 for(const [facing,x,y] of (id === 'loop_factory_pattern_provider' ? [['up',0,0],['down',180,0],['north',90,0],['east',90,90],['south',90,180],['west',90,270]] : [['north',0,0],['east',0,90],['south',0,180],['west',0,270],['up',270,0],['down',90,0]]))
-                    variants['facing='+facing]={model:'ae2lightoptimizer:block/'+id,x,y};
+                    variants['facing='+facing]={model:'ae2lpt:block/'+id,x,y};
                 json(assets+'/blockstates/'+id+'.json',{variants});
             }
             const output=root+'/design/loop_factory/'+gen+'/'+id+'.bbmodel';
@@ -211,7 +211,7 @@
         for (const gen of ['1.21.1','26.1.2']) {
             const ref=root+'/design/loop_factory/references/'+gen;
             const common=root+'/design/loop_factory/references';
-            const assets=root+'/versions/neoforge-'+gen+'/src/main/resources/assets/ae2lightoptimizer';
+            const assets=root+'/versions/neoforge-'+gen+'/src/main/resources/assets/ae2lpt';
             await project(gen,'loop_factory_pattern_provider',{
                 loop_factory_provider_front:recolor(await read(ref+'/pattern_provider_alternate_front.png'),yellowToGrey),
                 loop_factory_provider_side:recolor(await read(ref+'/pattern_provider_alternate_arrow.png'),yellowToGrey),

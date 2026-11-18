@@ -854,3 +854,7 @@ Final native factory performance evidence is archived under `archive/2026-09-09-
 - 两代测试助手 `RipperImportClient.java`：通过生产按钮的鼠标处理发送真实菜单动作，检查实际 GUI 缩放，采集正常、悬停、进度、完成及离线界面。`ClientBootstrap` 将其接在动态样板验收后，启动器要求对应报告和全部截图。
 
 证据入口为 `../Minecraft Forge Workspace/archive/20261110-195356-ae2lf-ripper-import/`。产品 JAR 保留在两代 `build/libs/`；测试助手与截图作为证据保存，不进入产品资源包。
+
+## 2026-11-18 注册域与水晶科技
+
+两代 `compat/CrystalScienceCompat.java` 负责水晶科技可选物品；内置资源包 `resourcepacks/crystal_science/` 负责四阶段原图换色。`LegacyNamespace.java` 登记旧 ID，`LegacyRecipeLookupMixin.java` 兼容已编码配方，`tools/migrate_ae2lpt_pack.py` 转换玩家数据包和资源包。

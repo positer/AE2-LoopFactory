@@ -17,16 +17,16 @@ public final class OmniConnectorScreen extends AEBaseScreen<OmniConnectorMenu> {
     private final ToggleButton visibility;
     public OmniConnectorScreen(OmniConnectorMenu menu, Inventory inventory, Component title, ScreenStyle style) {
         super(menu, inventory, title, style);
-        widgets.add("createLink", new FactoryIconButton(appeng.util.Icon.ENTER, "gui.ae2lightoptimizer.omni.create", () -> {
+        widgets.add("createLink", new FactoryIconButton(appeng.util.Icon.ENTER, "gui.ae2lpt.omni.create", () -> {
             if (name != null) menu.create(name.getValue());
         }));
-        widgets.add("previous", previous = new FactoryIconButton(appeng.util.Icon.ARROW_LEFT, "gui.ae2lightoptimizer.omni.previous", () -> menu.setPage(menu.page - 1)));
-        widgets.add("next", next = new FactoryIconButton(appeng.util.Icon.ARROW_RIGHT, "gui.ae2lightoptimizer.omni.next", () -> menu.setPage(menu.page + 1)));
-        widgets.add("unlink", unlink = new FactoryIconButton(appeng.util.Icon.CLEAR, "gui.ae2lightoptimizer.omni.unlink", () -> menu.select("")));
+        widgets.add("previous", previous = new FactoryIconButton(appeng.util.Icon.ARROW_LEFT, "gui.ae2lpt.omni.previous", () -> menu.setPage(menu.page - 1)));
+        widgets.add("next", next = new FactoryIconButton(appeng.util.Icon.ARROW_RIGHT, "gui.ae2lpt.omni.next", () -> menu.setPage(menu.page + 1)));
+        widgets.add("unlink", unlink = new FactoryIconButton(appeng.util.Icon.CLEAR, "gui.ae2lpt.omni.unlink", () -> menu.select("")));
         // Native AE2 binary toggle: locked = the channel being created is private to this player.
         widgets.add("visibility", visibility = new ToggleButton(appeng.util.Icon.LOCKED, appeng.util.Icon.UNLOCKED,
-                Component.translatable("gui.ae2lightoptimizer.omni.visibility"),
-                Component.translatable("gui.ae2lightoptimizer.omni.visibility.hint"), menu::setCreatePrivate));
+                Component.translatable("gui.ae2lpt.omni.visibility"),
+                Component.translatable("gui.ae2lpt.omni.visibility.hint"), menu::setCreatePrivate));
         for (int i = 0; i < choices.length; i++) {
             int row = i;
             choices[i] = new AE2Button(Component.empty(), button -> {
@@ -36,14 +36,14 @@ public final class OmniConnectorScreen extends AEBaseScreen<OmniConnectorMenu> {
         }
     }
     private static String marker(boolean privateLink) {
-        return privateLink ? " · " + Component.translatable("gui.ae2lightoptimizer.omni.private").getString() : "";
+        return privateLink ? " · " + Component.translatable("gui.ae2lpt.omni.private").getString() : "";
     }
     @Override protected void init() {
         String value = name == null ? "" : name.getValue();
         super.init();
-        name = new EditBox(font, leftPos + 8, topPos + 40, 184, 16, Component.translatable("gui.ae2lightoptimizer.omni.name"));
+        name = new EditBox(font, leftPos + 8, topPos + 40, 184, 16, Component.translatable("gui.ae2lpt.omni.name"));
         name.setMaxLength(com.example.ae2lightoptimizer.network.OmniLinkDirectory.MAX_NAME_LENGTH);
-        name.setHint(Component.translatable("gui.ae2lightoptimizer.omni.name"));
+        name.setHint(Component.translatable("gui.ae2lpt.omni.name"));
         name.setValue(value); addRenderableWidget(name);
     }
     @Override protected void updateBeforeRender() {
@@ -61,10 +61,10 @@ public final class OmniConnectorScreen extends AEBaseScreen<OmniConnectorMenu> {
             button.setMessage(Component.literal(shortened)); button.setTooltip(Tooltip.create(Component.literal(label)));
         }
         previous.active = menu.page > 0; next.active = menu.page + 1 < menu.pages; unlink.active = !menu.selectedId.isEmpty();
-        var current = menu.selectedName.isEmpty() ? Component.translatable("gui.ae2lightoptimizer.omni.none")
+        var current = menu.selectedName.isEmpty() ? Component.translatable("gui.ae2lpt.omni.none")
                 : Component.literal(menu.selectedName);
-        setTextContent("selected", Component.literal(font.plainSubstrByWidth(Component.translatable("gui.ae2lightoptimizer.omni.selected", current).getString(), 230)));
-        setTextContent("page", Component.translatable(menu.invalidName ? "gui.ae2lightoptimizer.omni.invalid" : "gui.ae2lightoptimizer.omni.page", menu.page + 1, menu.pages));
+        setTextContent("selected", Component.literal(font.plainSubstrByWidth(Component.translatable("gui.ae2lpt.omni.selected", current).getString(), 230)));
+        setTextContent("page", Component.translatable(menu.invalidName ? "gui.ae2lpt.omni.invalid" : "gui.ae2lpt.omni.page", menu.page + 1, menu.pages));
     }
     @Override public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
         int key = event.key();

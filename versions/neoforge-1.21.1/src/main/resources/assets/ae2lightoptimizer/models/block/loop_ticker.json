@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/cube_bottom_top",
-  "textures": {
-    "bottom": "ae2:block/generics/bottom",
-    "side": "ae2lightoptimizer:block/loop_ticker_workbench_side",
-    "top": "ae2lightoptimizer:block/loop_ticker_workbench_top"
-  }
-}

@@ -14,7 +14,7 @@ import net.minecraft.world.level.Level;
 public final class FactoryPatternItem extends EncodedPatternItem<FactoryPatternDetails> {
     public FactoryPatternItem(Properties properties) {
         super(properties, FactoryPatternDetails::decode,
-                (stack, level, error, flags) -> new PatternDetailsTooltip(Component.translatable("item.ae2lightoptimizer.loop_factory_pattern")));
+                (stack, level, error, flags) -> new PatternDetailsTooltip(Component.translatable("item.ae2lpt.loop_factory_pattern")));
     }
     private static ItemStack previewRecipe(ItemStack stack) {
         var recipe = FactoryPatternData.get(stack).recipe();

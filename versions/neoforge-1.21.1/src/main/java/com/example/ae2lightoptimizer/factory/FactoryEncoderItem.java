@@ -31,7 +31,7 @@ public final class FactoryEncoderItem extends Item implements IMenuItem {
     public static void clearBinding(Player player, ItemStack stack) {
         var old = FactoryPatternData.get(stack);
         stack.set(FactoryPatternData.TYPE.get(), new FactoryPatternData(old.code(), "", ItemStack.EMPTY));
-        player.displayClientMessage(Component.translatable("gui.ae2lightoptimizer.factory.binding_cleared"), true);
+        player.displayClientMessage(Component.translatable("gui.ae2lpt.factory.binding_cleared"), true);
     }
 
     /**
@@ -65,7 +65,7 @@ public final class FactoryEncoderItem extends Item implements IMenuItem {
         var target = FactoryServer.at(level, pos);
         if (data.factoryId().isEmpty() && target != null && !player.isShiftKeyDown()) {
             stack.set(FactoryPatternData.TYPE.get(), new FactoryPatternData(data.code(), target.factoryId(), ItemStack.EMPTY));
-            player.displayClientMessage(Component.translatable("gui.ae2lightoptimizer.factory.bound", target.factoryName()), true);
+            player.displayClientMessage(Component.translatable("gui.ae2lpt.factory.bound", target.factoryName()), true);
             return InteractionResult.SUCCESS;
         }
         var owner = FactoryServer.find(level, data.factoryId());
@@ -149,6 +149,6 @@ public final class FactoryEncoderItem extends Item implements IMenuItem {
         }
         owner.saveChanges();refresh(player,stack);message(player,"untagged",tag,removed);
     }
-    private static void message(Player player,String key,Object... args) { player.displayClientMessage(Component.translatable("gui.ae2lightoptimizer.factory."+key,args),true); }
+    private static void message(Player player,String key,Object... args) { player.displayClientMessage(Component.translatable("gui.ae2lpt.factory."+key,args),true); }
 
 }

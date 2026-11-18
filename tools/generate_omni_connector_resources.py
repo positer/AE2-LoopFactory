@@ -4,7 +4,7 @@ import json
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-MOD = 'ae2lightoptimizer'
+MOD = 'ae2lpt'
 ID = 'omnidirectional_connector'
 
 def write(path, value):
@@ -43,8 +43,9 @@ for generation in ['1.21.1', '26.1.2']:
     if source not in atlas['sources']: atlas['sources'].append(source)
     write(atlas_path, atlas)
     ingredient = (lambda item: {'item': item}) if generation == '1.21.1' else (lambda item: item)
+    loop_crystals = {'tag': 'c:gems/loop_crystal'} if generation == '1.21.1' else '#c:gems/loop_crystal'
     write(root / f'data/{MOD}/recipe/{ID}.json', {'type': 'minecraft:crafting_shapeless', 'category': 'misc',
-          'ingredients': [ingredient('ae2:wireless_access_point'), ingredient(f'{MOD}:loop_crystal'), ingredient('ae2:quantum_entangled_singularity')],
+          'ingredients': [ingredient('ae2:wireless_access_point'), loop_crystals, ingredient('ae2:quantum_entangled_singularity')],
           'result': {'id': f'{MOD}:{ID}', 'count': 4}})
     write(root / f'data/{MOD}/loot_table/blocks/{ID}.json', {'type': 'minecraft:block', 'pools': [{'rolls': 1,
           'entries': [{'type': 'minecraft:item', 'name': f'{MOD}:{ID}'}], 'conditions': [{'condition': 'minecraft:survives_explosion'}]}]})

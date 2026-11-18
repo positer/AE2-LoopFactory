@@ -105,9 +105,9 @@ def panel_elements() -> list[dict[str, object]]:
 
 def panel_models(generation: str) -> tuple[dict[str, object], dict[str, object]]:
     textures = {
-        "lightsBright": "ae2lightoptimizer:part/loop_factory_pattern_encoding_panel_bright",
-        "lightsMedium": "ae2lightoptimizer:part/loop_factory_pattern_encoding_panel_medium",
-        "lightsDark": "ae2lightoptimizer:part/loop_factory_pattern_encoding_panel_dark",
+        "lightsBright": "ae2lpt:part/loop_factory_pattern_encoding_panel_bright",
+        "lightsMedium": "ae2lpt:part/loop_factory_pattern_encoding_panel_medium",
+        "lightsDark": "ae2lpt:part/loop_factory_pattern_encoding_panel_dark",
     }
     off = {
         "parent": "ae2:part/display_off",
@@ -126,9 +126,9 @@ def panel_item_model() -> dict[str, object]:
         "parent": "ae2:item/display_base",
         "textures": {
             "front": "ae2:part/pattern_encoding_terminal",
-            "front_bright": "ae2lightoptimizer:part/loop_factory_pattern_encoding_panel_bright",
-            "front_medium": "ae2lightoptimizer:part/loop_factory_pattern_encoding_panel_medium",
-            "front_dark": "ae2lightoptimizer:part/loop_factory_pattern_encoding_panel_dark",
+            "front_bright": "ae2lpt:part/loop_factory_pattern_encoding_panel_bright",
+            "front_medium": "ae2lpt:part/loop_factory_pattern_encoding_panel_medium",
+            "front_dark": "ae2lpt:part/loop_factory_pattern_encoding_panel_dark",
         },
     }
 
@@ -137,7 +137,7 @@ def panel_item_descriptor() -> dict[str, object]:
     return {
         "model": {
             "type": "minecraft:model",
-            "model": "ae2lightoptimizer:item/loop_factory_pattern_encoding_panel",
+            "model": "ae2lpt:item/loop_factory_pattern_encoding_panel",
             "tints": [
                 {"type": "minecraft:constant", "value": -1},
                 {"type": "ae2:color", "color": "fluix", "variant": "dark"},
@@ -243,7 +243,7 @@ def main() -> None:
             / "main"
             / "resources"
             / "assets"
-            / "ae2lightoptimizer"
+            / "ae2lpt"
             / "textures"
             / "part"
         )
@@ -286,7 +286,7 @@ def main() -> None:
             outputs.append(output_path)
             report.append(validate_layer(output, generation, layer, expected[layer]))
 
-        assets_root = ROOT / "versions" / f"neoforge-{generation}" / "src" / "main" / "resources" / "assets" / "ae2lightoptimizer"
+        assets_root = ROOT / "versions" / f"neoforge-{generation}" / "src" / "main" / "resources" / "assets" / "ae2lpt"
         off, on = panel_models(generation)
         item_model = panel_item_model()
         model_paths = [

@@ -8,7 +8,7 @@ modId="ae2lf_runtime_probe"
 version="1"
 displayName="AE2LF isolated acceptance probe"
 [[dependencies.ae2lf_runtime_probe]]
-modId="ae2lightoptimizer"
+modId="ae2lpt"
 type="required"
 versionRange="[0.0.4,)"
 ordering="AFTER"

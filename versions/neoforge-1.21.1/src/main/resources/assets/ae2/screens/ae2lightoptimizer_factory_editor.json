@@ -8,7 +8,7 @@
     "height": 236
   },
   "slots": {
-    "AE2LT_FACTORY_PATTERN": {
+    "AE2LpT_FACTORY_PATTERN": {
       "left": 334,
       "top": 8
     }
@@ -16,7 +16,7 @@
   "text": {
     "dialog_title": {
       "text": {
-        "translate": "block.ae2lightoptimizer.loop_factory_network_terminal"
+        "translate": "block.ae2lpt.loop_factory_network_terminal"
       },
       "position": {
         "left": 8,

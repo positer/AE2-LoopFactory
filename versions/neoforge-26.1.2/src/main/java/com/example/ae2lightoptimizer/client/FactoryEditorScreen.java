@@ -24,15 +24,15 @@ public final class FactoryEditorScreen extends AEBaseScreen<FactoryEditorMenu> {
         super(menu, inventory, title, style);
         if(menu.isPanel()) {
             var recipeTab = new appeng.client.gui.widgets.TabButton(appeng.util.Icon.TAB_PROCESSING,
-                    Component.translatable("gui.ae2lightoptimizer.factory.recipe_page"), button -> menu.recipePage());
+                    Component.translatable("gui.ae2lpt.factory.recipe_page"), button -> menu.recipePage());
             recipeTab.setStyle(appeng.client.gui.widgets.TabButton.Style.HORIZONTAL);
             widgets.add("recipePage", recipeTab);
-            widgets.add("upload", uploadButton = new FactoryIconButton(appeng.util.Icon.ARROW_UP, "gui.ae2lightoptimizer.factory.upload", () -> {
+            widgets.add("upload", uploadButton = new FactoryIconButton(appeng.util.Icon.ARROW_UP, "gui.ae2lpt.factory.upload", () -> {
                 if(editor!=null) menu.saveCode(editor.getValue());
                 minecraft.setScreen(new FactoryUploadScreen(this,menu));
             }));
         }
-        widgets.add("save", saveButton = new FactoryIconButton(appeng.util.Icon.ENTER, "gui.ae2lightoptimizer.factory.save", () -> {
+        widgets.add("save", saveButton = new FactoryIconButton(appeng.util.Icon.ENTER, "gui.ae2lpt.factory.save", () -> {
             if (editor != null) menu.saveCode(editor.getValue());
         }));
     }
@@ -42,7 +42,7 @@ public final class FactoryEditorScreen extends AEBaseScreen<FactoryEditorMenu> {
         super.init();
         editor = MultiLineEditBox.builder().setX(leftPos + 8).setY(topPos + 30)
                 .setPlaceholder(Component.literal("import A")).setShowBackground(true)
-                .build(font, 344, 96, Component.translatable("gui.ae2lightoptimizer.factory.code_page"));
+                .build(font, 344, 96, Component.translatable("gui.ae2lpt.factory.code_page"));
         editor.setCharacterLimit(FactoryCompiler.MAX_SOURCE_LENGTH);
         editor.setValue(previous);
         addRenderableWidget(editor);

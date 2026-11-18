@@ -60,7 +60,7 @@ public final class LoopStorageCellItem extends Item implements LoopStorageTierPr
             TooltipFlag flag) {
         super.appendHoverText(stack, context, display, lines, flag);
         LoopStorageCellHandler.INSTANCE.addCellInformationToTooltip(stack, lines);
-        lines.accept(Component.translatable("tooltip.ae2lightoptimizer.loop_storage_cell.universal")
+        lines.accept(Component.translatable("tooltip.ae2lpt.loop_storage_cell.universal")
                 .withStyle(ChatFormatting.DARK_GRAY));
     }
 }

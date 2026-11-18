@@ -1,0 +1,18 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ae2cs"
+    }
+  ],
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "ae2lpt:loop_crystal_powder",
+    "minecraft:sand"
+  ],
+  "result": {
+    "count": 2,
+    "id": "ae2lpt:loop_crystal_seed"
+  }
+}

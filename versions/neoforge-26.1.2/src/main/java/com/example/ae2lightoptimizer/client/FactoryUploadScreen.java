@@ -17,7 +17,7 @@ public final class FactoryUploadScreen extends Screen {
     private int left, top, panelWidth, panelHeight;
 
     public FactoryUploadScreen(Screen parent, FactoryEditorMenu menu) {
-        super(Component.translatable("gui.ae2lightoptimizer.factory.upload"));
+        super(Component.translatable("gui.ae2lpt.factory.upload"));
         this.parent = parent;
         this.menu = menu;
     }
@@ -46,9 +46,9 @@ public final class FactoryUploadScreen extends Screen {
         for (int i = page * capacity; i < Math.min(rows.length, (page + 1) * capacity); i++) {
             String[] row = rows[i].split("[|]", 4);
             Component label = row.length == 4
-                    ? Component.translatable("gui.ae2lightoptimizer.factory.provider_choice",
-                            row[1].equals(row[0]) ? Component.translatable("block.ae2lightoptimizer.loop_factory_pattern_provider") : Component.literal(row[1]), row[2],
-                            Component.translatable("gui.ae2lightoptimizer.factory.direction." + row[3]))
+                    ? Component.translatable("gui.ae2lpt.factory.provider_choice",
+                            row[1].equals(row[0]) ? Component.translatable("block.ae2lpt.loop_factory_pattern_provider") : Component.literal(row[1]), row[2],
+                            Component.translatable("gui.ae2lpt.factory.direction." + row[3]))
                     : Component.literal(row[0]);
             var button = new AE2Button(left + 8, top + 25 + (i % capacity) * 22, panelWidth - 16, 20,
                     label, clicked -> { menu.upload(row[0]); minecraft.setScreen(parent); });
@@ -57,20 +57,20 @@ public final class FactoryUploadScreen extends Screen {
         }
         if (rows.length == 0) {
             var empty = new AE2Button(left + 8, top + 25, panelWidth - 16, 20,
-                    Component.translatable("gui.ae2lightoptimizer.factory.no_providers"), clicked -> {});
+                    Component.translatable("gui.ae2lpt.factory.no_providers"), clicked -> {});
             empty.active = false;
             addRenderableWidget(empty);
         }
         int buttonWidth = (panelWidth - 20) / 2;
         var next = new AE2Button(left + 8, top + panelHeight - 28, buttonWidth, 20,
-                Component.translatable("gui.ae2lightoptimizer.factory.next"), clicked -> {
+                Component.translatable("gui.ae2lpt.factory.next"), clicked -> {
                     if ((page + 1) * capacity < rows.length) { page++; rebuildWidgets(); }
                     else { page = 0; menu.nextProviders(); if (menu.providerPages == 1) rebuildWidgets(); }
                 });
         next.active = rows.length > capacity || menu.providerPages > 1;
         addRenderableWidget(next);
         addRenderableWidget(new AE2Button(left + panelWidth - 8 - buttonWidth, top + panelHeight - 28,
-                buttonWidth, 20, Component.translatable("gui.ae2lightoptimizer.factory.back"),
+                buttonWidth, 20, Component.translatable("gui.ae2lpt.factory.back"),
                 clicked -> minecraft.setScreen(parent)));
     }
 

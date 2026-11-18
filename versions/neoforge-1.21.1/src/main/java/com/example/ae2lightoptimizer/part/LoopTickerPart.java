@@ -31,7 +31,7 @@ public final class LoopTickerPart extends AEBasePart
     private static final int MAX_CARDS = 4;
 
     public static final ResourceLocation MODEL_BASE =
-            ResourceLocation.fromNamespaceAndPath("ae2lightoptimizer", "part/loop_ticker_base");
+            ResourceLocation.fromNamespaceAndPath("ae2lpt", "part/loop_ticker_base");
     public static final IPartModel MODELS_OFF = new PartModel(MODEL_BASE,
             ResourceLocation.fromNamespaceAndPath("ae2", "part/export_bus_off"));
     public static final IPartModel MODELS_ON = new PartModel(MODEL_BASE,

@@ -28,7 +28,7 @@ import net.minecraft.world.level.Level;
 
 /** Native crafting semantics with persistent, live-validated component input alternatives. */
 public final class CatalogCraftingPattern extends AECraftingPattern {
-    private static final String MARKER = "ae2lightoptimizer:catalog_crafting";
+    private static final String MARKER = "ae2lpt:catalog_crafting";
     private static final Codec<List<List<AEItemKey>>> CHOICES_CODEC = AEItemKey.CODEC.listOf().listOf();
     private static final Codec<List<List<CompoundTag>>> CHOICE_MARKERS_CODEC = CompoundTag.CODEC.listOf().listOf();
     private static boolean decoderRegistered;

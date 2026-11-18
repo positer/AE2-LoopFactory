@@ -1,0 +1,82 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "front": "ae2lpt:block/loop_factory_terminal",
+    "case": "ae2lpt:block/loop_factory_terminal_top",
+    "side": "ae2lpt:block/loop_factory_terminal_side",
+    "back": "ae2lpt:block/loop_factory_terminal_back",
+    "back": "ae2lpt:block/loop_factory_terminal_back",
+    "particle": "ae2lpt:block/loop_factory_terminal_top"
+  },
+  "elements": [
+    {
+      "name": "AE2 terminal housing",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "down": {
+          "texture": "#case",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#case",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "north": {
+          "texture": "#front",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#back",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#side",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#side",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    }
+  ]
+}

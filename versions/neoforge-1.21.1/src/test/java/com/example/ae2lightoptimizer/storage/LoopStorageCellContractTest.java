@@ -133,15 +133,15 @@ class LoopStorageCellContractTest {
     @Test
     void usesAe2ExplosionTransformForTheExactInfiniteRecipe() throws IOException {
         String json = Files.readString(Path.of(
-                "src/main/resources/data/ae2lightoptimizer/recipe/infinite_loop_storage_cell.json"));
+                "src/main/resources/data/ae2lpt/recipe/infinite_loop_storage_cell.json"));
 
         assertTrue(json.contains("\"type\":  \"ae2:transform\"")
                 || json.contains("\"type\": \"ae2:transform\""));
         assertTrue(json.contains("\"type\":  \"explosion\"")
                 || json.contains("\"type\": \"explosion\""));
-        assertEquals(64, count(json, "ae2lightoptimizer:256m_loop_storage_core"));
-        assertEquals(1, count(json, "ae2lightoptimizer:loop_storage_cell_housing"));
-        assertEquals(1, count(json, "ae2lightoptimizer:infinite_loop_storage_cell"));
+        assertEquals(64, count(json, "ae2lpt:256m_loop_storage_core"));
+        assertEquals(1, count(json, "ae2lpt:loop_storage_cell_housing"));
+        assertEquals(1, count(json, "ae2lpt:infinite_loop_storage_cell"));
         assertFalse(json.contains("minecraft:tnt"));
     }
 

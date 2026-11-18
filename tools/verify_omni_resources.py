@@ -11,7 +11,7 @@ for gen in ['1.21.1','26.1.2']:
  def read(p):return json.loads((r/p).read_text(encoding='utf-8'))
  with zipfile.ZipFile(j) as z:
   original=json.loads(z.read('assets/ae2/blockstates/wireless_access_point.json'))
-  actual=read('assets/ae2lightoptimizer/blockstates/omnidirectional_connector.json')
+  actual=read('assets/ae2lpt/blockstates/omnidirectional_connector.json')
   assert len(original['multipart'])==len(actual['multipart'])
   for a,b in zip(original['multipart'],actual['multipart']):
    old=a['apply']['model'];new=b['apply']['model']
@@ -20,17 +20,17 @@ for gen in ['1.21.1','26.1.2']:
     wrapper=read('assets/'+new.replace(':','/models/')+'.json')
     assert wrapper['parent']==old
     assert set(wrapper)=={'parent','textures'}
-    assert all(v=='ae2lightoptimizer:block/omni_white' for v in wrapper['textures'].values())
+    assert all(v=='ae2lpt:block/omni_white' for v in wrapper['textures'].values())
    b['apply']['model']=old
    assert a==b, '朝向、状态或旋转偏离原生'
-  recipe=read('data/ae2lightoptimizer/recipe/omnidirectional_connector.json')
-  assert recipe['result']=={'id':'ae2lightoptimizer:omnidirectional_connector','count':4}
-  ingredients=[x['item'] if isinstance(x,dict) else x for x in recipe['ingredients']]
-  assert set(ingredients)=={'ae2:wireless_access_point','ae2lightoptimizer:loop_crystal','ae2:quantum_entangled_singularity'}
+  recipe=read('data/ae2lpt/recipe/omnidirectional_connector.json')
+  assert recipe['result']=={'id':'ae2lpt:omnidirectional_connector','count':4}
+  ingredients=[x if isinstance(x,str) else x.get('item') or '#'+x['tag'] for x in recipe['ingredients']]
+  assert set(ingredients)=={'ae2:wireless_access_point','#c:gems/loop_crystal','ae2:quantum_entangled_singularity'}
   for name in ingredients:
    if name.startswith('ae2:'):assert f"assets/ae2/models/item/{name.split(':')[1]}.json" in z.namelist() or f"assets/ae2/items/{name.split(':')[1]}.json" in z.namelist()
-  assert {'type':'ae2lightoptimizer:omni_white'} in read('assets/minecraft/atlases/blocks.json')['sources']
+  assert {'type':'ae2lpt:omni_white'} in read('assets/minecraft/atlases/blocks.json')['sources']
   for lang in ['en_us','zh_cn']:
-   assert read(f'assets/ae2lightoptimizer/lang/{lang}.json')['block.ae2lightoptimizer.omnidirectional_connector']
+   assert read(f'assets/ae2lpt/lang/{lang}.json')['block.ae2lpt.omnidirectional_connector']
   results.append({'generation':gen,'nativeMultipartIdenticalExceptPalette':True,'recipeThreeIngredientsFourOutput':True,'runtimeSpriteRegistered':True})
 print(json.dumps({'passed':True,'results':results},ensure_ascii=False,indent=2))

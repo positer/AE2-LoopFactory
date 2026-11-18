@@ -1,9 +1,0 @@
-{
-  "model": {
-    "type": "ae2:model",
-    "model": "ae2lightoptimizer:part/loop_ticker_base"
-  },
-  "properties": {
-    "require_cable_connection": true
-  }
-}

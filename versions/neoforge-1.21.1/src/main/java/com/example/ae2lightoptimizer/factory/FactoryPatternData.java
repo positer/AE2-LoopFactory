@@ -23,7 +23,7 @@ public record FactoryPatternData(String code, String factoryId, ItemStack recipe
             Codec.string(0, 128).fieldOf("factory_id").forGetter(FactoryPatternData::factoryId),
             ItemStack.OPTIONAL_CODEC.fieldOf("recipe").forGetter(FactoryPatternData::recipe)
     ).apply(i, FactoryPatternData::new));
-    public static final DeferredRegister.DataComponents COMPONENTS = DeferredRegister.createDataComponents(Ae2LightOptimizer.MOD_ID);
+    public static final DeferredRegister.DataComponents COMPONENTS = DeferredRegister.createDataComponents(Ae2LightOptimizer.NAMESPACE);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<FactoryPatternData>> TYPE =
             COMPONENTS.registerComponentType("factory_program", b -> b.persistent(CODEC)
                     .networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(CODEC)));

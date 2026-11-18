@@ -70,7 +70,7 @@
         { "condition": "minecraft:survives_explosion" }
       ],
       "entries": [
-        { "type": "minecraft:item", "name": "ae2lightoptimizer:loop_crystal" }
+        { "type": "minecraft:item", "name": "ae2lpt:loop_crystal" }
       ],
       "rolls": 1.0
     }

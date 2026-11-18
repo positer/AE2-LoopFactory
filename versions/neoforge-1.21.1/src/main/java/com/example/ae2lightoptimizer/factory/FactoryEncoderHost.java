@@ -33,7 +33,7 @@ public final class FactoryEncoderHost extends ItemMenuHost<FactoryEncoderItem> i
         };
         patterns.fromItemContainerContents(getItemStack().getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY));
     }
-    @Override public String editorTitleKey() { return "item.ae2lightoptimizer.handheld_loop_factory_encoder"; }
+    @Override public String editorTitleKey() { return "item.ae2lpt.handheld_loop_factory_encoder"; }
     @Override public InternalInventory factoryPatterns() { return patterns; }
     @Override public String factoryDraft() { return FactoryPatternData.get(getItemStack()).code(); }
     @Override public void setFactoryDraft(String draft) {

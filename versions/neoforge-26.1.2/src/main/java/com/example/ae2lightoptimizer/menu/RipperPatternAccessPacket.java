@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 /** Ripper-only transport: bounded chunks and VarInt slot identities; AE2's wire codec stays untouched. */
 public record RipperPatternAccessPacket(PatternAccessTerminalPacket contents) implements CustomPacketPayload {
     public static final int MAX_ENTRIES = 128;
-    public static final Type<RipperPatternAccessPacket> TYPE = new Type<>(Identifier.fromNamespaceAndPath("ae2lightoptimizer", "ripper_patterns"));
+    public static final Type<RipperPatternAccessPacket> TYPE = new Type<>(Identifier.fromNamespaceAndPath("ae2lpt", "ripper_patterns"));
     public static final StreamCodec<RegistryFriendlyByteBuf, RipperPatternAccessPacket> CODEC = StreamCodec.of(
             (buffer, message) -> message.write(buffer), RipperPatternAccessPacket::read);
     @Override public Type<? extends CustomPacketPayload> type() { return TYPE; }

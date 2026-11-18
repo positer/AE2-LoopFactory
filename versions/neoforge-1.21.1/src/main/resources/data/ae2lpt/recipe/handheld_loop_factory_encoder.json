@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "I I",
+    "KCQ",
+    " R "
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "K": {
+      "item": "ae2:calculation_processor"
+    },
+    "C": {
+      "tag": "c:gems/loop_crystal"
+    },
+    "Q": {
+      "item": "ae2:quartz_glass"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "id": "ae2lpt:handheld_loop_factory_encoder",
+    "count": 1
+  }
+}

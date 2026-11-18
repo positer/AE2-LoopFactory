@@ -11,7 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class GuideMeDocumentationContractTest {
-    private static final String GUIDE_ROOT = "assets/ae2lightoptimizer/ae2guide/";
+    private static final String GUIDE_ROOT = "assets/ae2lpt/ae2guide/";
     private static final List<String> LOOP_STORAGE_TIERS = List.of(
             "1k", "4k", "16k", "64k", "256k", "1m", "4m", "16m", "64m", "256m");
 
@@ -25,7 +25,7 @@ class GuideMeDocumentationContractTest {
         assertTrue(ring.contains("supercomputing_crafting_optimizer_interface.md"));
         assertTrue(optimizer.contains("recipe_ring_solver_terminal.md"));
         assertNull(getClass().getClassLoader().getResource(
-                "assets/ae2lightoptimizer/guideme_guides/guide.json"));
+                "assets/ae2lpt/guideme_guides/guide.json"));
     }
 
     @Test
@@ -60,26 +60,26 @@ class GuideMeDocumentationContractTest {
 
     private static void assertGuidePage(String page, String itemId) {
         assertTrue(page.contains("parent: ae2:items-blocks-machines/items-blocks-machines-index.md"));
-        assertTrue(page.contains("item_ids:\n- ae2lightoptimizer:" + itemId));
-        assertTrue(page.contains("<BlockImage id=\"ae2lightoptimizer:" + itemId + "\""));
-        assertTrue(page.contains("<RecipeFor id=\"ae2lightoptimizer:" + itemId + "\" />"));
+        assertTrue(page.contains("item_ids:\n- ae2lpt:" + itemId));
+        assertTrue(page.contains("<BlockImage id=\"ae2lpt:" + itemId + "\""));
+        assertTrue(page.contains("<RecipeFor id=\"ae2lpt:" + itemId + "\" />"));
     }
 
     private static void assertLoopStorageGuide(String page) {
         assertTrue(page.contains("parent: ae2:items-blocks-machines/items-blocks-machines-index.md"));
-        assertTrue(page.contains("- ae2lightoptimizer:loop_storage_cell_housing"));
-        assertTrue(page.contains("<RecipeFor id=\"ae2lightoptimizer:loop_storage_cell_housing\" />"));
+        assertTrue(page.contains("- ae2lpt:loop_storage_cell_housing"));
+        assertTrue(page.contains("<RecipeFor id=\"ae2lpt:loop_storage_cell_housing\" />"));
         for (String tier : LOOP_STORAGE_TIERS) {
-            assertTrue(page.contains("- ae2lightoptimizer:" + tier + "_loop_storage_core"), tier);
-            assertTrue(page.contains("- ae2lightoptimizer:" + tier + "_loop_storage_cell"), tier);
-            assertTrue(page.contains("<RecipeFor id=\"ae2lightoptimizer:" + tier
+            assertTrue(page.contains("- ae2lpt:" + tier + "_loop_storage_core"), tier);
+            assertTrue(page.contains("- ae2lpt:" + tier + "_loop_storage_cell"), tier);
+            assertTrue(page.contains("<RecipeFor id=\"ae2lpt:" + tier
                     + "_loop_storage_core\" />"), tier);
-            assertTrue(page.contains("<RecipeFor id=\"ae2lightoptimizer:" + tier
+            assertTrue(page.contains("<RecipeFor id=\"ae2lpt:" + tier
                     + "_loop_storage_cell\" />"), tier);
         }
-        assertTrue(page.contains("- ae2lightoptimizer:infinite_loop_storage_cell"));
-        assertTrue(page.contains("<ItemImage id=\"ae2lightoptimizer:infinite_loop_storage_cell\""));
-        assertTrue(page.contains("<RecipeFor id=\"ae2lightoptimizer:infinite_loop_storage_cell\" />"));
+        assertTrue(page.contains("- ae2lpt:infinite_loop_storage_cell"));
+        assertTrue(page.contains("<ItemImage id=\"ae2lpt:infinite_loop_storage_cell\""));
+        assertTrue(page.contains("<RecipeFor id=\"ae2lpt:infinite_loop_storage_cell\" />"));
     }
 
     private String read(String relativePath) throws IOException {

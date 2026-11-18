@@ -237,7 +237,7 @@ public final class BackgroundAudit {
             appeng.menu.MenuOpener.open(FactoryPanelRecipeMenu.TYPE.get(),p,appeng.menu.locator.MenuLocators.forPart(part));
         }),"FactoryPanelRecipeScreen",()->((FactoryPanelRecipeMenu)mc.player.containerMenu).getMode()==appeng.parts.encoding.EncodingMode.PROCESSING);
         add("ui-factory-panel-code-tab-native",()->{},"FactoryPanelRecipeScreen",()->{
-            var label=Component.translatable("gui.ae2lightoptimizer.factory.code_page").getString();
+            var label=Component.translatable("gui.ae2lpt.factory.code_page").getString();
             return mc.screen.children().stream().anyMatch(widget->widget instanceof appeng.client.gui.widgets.TabButton tab
                     &&tab.getMessage().getString().equals(label)
                     &&tab.getStyle()==appeng.client.gui.widgets.TabButton.Style.HORIZONTAL
@@ -289,7 +289,7 @@ public final class BackgroundAudit {
             return menu.status.startsWith("Line ")&&FactoryPatternData.get(menu.getSlot(0).getItem()).code().equals("done");
         });
         add("ui-factory-panel-code-zh-cn",()->language("zh_cn"),"FactoryEditorScreen",
-            ()->net.minecraft.client.resources.language.I18n.get("gui.ae2lightoptimizer.factory.save").equals("保存代码"));
+            ()->net.minecraft.client.resources.language.I18n.get("gui.ae2lpt.factory.save").equals("保存代码"));
         add("ui-factory-panel-error-zh-cn",()->edit("get"),"FactoryEditorScreen",
             ()->com.example.ae2lightoptimizer.client.FactoryMessages.status(((FactoryEditorMenu)mc.player.containerMenu).status).getString().contains("第 1 行"));
         add("ui-sfm-error-zh-cn",()->edit("EVERY TICK DO INPUT RETAIN 1 iron_ingot FROM A END"),"FactoryEditorScreen",
@@ -309,7 +309,7 @@ public final class BackgroundAudit {
                 mc.setScreen(new com.example.ae2lightoptimizer.client.FactoryUploadScreen(uploadParent, menu));
             }, "FactoryUploadScreen", () -> mc.screen.children().stream().anyMatch(widget ->
                     widget instanceof appeng.client.gui.widgets.AE2Button button && !button.active
-                    && button.getMessage().getString().equals(Component.translatable("gui.ae2lightoptimizer.factory.no_providers").getString())));
+                    && button.getMessage().getString().equals(Component.translatable("gui.ae2lpt.factory.no_providers").getString())));
             add("style-upload-many", () -> {
                 var menu = (FactoryEditorMenu) mc.player.containerMenu;
                 var rows = new java.util.ArrayList<String>();
@@ -321,7 +321,7 @@ public final class BackgroundAudit {
                     widget instanceof appeng.client.gui.widgets.AE2Button).count() == Math.max(1, (Math.min(240, mc.screen.height - 16) - 58) / 22) + 2);
             add("style-upload-next-page", () -> mc.screen.children().stream().filter(widget ->
                     widget instanceof appeng.client.gui.widgets.AE2Button button && button.getMessage().getString()
-                    .equals(Component.translatable("gui.ae2lightoptimizer.factory.next").getString()))
+                    .equals(Component.translatable("gui.ae2lpt.factory.next").getString()))
                     .map(widget -> (appeng.client.gui.widgets.AE2Button)widget).findFirst().orElseThrow().onPress(),
                     "FactoryUploadScreen", () -> mc.screen.children().stream().anyMatch(widget ->
                     widget instanceof appeng.client.gui.widgets.AE2Button button && button.getMessage().getString().contains("LINE-" + String.format("%02d", Math.max(1, (Math.min(240, mc.screen.height - 16) - 58) / 22) + 1))));
@@ -348,7 +348,7 @@ public final class BackgroundAudit {
             var panel=(FactoryEncodingPanel)appeng.api.parts.PartHelper.getPart(p.serverLevel(),new BlockPos(2,100,1),net.minecraft.core.Direction.SOUTH);
             if(panel.getHost().getColor()!=appeng.api.util.AEColor.RED)throw new IllegalStateException("Panel did not inherit cable dye");
         }),"world",()->mc.screen==null);
-        add("language-en-us",()->language("en_us"),"world",()->net.minecraft.client.resources.language.I18n.get("gui.ae2lightoptimizer.factory.save").equals("Save code"));
+        add("language-en-us",()->language("en_us"),"world",()->net.minecraft.client.resources.language.I18n.get("gui.ae2lpt.factory.save").equals("Save code"));
         add("prepare-handheld-encoder",()->server(p->{
             p.closeContainer(); var phone=FactoryContent.ENCODER.get().getDefaultInstance();
             var pattern=ModItems.LOOP_FACTORY_PATTERN.get().getDefaultInstance();
@@ -421,7 +421,7 @@ public final class BackgroundAudit {
                 return ((java.util.List<?>)field.get(null)).isEmpty();
             }catch(ReflectiveOperationException failure){throw new RuntimeException(failure);}
         });
-        var items=BuiltInRegistries.ITEM.stream().filter(i->BuiltInRegistries.ITEM.getKey(i).getNamespace().equals("ae2lightoptimizer"))
+        var items=BuiltInRegistries.ITEM.stream().filter(i->BuiltInRegistries.ITEM.getKey(i).getNamespace().equals("ae2lpt"))
                 .sorted(Comparator.comparing(i->BuiltInRegistries.ITEM.getKey(i).toString())).toList();
         add("ui-close",()->server(p->p.closeContainer()),"world",()->mc.screen==null);
         add("model-ae2-pattern-encoding-terminal-reference",
@@ -514,7 +514,7 @@ public final class BackgroundAudit {
                 add("ui-guide-language-"+locale,()->language(locale),"",()->languageReload!=null&&languageReload.isDone());
                 add("ui-guide-top-"+locale,()->{
                     var guide=guideme.Guides.getById(appeng.items.tools.GuideItem.GUIDE_ID);
-                    var page=net.minecraft.resources.ResourceLocation.parse("ae2lightoptimizer:items-blocks-machines/loop_factory.md");
+                    var page=net.minecraft.resources.ResourceLocation.parse("ae2lpt:items-blocks-machines/loop_factory.md");
                     if(!guide.pageExists(page))throw new IllegalStateException("Factory guide page missing");
                     var screen=guideme.internal.screen.GuideScreen.openNew(guide,guideme.PageAnchor.page(page));
                     mc.setScreen(screen);
@@ -526,7 +526,7 @@ public final class BackgroundAudit {
                     } catch(ReflectiveOperationException failure){throw new RuntimeException(failure);}
                     if(!document.contains("StageOne")||!document.contains("moveOne")||!document.contains("O2")||!document.contains("EVERY")||document.contains("PARSING ERROR"))
                         throw new IllegalStateException("Guide did not compile all runnable examples: "+document.substring(0,Math.min(240,document.length())));
-                },"GuideScreen",()->((guideme.internal.screen.GuideScreen)mc.screen).getCurrentPageId().toString().equals("ae2lightoptimizer:items-blocks-machines/loop_factory.md"));
+                },"GuideScreen",()->((guideme.internal.screen.GuideScreen)mc.screen).getCurrentPageId().toString().equals("ae2lpt:items-blocks-machines/loop_factory.md"));
                 for(int page=1;page<=60;page++) {
                     add("ui-guide-page-"+page+"-"+locale,()->{
                         var screen=(guideme.internal.screen.GuideScreen)mc.screen;
@@ -619,7 +619,7 @@ public final class BackgroundAudit {
                 add("panel-align-factory-code-"+locale, () -> ((FactoryPanelRecipeMenu)mc.player.containerMenu).codePage(),
                         "FactoryEditorScreen", () -> ((FactoryEditorMenu)mc.player.containerMenu).isPanel());
                 add("panel-align-return-recipe-"+locale, () -> {
-                    var label = Component.translatable("gui.ae2lightoptimizer.factory.recipe_page").getString();
+                    var label = Component.translatable("gui.ae2lpt.factory.recipe_page").getString();
                     var tab = mc.screen.children().stream().filter(widget -> widget instanceof appeng.client.gui.widgets.TabButton
                             && ((appeng.client.gui.widgets.TabButton)widget).getMessage().getString().equals(label))
                             .map(widget -> (appeng.client.gui.widgets.TabButton)widget).findFirst().orElseThrow();

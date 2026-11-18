@@ -57,7 +57,7 @@ public final class Ae2LightOptimizerClient {
 
     private static Identifier model(LoopStorageTier tier) {
         return Identifier.fromNamespaceAndPath(
-                Ae2LightOptimizer.MOD_ID,
+                Ae2LightOptimizer.NAMESPACE,
                 "block/drive/cells/" + tier.id() + "_loop_storage_cell");
     }
 }

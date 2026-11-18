@@ -10,7 +10,7 @@ function Pixel($Image, $X, $Y, $Hex) {
 # Extend the existing code-authored machine face. The outer three pixels retain
 # its exact frame; nine discrete cells form a crafting grid in the core.
 foreach ($generation in @('1.21.1', '26.1.2')) {
-    $assets = Join-Path $WorkspaceRoot "versions/neoforge-$generation/src/main/resources/assets/ae2lightoptimizer"
+    $assets = Join-Path $WorkspaceRoot "versions/neoforge-$generation/src/main/resources/assets/ae2lpt"
     foreach ($connected in @($false, $true)) {
         $suffix = if ($connected) { '_connected' } else { '' }
         $source = [System.Drawing.Bitmap]::new((Join-Path $assets "textures/block/supercomputing_crafting_optimizer_interface$suffix.png"))

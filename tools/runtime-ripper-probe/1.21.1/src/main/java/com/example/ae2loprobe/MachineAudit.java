@@ -66,6 +66,15 @@ public final class MachineAudit {
         report.put("world", server.getWorldData().getLevelName());
         report.put("chain", "machine_audit");
         report.put("checks", checks);
+        if (Boolean.getBoolean("ae2lo.probe.migrationCopy")) {
+            var pos = new BlockPos(-3, 100, 0);
+            var entity = level.getBlockEntity(pos);
+            check("legacy_world_block", net.minecraft.core.registries.BuiltInRegistries.BLOCK
+                    .getKey(level.getBlockState(pos).getBlock()).toString().equals("ae2lpt:recipe_ring_solver_terminal"));
+            check("legacy_world_entity", entity != null && net.minecraft.core.registries.BuiltInRegistries.BLOCK_ENTITY_TYPE
+                    .getKey(entity.getType()).toString().equals("ae2lpt:recipe_ring_solver_terminal"));
+            check("without_crystal_science", !net.neoforged.fml.ModList.get().isLoaded("ae2cs"));
+        }
         if (player != null) {
             player.setGameMode(GameType.CREATIVE);
             player.connection.teleport(0.5, 103, 4.5, 180, 30);
@@ -248,6 +257,7 @@ public final class MachineAudit {
                 }
                 case 10 -> {
                     if (since < 40) return;
+                    if (net.neoforged.fml.ModList.get().isLoaded("ae2cs")) check("four_native_silver_sprites", crystalSpritesReady);
                     report.put("passed", checks.values().stream().allMatch(Boolean::booleanValue));
                     finish();
                 }
@@ -257,14 +267,33 @@ public final class MachineAudit {
         }
     }
 
+    public static volatile boolean crystalSpritesReady;
+
     private static void testMachineRecipes() {
-        String c = "ae2lightoptimizer:loop_crystal", p = "ae2:engineering_processor";
-        String k = "ae2lightoptimizer:4k_loop_storage_core", l = "ae2:logic_processor";
-        String block = "ae2lightoptimizer:loop_ticker", part = block + "_part";
+        var old = net.minecraft.resources.ResourceLocation.parse("ae2lightoptimizer:loop_ticker");
+        var current = net.minecraft.resources.ResourceLocation.parse("ae2lpt:loop_ticker");
+        var items = net.minecraft.core.registries.BuiltInRegistries.ITEM;
+        var blocks = net.minecraft.core.registries.BuiltInRegistries.BLOCK;
+        var entities = net.minecraft.core.registries.BuiltInRegistries.BLOCK_ENTITY_TYPE;
+        check("old_addon_dependency", net.neoforged.fml.ModList.get().isLoaded("ae2lightoptimizer"));
+        check("old_recipe_id", level.getServer().getRecipeManager().byKey(old).isPresent());
+        check("old_inventory_id", items.get(old) == ModItems.LOOP_TICKER.get() && items.getKey(items.get(old)).equals(current));
+        check("old_chunk_palette_id", blocks.get(old) == com.example.ae2lightoptimizer.block.ModBlocks.LOOP_TICKER.get());
+        check("old_block_entity_id", entities.get(old) == entities.get(current) && entities.get(current) != null);
+        String c = "ae2lpt:loop_crystal", p = "ae2:engineering_processor";
+        String k = "ae2lpt:4k_loop_storage_core", l = "ae2:logic_processor";
+        String block = "ae2lpt:loop_ticker", part = block + "_part";
+        if (net.neoforged.fml.ModList.get().isLoaded("ae2cs")) testCrystalScience();
         verifyRecipe("loop_ticker", block, c, "ae2:speed_card", c, p, "ae2:cell_workbench", p, "", "ae2:export_bus", "");
-        verifyRecipe("loop_condenser", "ae2lightoptimizer:loop_condenser", c, k, c, l, "ae2:condenser", l, c, k, c);
+        verifyRecipe("loop_condenser", "ae2lpt:loop_condenser", c, k, c, l, "ae2:condenser", l, c, k, c);
         verifyRecipe("loop_ticker_part_from_loop_ticker", part, block);
         verifyRecipe("loop_ticker_from_loop_ticker_part", block, part);
+    }
+
+    private static void testCrystalScience() {
+        CrystalScienceAudit.run(level, MachineAudit::check);
+        verifyRecipe("crystal_science/loop_crystal_seed", "ae2lpt:loop_crystal_seed",
+                "ae2lpt:loop_crystal_powder", "minecraft:sand");
     }
 
     private static void verifyRecipe(String path, String outputId, String... ingredients) {
@@ -273,15 +302,15 @@ public final class MachineAudit {
         for (String id : ingredients) {
             stacks.add(id.isEmpty() ? ItemStack.EMPTY : new ItemStack(registry.get(net.minecraft.resources.ResourceLocation.parse(id))));
         }
-        var recipe = (net.minecraft.world.item.crafting.CraftingRecipe) level.getRecipeManager().byKey(net.minecraft.resources.ResourceLocation.parse("ae2lightoptimizer:" + path)).orElseThrow().value();
-        int width = ingredients.length == 1 ? 1 : 3;
-        var input = net.minecraft.world.item.crafting.CraftingInput.of(width, width, stacks);
+        var recipe = (net.minecraft.world.item.crafting.CraftingRecipe) level.getRecipeManager().byKey(net.minecraft.resources.ResourceLocation.parse("ae2lpt:" + path)).orElseThrow().value();
+        int width = Math.min(ingredients.length, 3);
+        var input = net.minecraft.world.item.crafting.CraftingInput.of(width, ingredients.length / width, stacks);
         check("recipe_matches_" + path, recipe.matches(input, level));
         var result = recipe.assemble(input, level.registryAccess());
-        check("recipe_result_" + path, result.getCount() == 1 && registry.getKey(result.getItem()).toString().equals(outputId));
+        check("recipe_result_" + path, result.getCount() == (path.equals("crystal_science/loop_crystal_seed") ? 2 : 1) && registry.getKey(result.getItem()).toString().equals(outputId));
         if (width == 3) {
             java.util.Collections.swap(stacks, 0, 1);
-            input = net.minecraft.world.item.crafting.CraftingInput.of(width, width, stacks);
+            input = net.minecraft.world.item.crafting.CraftingInput.of(width, ingredients.length / width, stacks);
             check("recipe_order_" + path, !recipe.matches(input, level));
         }
     }

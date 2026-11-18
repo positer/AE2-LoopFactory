@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 /**
  * Applies the optional Thunderbolt channel bridge only when Thunderbolt (AE2 Lightning Tech's channel
- * engine) is on the classpath. Without it the bridge mixins stay unapplied, so AE2LT keeps its native
+ * engine) is on the classpath. Without it the bridge mixins stay unapplied, so AE2LpT keeps its native
  * AE2 pathing behaviour and never hard-depends on that mod.
  */
 public final class OptionalCompatMixinPlugin implements IMixinConfigPlugin {

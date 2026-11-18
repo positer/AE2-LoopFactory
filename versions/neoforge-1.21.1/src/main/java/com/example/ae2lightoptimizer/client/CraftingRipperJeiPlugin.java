@@ -16,7 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 public final class CraftingRipperJeiPlugin implements IModPlugin {
     @Override
     public ResourceLocation getPluginUid() {
-        return ResourceLocation.fromNamespaceAndPath(Ae2LightOptimizer.MOD_ID, "crafting_ripper_ui");
+        return ResourceLocation.fromNamespaceAndPath(Ae2LightOptimizer.NAMESPACE, "crafting_ripper_ui");
     }
 
     @Override

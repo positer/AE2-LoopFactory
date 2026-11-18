@@ -30,7 +30,7 @@ final class MachineWrenchAudit {
         for (int i = 0; i < IDS.length; i++) {
             var p = pos(i);
             level.setChunkForced(p.getX() >> 4, p.getZ() >> 4, true);
-            level.setBlockAndUpdate(p, BuiltInRegistries.BLOCK.get(ResourceLocation.parse("ae2lightoptimizer:" + IDS[i])).defaultBlockState());
+            level.setBlockAndUpdate(p, BuiltInRegistries.BLOCK.get(ResourceLocation.parse("ae2lpt:" + IDS[i])).defaultBlockState());
         }
     }
     static void check(boolean condition, String reason) { if (!condition) throw new IllegalStateException(reason); }
@@ -50,12 +50,12 @@ final class MachineWrenchAudit {
         try {
             player.setShiftKeyDown(true);
             var certus = AEItems.CERTUS_QUARTZ_CRYSTAL.stack();
-            var fragment = BuiltInRegistries.ITEM.get(ResourceLocation.parse("ae2lightoptimizer:loop_crystal_fragment")).getDefaultInstance();
+            var fragment = BuiltInRegistries.ITEM.get(ResourceLocation.parse("ae2lpt:loop_crystal_fragment")).getDefaultInstance();
             var input = CraftingInput.of(3, 3, List.of(certus.copy(), fragment.copy(), certus.copy(),
                     fragment.copy(), ItemStack.EMPTY, fragment.copy(), certus.copy(), fragment.copy(), certus.copy()));
             var recipe = level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level).orElseThrow();
             var output = recipe.value().assemble(input, level.registryAccess());
-            check(output.is(BuiltInRegistries.ITEM.get(ResourceLocation.parse("ae2lightoptimizer:loop_crystal"))) && output.getCount() == 4,
+            check(output.is(BuiltInRegistries.ITEM.get(ResourceLocation.parse("ae2lpt:loop_crystal"))) && output.getCount() == 4,
                     "Native empty-centre growth recipe differs");
             var encoded = appeng.api.crafting.PatternDetailsHelper.encodeCraftingPattern(recipe,
                     input.items().toArray(ItemStack[]::new), output, false, false);

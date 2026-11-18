@@ -8,7 +8,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ModBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
-            DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, Ae2LightOptimizer.MOD_ID);
+            DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, Ae2LightOptimizer.NAMESPACE);
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<RecipeRingSolverTerminalBlockEntity>>
             RECIPE_RING_SOLVER_TERMINAL = BLOCK_ENTITIES.register(

@@ -14,7 +14,7 @@ import net.minecraft.network.chat.Component;
 public final class FactoryBuffer implements MEStorage {
     public static final int MAX_TYPES = 256;
     private final KeyCounter contents = new KeyCounter();
-    @Override public Component getDescription() { return Component.translatable("gui.ae2lightoptimizer.factory.source_buffer"); }
+    @Override public Component getDescription() { return Component.translatable("gui.ae2lpt.factory.source_buffer"); }
     @Override public void getAvailableStacks(KeyCounter result) { result.addAll(contents); }
     @Override public long insert(AEKey key, long amount, Actionable mode, IActionSource source) {
         MEStorage.checkPreconditions(key, amount, mode, source);

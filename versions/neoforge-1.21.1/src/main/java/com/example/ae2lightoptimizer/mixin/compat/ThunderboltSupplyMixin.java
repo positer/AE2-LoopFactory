@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Applies AE2LT's single capacity doubling to Thunderbolt's overloaded-controller network. Its max-flow
+ * Applies AE2LpT's single capacity doubling to Thunderbolt's overloaded-controller network. Its max-flow
  * takes per-controller supply from a static helper, so doubling the native node and connection capacities
  * (what AE2's own BFS needs) would leave an overloaded network unchanged; the supply is the quantity that
  * has to grow for one more overloaded controller's worth of channels to become usable.

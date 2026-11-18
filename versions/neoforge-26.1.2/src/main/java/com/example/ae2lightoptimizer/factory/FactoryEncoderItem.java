@@ -32,7 +32,7 @@ public final class FactoryEncoderItem extends Item implements IMenuItem {
         var old = FactoryPatternData.get(stack);
         stack.set(FactoryPatternData.TYPE.get(), new FactoryPatternData(old.code(), "", ItemStack.EMPTY));
         if (player instanceof net.minecraft.server.level.ServerPlayer server)
-            server.sendSystemMessage(Component.translatable("gui.ae2lightoptimizer.factory.binding_cleared"), true);
+            server.sendSystemMessage(Component.translatable("gui.ae2lpt.factory.binding_cleared"), true);
     }
 
     /**
@@ -66,7 +66,7 @@ public final class FactoryEncoderItem extends Item implements IMenuItem {
         var target = FactoryServer.at(level, pos);
         if (data.factoryId().isEmpty() && target != null && !player.isShiftKeyDown()) {
             stack.set(FactoryPatternData.TYPE.get(), new FactoryPatternData(data.code(), target.factoryId(), ItemStack.EMPTY));
-            ((net.minecraft.server.level.ServerPlayer) player).sendSystemMessage(Component.translatable("gui.ae2lightoptimizer.factory.bound", target.factoryName()), true);
+            ((net.minecraft.server.level.ServerPlayer) player).sendSystemMessage(Component.translatable("gui.ae2lpt.factory.bound", target.factoryName()), true);
             return InteractionResult.SUCCESS;
         }
         var owner = FactoryServer.find(level, data.factoryId());
@@ -150,6 +150,6 @@ public final class FactoryEncoderItem extends Item implements IMenuItem {
         }
         owner.saveChanges();refresh(player,stack);message(player,"untagged",tag,removed);
     }
-    private static void message(Player player,String key,Object... args) { player.sendOverlayMessage(Component.translatable("gui.ae2lightoptimizer.factory."+key,args)); }
+    private static void message(Player player,String key,Object... args) { player.sendOverlayMessage(Component.translatable("gui.ae2lpt.factory."+key,args)); }
 
 }

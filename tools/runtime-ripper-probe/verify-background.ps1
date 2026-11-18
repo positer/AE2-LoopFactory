@@ -21,7 +21,7 @@ $agent = Join-Path $taskRoot 'tools/runtime-factory-probe/background-agent/hidde
 $versionLine = @(Get-Content -LiteralPath (Join-Path $projectRoot 'gradle.properties') | Where-Object { $_ -match '^mod_version=' })
 if ($versionLine.Count -ne 1) { throw 'Expected one mod_version in the generation properties' }
 $modVersion = ($versionLine[0] -split '=',2)[1].Trim()
-$production = Join-Path $projectRoot "build/libs/ae2lt-neoforge-mc$Generation-$modVersion.jar"
+$production = Join-Path $projectRoot "build/libs/ae2lpt-neoforge-mc$Generation-$modVersion.jar"
 
 function Assert-WorkspacePath([string]$Path) {
     $resolved = [IO.Path]::GetFullPath($Path)
@@ -55,7 +55,7 @@ function Assert-HelperMatchesProduction {
         try { $toml = $reader.ReadToEnd() } finally { $reader.Dispose() }
         $blocks = [regex]::Matches($toml, '(?ms)^\[\[dependencies\.ae2lo_runtime_probe\]\][ \t]*\r?\n(?<body>.*?)(?=^\[\[|\z)')
         $productionDependency = @($blocks | Where-Object {
-            $_.Groups['body'].Value -match '(?m)^modId\s*=\s*"ae2lightoptimizer"\s*$'
+            $_.Groups['body'].Value -match '(?m)^modId\s*=\s*"ae2lpt"\s*$'
         })
         if ($productionDependency.Count -ne 1) { throw 'Expected exactly one production dependency in the actual helper JAR' }
         $range = [regex]::Match($productionDependency[0].Groups['body'].Value, '(?m)^versionRange\s*=\s*"([^"]+)"\s*$')

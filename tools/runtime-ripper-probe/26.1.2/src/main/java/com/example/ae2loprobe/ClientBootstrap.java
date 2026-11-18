@@ -264,7 +264,9 @@ public final class ClientBootstrap {
         }
         var saves = minecraft.gameDirectory.toPath().toAbsolutePath().normalize().resolve("saves");
         var target = saves.resolve(worldId).normalize();
-        if (!target.getParent().equals(saves) || Files.exists(target)) {
+        boolean migrationCopy = Boolean.getBoolean("ae2lo.probe.migrationCopy")
+                && Files.isRegularFile(target.resolve(".ae2lpt-migration-fixture"));
+        if (!target.getParent().equals(saves) || (Files.exists(target) && !migrationCopy)) {
             LOG.error("Refusing existing or non-isolated world path {}", target);
             return;
         }
@@ -283,6 +285,11 @@ public final class ClientBootstrap {
         minecraft.options.simulationDistance().set(5);
         shutdownEvent(minecraft, "options_overridden", "renderDistance=" + oldRenderDistance + "->6 simulationDistance="
                 + oldSimulationDistance + "->5 pauseOnLostFocus=" + oldPauseOnLostFocus + "->false; in-memory only");
+        if (migrationCopy) {
+            minecraft.createWorldOpenFlows().openWorld(worldId,
+                    () -> LOG.error("Loading the isolated migration fixture was cancelled"));
+            return;
+        }
         var settings = new LevelSettings(worldId, GameType.CREATIVE,
                 new LevelSettings.DifficultySettings(Difficulty.PEACEFUL, false, false), true, WorldDataConfiguration.DEFAULT);
         LOG.info("AE2LO client probe creating NEW world {} at {} with seed {}", worldId, target, SEED);

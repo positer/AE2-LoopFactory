@@ -36,15 +36,15 @@ public final class LoopStorageCellHandler implements ICellHandler {
         }
         var tier = inventory.tier();
         if (tier.infinite()) {
-            lines.accept(Component.translatable("tooltip.ae2lightoptimizer.loop_storage_cell.capacity_infinite"));
+            lines.accept(Component.translatable("tooltip.ae2lpt.loop_storage_cell.capacity_infinite"));
         } else {
             lines.accept(Component.translatable(
-                    "tooltip.ae2lightoptimizer.loop_storage_cell.bytes",
+                    "tooltip.ae2lpt.loop_storage_cell.bytes",
                     inventory.usedBytes(), tier.capacityBytes()));
         }
         if (tier.hasTypeLimit()) {
             lines.accept(Component.translatable(
-                    "tooltip.ae2lightoptimizer.loop_storage_cell.types",
+                    "tooltip.ae2lpt.loop_storage_cell.types",
                     inventory.storedTypeCount(), tier.maxTypes()));
         }
     }

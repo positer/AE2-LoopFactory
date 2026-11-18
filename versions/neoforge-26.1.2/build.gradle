@@ -6,15 +6,20 @@ plugins {
 version = mod_version
 group = mod_group_id
 
-base { archivesName = "ae2lt-neoforge-mc${minecraft_version}" }
+base { archivesName = "ae2lpt-neoforge-mc${minecraft_version}" }
 java.toolchain.languageVersion = JavaLanguageVersion.of(java_version as int)
 
 repositories {
+    exclusiveContent {
+        forRepository { maven { url = 'https://api.modrinth.com/maven' } }
+        filter { includeModule 'maven.modrinth', 'ae2-crystal-science' }
+    }
     mavenCentral()
     maven { url = 'https://maven.blamejared.com' }
 }
 
 dependencies {
+    compileOnly 'maven.modrinth:ae2-crystal-science:9wyPpLcp'
     compileOnly "org.appliedenergistics:appliedenergistics2:${ae2_version}"
     compileOnly 'mezz.jei:jei-26.1.2-neoforge-api:29.21.0.68'
     runtimeOnly "org.appliedenergistics:appliedenergistics2:${ae2_version}"

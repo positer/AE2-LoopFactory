@@ -143,11 +143,11 @@ function Write-StrictRecolor(
 
 function Write-ItemModel([string]$resourceRoot, [string]$id, [bool]$modernItems, [bool]$storageCell) {
     $textureLayers = @"
-    "layer0": "ae2lightoptimizer:item/$id"
+    "layer0": "ae2lpt:item/$id"
 "@
     if ($storageCell) {
         $textureLayers = @"
-    "layer0": "ae2lightoptimizer:item/$id",
+    "layer0": "ae2lpt:item/$id",
     "layer1": "ae2:item/storage_cell_led"
 "@
     }
@@ -159,7 +159,7 @@ $textureLayers
   }
 }
 "@
-    Write-Utf8 (Join-Path $resourceRoot "assets\ae2lightoptimizer\models\item\$id.json") $model.TrimEnd()
+    Write-Utf8 (Join-Path $resourceRoot "assets\ae2lpt\models\item\$id.json") $model.TrimEnd()
     if ($modernItems) {
         $tints = ''
         if ($storageCell) {
@@ -175,11 +175,11 @@ $textureLayers
 {
   "model": {
     "type": "minecraft:model",
-    "model": "ae2lightoptimizer:item/$id"$tints
+    "model": "ae2lpt:item/$id"$tints
   }
 }
 "@
-        Write-Utf8 (Join-Path $resourceRoot "assets\ae2lightoptimizer\items\$id.json") $descriptor.TrimEnd()
+        Write-Utf8 (Join-Path $resourceRoot "assets\ae2lpt\items\$id.json") $descriptor.TrimEnd()
     }
 }
 
@@ -193,20 +193,20 @@ function Write-PortableItemModel(
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "ae2lightoptimizer:item/$housingTexture",
+    "layer0": "ae2lpt:item/$housingTexture",
     "layer1": "ae2:item/portable_cell_led",
     "layer2": "ae2:item/portable_cell_screen",
-    "layer3": "ae2lightoptimizer:item/$sideTexture"
+    "layer3": "ae2lpt:item/$sideTexture"
   }
 }
 "@
-    Write-Utf8 (Join-Path $resourceRoot "assets\ae2lightoptimizer\models\item\$id.json") $model.TrimEnd()
+    Write-Utf8 (Join-Path $resourceRoot "assets\ae2lpt\models\item\$id.json") $model.TrimEnd()
     if ($modernItems) {
         $descriptor = @"
 {
   "model": {
     "type": "minecraft:model",
-    "model": "ae2lightoptimizer:item/$id",
+    "model": "ae2lpt:item/$id",
     "tints": [
       { "type": "minecraft:constant", "value": -1 },
       { "type": "ae2:storage_cell_state" },
@@ -215,7 +215,7 @@ function Write-PortableItemModel(
   }
 }
 "@
-        Write-Utf8 (Join-Path $resourceRoot "assets\ae2lightoptimizer\items\$id.json") $descriptor.TrimEnd()
+        Write-Utf8 (Join-Path $resourceRoot "assets\ae2lpt\items\$id.json") $descriptor.TrimEnd()
     }
 }
 
@@ -223,7 +223,7 @@ try {
 foreach ($version in $versions) {
     $jarPath = Get-Ae2Jar $version
     $resourceRoot = Join-Path $WorkspaceRoot "versions\$($version.Directory)\src\main\resources"
-    $textureRoot = Join-Path $resourceRoot 'assets\ae2lightoptimizer\textures\item'
+    $textureRoot = Join-Path $resourceRoot 'assets\ae2lpt\textures\item'
 
     Write-StrictRecolor $jarPath 'assets/ae2/textures/item/item_cell_housing.png' `
         $kShell (Join-Path $textureRoot 'loop_storage_cell_housing.png') $true
@@ -272,7 +272,7 @@ foreach ($version in $versions) {
         }
         Write-PortableItemModel $resourceRoot $portableId $portableHousing $portableSide $version.ModernItems
 
-        $driveModelPath = Join-Path $resourceRoot "assets\ae2lightoptimizer\models\block\drive\cells\$cellId.json"
+        $driveModelPath = Join-Path $resourceRoot "assets\ae2lpt\models\block\drive\cells\$cellId.json"
         Write-DriveModel $jarPath $version.ModernItems $tier.Base $driveModelPath
     }
 
@@ -288,7 +288,7 @@ foreach ($version in $versions) {
         'portable_infinite_loop_storage_cell_side' $version.ModernItems
 
     $infiniteDrivePath = Join-Path $resourceRoot `
-        'assets\ae2lightoptimizer\models\block\drive\cells\infinite_loop_storage_cell.json'
+        'assets\ae2lpt\models\block\drive\cells\infinite_loop_storage_cell.json'
     Write-DriveModel $jarPath $version.ModernItems '1k' $infiniteDrivePath
 }
 } finally {

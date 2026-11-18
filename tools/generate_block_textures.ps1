@@ -197,7 +197,7 @@ Assert-RotationalSymmetry $textures['supercomputing_crafting_optimizer_interface
 $modIcon = New-RingBlockIcon $textures['recipe_ring_solver_terminal_connected.png']
 
 foreach ($version in @('neoforge-1.21.1', 'neoforge-26.1.2')) {
-    $target = Join-Path $WorkspaceRoot "versions\$version\src\main\resources\assets\ae2lightoptimizer\textures\block"
+    $target = Join-Path $WorkspaceRoot "versions\$version\src\main\resources\assets\ae2lpt\textures\block"
     New-Item -ItemType Directory -Force -Path $target | Out-Null
     foreach ($entry in $textures.GetEnumerator()) {
         $entry.Value.Save((Join-Path $target $entry.Key), [System.Drawing.Imaging.ImageFormat]::Png)

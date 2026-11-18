@@ -77,15 +77,15 @@ for gen in ['1.21.1', '26.1.2']:
         current_classes={n:hashlib.sha256(z.read(n)).hexdigest() for n in names if n.endswith('.class')}
         assert current_classes == restart_artifacts[gen]['classes'], 'Runtime classes changed after restart evidence'
         for panel_model in ('loop_factory_panel_off.json', 'loop_factory_panel_on.json'):
-            particle=json.loads(z.read('assets/ae2lightoptimizer/models/part/' + panel_model))['textures']
+            particle=json.loads(z.read('assets/ae2lpt/models/part/' + panel_model))['textures']
             assert particle.get('particle') == '#lightsMedium'
 
         assert not any('ae2lfprobe' in n or 'immortalstorage' in n.lower() or n.endswith('.jar') for n in names)
         for cls in ['FactoryEncoderItem', 'FactoryEncodingPanel', 'FactoryEncoderAction']:
             assert f'com/example/ae2lightoptimizer/factory/{cls}.class' in names
-        en = json.loads(z.read('assets/ae2lightoptimizer/lang/en_us.json'))
-        zh = json.loads(z.read('assets/ae2lightoptimizer/lang/zh_cn.json'))
-        keys = {k for k in en if k.startswith('gui.ae2lightoptimizer.factory.')}
+        en = json.loads(z.read('assets/ae2lpt/lang/en_us.json'))
+        zh = json.loads(z.read('assets/ae2lpt/lang/zh_cn.json'))
+        keys = {k for k in en if k.startswith('gui.ae2lpt.factory.')}
         assert keys and keys <= set(zh)
         assert all(not any('\u4e00' <= c <= '\u9fff' for c in en[k]) for k in keys)
     summary['generations'][gen] = {'evidenceDirectory': str(base.relative_to(root)), 'uiEvidenceDirectory': str(ui_base.relative_to(root)), 'uiRecaptureSteps': len(ui_rows), 'multiTag': json.loads((base/'multi-tag-report.json').read_text(encoding='utf-8')), 'guideEvidenceDirectory':str(guide_base.relative_to(root)), 'guideSteps':len(guide_audit['results']), 'steps': len(audit['results']), 'categories': dict(counts),

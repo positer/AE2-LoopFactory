@@ -75,10 +75,10 @@ final class FactoryRecovery {
         carrier.applyComponents(withoutCargo(host.exportSettings(SettingsFrom.DISMANTLE_ITEM,null)));
         carrier.set(DataComponents.CUSTOM_DATA,CustomData.of(envelope));
         var lines=new ArrayList<Component>();
-        lines.add(Component.translatableWithFallback("gui.ae2lightoptimizer.factory.recovery_saved",
+        lines.add(Component.translatableWithFallback("gui.ae2lpt.factory.recovery_saved",
                 "Buffered resources saved. Place on a network to return them.").withStyle(net.minecraft.ChatFormatting.GRAY));
         if(!cargo.nativeRecovery().isEmpty())lines.add(Component.translatableWithFallback(
-                "gui.ae2lightoptimizer.factory.recovery_native_pending","Native recovery resources remain pending.").withStyle(net.minecraft.ChatFormatting.YELLOW));
+                "gui.ae2lpt.factory.recovery_native_pending","Native recovery resources remain pending.").withStyle(net.minecraft.ChatFormatting.YELLOW));
         carrier.set(DataComponents.LORE,new ItemLore(lines));return carrier;
     }
     static DataComponentMap withoutCargo(DataComponentMap components) {
@@ -91,7 +91,7 @@ final class FactoryRecovery {
         var lore=components.get(DataComponents.LORE);
         if(lore!=null) {
             var retained=lore.lines().stream().filter(line->!(line.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents text)
-                    ||!java.util.Set.of("gui.ae2lightoptimizer.factory.recovery_saved","gui.ae2lightoptimizer.factory.recovery_native_pending").contains(text.getKey())).toList();
+                    ||!java.util.Set.of("gui.ae2lpt.factory.recovery_saved","gui.ae2lpt.factory.recovery_native_pending").contains(text.getKey())).toList();
             if(retained.size()!=lore.lines().size()){builder.set(DataComponents.LORE,retained.isEmpty()?null:new ItemLore(retained));changed=true;}
         }
         return changed?builder.build():components;

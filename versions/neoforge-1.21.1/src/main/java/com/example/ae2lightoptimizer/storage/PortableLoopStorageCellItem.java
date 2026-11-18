@@ -85,7 +85,7 @@ public final class PortableLoopStorageCellItem extends AbstractPortableCell impl
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> lines, TooltipFlag flag) {
         super.appendHoverText(stack, context, lines, flag);
         LoopStorageCellHandler.INSTANCE.addCellInformationToTooltip(stack, lines::add);
-        lines.add(Component.translatable("tooltip.ae2lightoptimizer.loop_storage_cell.universal")
+        lines.add(Component.translatable("tooltip.ae2lpt.loop_storage_cell.universal")
                 .withStyle(ChatFormatting.DARK_GRAY));
     }
 }

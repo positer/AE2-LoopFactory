@@ -37,3 +37,17 @@ type="required"
 versionRange="${minecraft_version_range}"
 ordering="NONE"
 side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="ae2cs"
+type="optional"
+versionRange="[1.1.12,)"
+ordering="AFTER"
+side="BOTH"
+
+# Dependency marker for addons built against AE2LF.
+[[mods]]
+modId="ae2lightoptimizer"
+version="${mod_version}"
+displayName="AE2 LoopTech Legacy ID"
+description="Compatibility identifier provided by AE2 LoopTech."

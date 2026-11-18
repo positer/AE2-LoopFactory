@@ -55,49 +55,49 @@ function DisassemblyRecipe([string]$cellId, [object[]]$items) {
 
 foreach ($version in $versions) {
     $recipeRoot = Join-Path $WorkspaceRoot `
-        "versions\$($version.Directory)\src\main\resources\data\ae2lightoptimizer\recipe"
+        "versions\$($version.Directory)\src\main\resources\data\ae2lpt\recipe"
     $objects = $version.ObjectIngredients
 
     $housing = ShapedRecipe @('GPG', 'I I', 'GPG') ([ordered]@{
         G = Ingredient 'minecraft:glass' $objects
-        P = Ingredient 'ae2lightoptimizer:loop_crystal_powder' $objects
+        P = Ingredient 'ae2lpt:loop_crystal_powder' $objects
         I = Ingredient 'minecraft:iron_ingot' $objects
-    }) 'ae2lightoptimizer:loop_storage_cell_housing'
+    }) 'ae2lpt:loop_storage_cell_housing'
     Write-Json (Join-Path $recipeRoot 'loop_storage_cell_housing.json') $housing
 
     for ($index = 0; $index -lt $tiers.Count; $index++) {
         $tier = $tiers[$index]
-        $coreId = "ae2lightoptimizer:$tier`_loop_storage_core"
-        $cellId = "ae2lightoptimizer:$tier`_loop_storage_cell"
+        $coreId = "ae2lpt:$tier`_loop_storage_core"
+        $cellId = "ae2lpt:$tier`_loop_storage_cell"
 
         if ($index -eq 0) {
             $coreRecipe = ShapedRecipe @('IFI', 'FCF', 'IFI') ([ordered]@{
                 I = Ingredient 'minecraft:iron_ingot' $objects
-                F = Ingredient 'ae2lightoptimizer:loop_crystal_fragment' $objects
+                F = Ingredient 'ae2lpt:loop_crystal_fragment' $objects
                 C = Ingredient 'ae2:certus_quartz_crystal' $objects
             }) $coreId
         } elseif ($index -le 4) {
-            $previous = "ae2lightoptimizer:$($tiers[$index - 1])_loop_storage_core"
+            $previous = "ae2lpt:$($tiers[$index - 1])_loop_storage_core"
             $coreRecipe = ShapedRecipe @('IPI', 'PCP', 'IFI') ([ordered]@{
                 I = Ingredient 'minecraft:iron_ingot' $objects
                 P = Ingredient $previous $objects
                 C = Ingredient 'ae2:certus_quartz_crystal' $objects
-                F = Ingredient 'ae2lightoptimizer:loop_crystal_powder' $objects
+                F = Ingredient 'ae2lpt:loop_crystal_powder' $objects
             }) $coreId
         } else {
-            $previous = "ae2lightoptimizer:$($tiers[$index - 1])_loop_storage_core"
+            $previous = "ae2lpt:$($tiers[$index - 1])_loop_storage_core"
             $coreRecipe = ShapedRecipe @('NPN', 'PSP', 'NLN') ([ordered]@{
                 N = Ingredient 'minecraft:netherite_ingot' $objects
                 P = Ingredient $previous $objects
                 S = Ingredient 'ae2:singularity' $objects
-                L = Ingredient 'ae2lightoptimizer:loop_crystal' $objects
+                L = Ingredient 'ae2lpt:loop_crystal' $objects
             }) $coreId
         }
         Write-Json (Join-Path $recipeRoot "$tier`_loop_storage_core.json") $coreRecipe
 
         $cellRecipe = ShapedRecipe @('GPG', 'ICI', 'GPG') ([ordered]@{
             G = Ingredient 'minecraft:glass' $objects
-            P = Ingredient 'ae2lightoptimizer:loop_crystal_powder' $objects
+            P = Ingredient 'ae2lpt:loop_crystal_powder' $objects
             I = Ingredient 'minecraft:iron_ingot' $objects
             C = Ingredient $coreId $objects
         }) $cellId
@@ -108,13 +108,13 @@ foreach ($version in $versions) {
             category = 'misc'
             ingredients = @(
                 (Ingredient $coreId $objects),
-                (Ingredient 'ae2lightoptimizer:loop_storage_cell_housing' $objects)
+                (Ingredient 'ae2lpt:loop_storage_cell_housing' $objects)
             )
             result = [ordered]@{ id = $cellId; count = 1 }
         }
         Write-Json (Join-Path $recipeRoot "$tier`_loop_storage_cell_from_housing.json") $fromHousing
 
-        $portableId = "ae2lightoptimizer:portable_$tier`_loop_storage_cell"
+        $portableId = "ae2lpt:portable_$tier`_loop_storage_cell"
         $portableFromCell = ShapelessRecipe @(
             (Ingredient $version.Chest $objects),
             (Ingredient 'ae2:energy_cell' $objects),
@@ -125,7 +125,7 @@ foreach ($version in $versions) {
         $portableFromParts = ShapelessRecipe @(
             (Ingredient $version.Chest $objects),
             (Ingredient 'ae2:energy_cell' $objects),
-            (Ingredient 'ae2lightoptimizer:loop_storage_cell_housing' $objects),
+            (Ingredient 'ae2lpt:loop_storage_cell_housing' $objects),
             (Ingredient $coreId $objects)
         ) $portableId
         Write-Json (Join-Path $recipeRoot "portable_$tier`_loop_storage_cell_from_parts.json") $portableFromParts
@@ -133,7 +133,7 @@ foreach ($version in $versions) {
         $portableDisassembly = DisassemblyRecipe $portableId @(
             (ItemStack $version.Chest),
             (ItemStack 'ae2:energy_cell'),
-            (ItemStack 'ae2lightoptimizer:loop_storage_cell_housing'),
+            (ItemStack 'ae2lpt:loop_storage_cell_housing'),
             (ItemStack $coreId)
         )
         Write-Json (Join-Path $recipeRoot "portable_$tier`_loop_storage_cell_disassembly.json") `
@@ -142,14 +142,14 @@ foreach ($version in $versions) {
 
     $infiniteIngredients = [System.Collections.ArrayList]::new()
     for ($count = 0; $count -lt 64; $count++) {
-        [void]$infiniteIngredients.Add((Ingredient 'ae2lightoptimizer:256m_loop_storage_core' $objects))
+        [void]$infiniteIngredients.Add((Ingredient 'ae2lpt:256m_loop_storage_core' $objects))
     }
-    [void]$infiniteIngredients.Add((Ingredient 'ae2lightoptimizer:loop_storage_cell_housing' $objects))
+    [void]$infiniteIngredients.Add((Ingredient 'ae2lpt:loop_storage_cell_housing' $objects))
     $infinite = [ordered]@{
         type = 'ae2:transform'
         circumstance = [ordered]@{ type = 'explosion' }
         ingredients = $infiniteIngredients
-        result = [ordered]@{ id = 'ae2lightoptimizer:infinite_loop_storage_cell'; count = 1 }
+        result = [ordered]@{ id = 'ae2lpt:infinite_loop_storage_cell'; count = 1 }
     }
     Write-Json (Join-Path $recipeRoot 'infinite_loop_storage_cell.json') $infinite
 
@@ -157,15 +157,15 @@ foreach ($version in $versions) {
     $portableInfinite = ShapelessRecipe @(
         (Ingredient $version.Chest $objects),
         (Ingredient 'ae2:energy_cell' $objects),
-        (Ingredient 'ae2lightoptimizer:infinite_loop_storage_cell' $objects)
-    ) 'ae2lightoptimizer:portable_infinite_loop_storage_cell'
+        (Ingredient 'ae2lpt:infinite_loop_storage_cell' $objects)
+    ) 'ae2lpt:portable_infinite_loop_storage_cell'
     Write-Json (Join-Path $recipeRoot 'portable_infinite_loop_storage_cell.json') $portableInfinite
 
     $portableInfiniteDisassembly = DisassemblyRecipe `
-        'ae2lightoptimizer:portable_infinite_loop_storage_cell' @(
+        'ae2lpt:portable_infinite_loop_storage_cell' @(
             (ItemStack $version.Chest),
             (ItemStack 'ae2:energy_cell'),
-            (ItemStack 'ae2lightoptimizer:infinite_loop_storage_cell')
+            (ItemStack 'ae2lpt:infinite_loop_storage_cell')
         )
     Write-Json (Join-Path $recipeRoot 'portable_infinite_loop_storage_cell_disassembly.json') `
         $portableInfiniteDisassembly

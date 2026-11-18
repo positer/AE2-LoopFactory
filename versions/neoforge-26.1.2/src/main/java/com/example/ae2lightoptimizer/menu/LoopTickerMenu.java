@@ -19,14 +19,14 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 /** Shows the accelerator rate and lets the player adjust it. */
 public final class LoopTickerMenu extends AEBaseMenu {
     public static final DeferredRegister<MenuType<?>> MENUS =
-            DeferredRegister.create(Registries.MENU, Ae2LightOptimizer.MOD_ID);
+            DeferredRegister.create(Registries.MENU, Ae2LightOptimizer.NAMESPACE);
     public static final DeferredHolder<MenuType<?>, MenuType<LoopTickerMenu>> PART_TYPE = MENUS.register(
             "loop_ticker_part", () -> MenuTypeBuilder.create(LoopTickerMenu::new, LoopTickerPart.class)
-                    .buildUnregistered(Identifier.fromNamespaceAndPath(Ae2LightOptimizer.MOD_ID, "loop_ticker_part")));
+                    .buildUnregistered(Identifier.fromNamespaceAndPath(Ae2LightOptimizer.NAMESPACE, "loop_ticker_part")));
 
     public static final DeferredHolder<MenuType<?>, MenuType<LoopTickerMenu>> TYPE = MENUS.register(
             "loop_ticker", () -> MenuTypeBuilder.create(LoopTickerMenu::new, LoopTickerBlockEntity.class)
-                    .buildUnregistered(Identifier.fromNamespaceAndPath(Ae2LightOptimizer.MOD_ID, "loop_ticker")));
+                    .buildUnregistered(Identifier.fromNamespaceAndPath(Ae2LightOptimizer.NAMESPACE, "loop_ticker")));
 
     private final LoopTickerHost host;
     @GuiSync(1) public int rate;

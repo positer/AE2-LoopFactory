@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "ae2:advanced_card"
+    },
+    {
+      "tag": "c:gems/loop_crystal"
+    }
+  ],
+  "result": {
+    "id": "ae2lpt:loop_card",
+    "count": 1
+  }
+}

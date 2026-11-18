@@ -51,7 +51,7 @@ for gen,name in sources.items():
  with zipfile.ZipFile(jar) as z:
   assert not any('ae2lfprobe' in n or 'immortalstorage' in n.lower() or n.endswith('.jar') for n in z.namelist())
   for locale in ('','_zh_cn/'):
-   assert '{/* factory-examples:start */}' in z.read(f'assets/ae2lightoptimizer/ae2guide/{locale}items-blocks-machines/loop_factory.md').decode('utf-8')
+   assert '{/* factory-examples:start */}' in z.read(f'assets/ae2lpt/ae2guide/{locale}items-blocks-machines/loop_factory.md').decode('utf-8')
  summary['generations'][gen]=records
 summary['frames']=len(cards)
 (out/'summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2),encoding='utf-8')

@@ -4,6 +4,7 @@
   "package": "com.example.ae2lightoptimizer.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "LegacyRecipeLookupMixin",
     "MinecraftShutdownMixin",
     "CraftingCalculationMixin",
     "CraftingCpuLogicMixin",

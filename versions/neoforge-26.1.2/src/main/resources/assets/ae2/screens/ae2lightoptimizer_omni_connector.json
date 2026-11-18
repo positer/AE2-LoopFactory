@@ -9,7 +9,7 @@
   "text": {
     "dialog_title": {
       "text": {
-        "translate": "block.ae2lightoptimizer.omnidirectional_connector"
+        "translate": "block.ae2lpt.omnidirectional_connector"
       },
       "position": {
         "left": 8,
@@ -24,7 +24,7 @@
     },
     "links": {
       "text": {
-        "translate": "gui.ae2lightoptimizer.omni.links"
+        "translate": "gui.ae2lpt.omni.links"
       },
       "position": {
         "left": 8,

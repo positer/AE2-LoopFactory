@@ -17,7 +17,7 @@ import net.minecraft.world.level.material.Fluids;
 @JeiPlugin
 public final class FactoryEditorJeiPlugin implements IModPlugin {
     @Override public Identifier getPluginUid() {
-        return Identifier.fromNamespaceAndPath(Ae2LightOptimizer.MOD_ID, "factory_editor_identifiers");
+        return Identifier.fromNamespaceAndPath(Ae2LightOptimizer.NAMESPACE, "factory_editor_identifiers");
     }
 
     @Override public void registerGuiHandlers(IGuiHandlerRegistration registration) {

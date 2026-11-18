@@ -9,4 +9,4 @@ plugins {
     id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
 }
 
-rootProject.name = 'ae2lightoptimizer-neoforge-26.1.2'
+rootProject.name = 'ae2lpt-neoforge-26.1.2'

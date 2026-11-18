@@ -12,7 +12,7 @@ public record FactoryEncoderAction(int delta, BlockPos position, boolean mark, b
     public FactoryEncoderAction(int delta, BlockPos position, boolean mark, boolean bulk, boolean offhand) {
         this(delta, position, mark, bulk, offhand, false);
     }
-    public static final Type<FactoryEncoderAction> TYPE=new Type<>(ResourceLocation.fromNamespaceAndPath("ae2lightoptimizer","encoder_action"));
+    public static final Type<FactoryEncoderAction> TYPE=new Type<>(ResourceLocation.fromNamespaceAndPath("ae2lpt","encoder_action"));
     public static final StreamCodec<RegistryFriendlyByteBuf,FactoryEncoderAction> CODEC=StreamCodec.of(
         (b,v)->{b.writeVarInt(v.delta);b.writeBlockPos(v.position);b.writeBoolean(v.mark);b.writeBoolean(v.bulk);b.writeBoolean(v.offhand);b.writeBoolean(v.remove);},
         b->new FactoryEncoderAction(b.readVarInt(),b.readBlockPos(),b.readBoolean(),b.readBoolean(),b.readBoolean(),b.readBoolean()));

@@ -1,10 +1,10 @@
 {
   "replace": false,
   "values": [
-    "ae2lightoptimizer:recipe_ring_solver_terminal",
-    "ae2lightoptimizer:supercomputing_crafting_optimizer_interface",
-    "ae2lightoptimizer:loop_crystal_block",
-    "ae2lightoptimizer:crafting_ripper",
-    "ae2lightoptimizer:omnidirectional_connector"
+    "ae2lpt:recipe_ring_solver_terminal",
+    "ae2lpt:supercomputing_crafting_optimizer_interface",
+    "ae2lpt:loop_crystal_block",
+    "ae2lpt:crafting_ripper",
+    "ae2lpt:omnidirectional_connector"
   ]
 }

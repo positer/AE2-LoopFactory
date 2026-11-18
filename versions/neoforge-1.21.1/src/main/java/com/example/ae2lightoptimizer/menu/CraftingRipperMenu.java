@@ -17,10 +17,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class CraftingRipperMenu extends PatternProviderMenu {
     public static final DeferredRegister<MenuType<?>> MENUS =
-            DeferredRegister.create(Registries.MENU, Ae2LightOptimizer.MOD_ID);
+            DeferredRegister.create(Registries.MENU, Ae2LightOptimizer.NAMESPACE);
     public static final DeferredHolder<MenuType<?>, MenuType<CraftingRipperMenu>> TYPE = MENUS.register(
             "crafting_ripper", () -> MenuTypeBuilder.create(CraftingRipperMenu::new, CraftingRipperBlockEntity.class)
-                    .buildUnregistered(ResourceLocation.fromNamespaceAndPath(Ae2LightOptimizer.MOD_ID, "crafting_ripper")));
+                    .buildUnregistered(ResourceLocation.fromNamespaceAndPath(Ae2LightOptimizer.NAMESPACE, "crafting_ripper")));
     private final CraftingRipperBlockEntity host;
     @GuiSync(8) public boolean loopCardInstalled;
     @GuiSync(9) public int patternRows = 1;

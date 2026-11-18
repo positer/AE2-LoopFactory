@@ -58,9 +58,9 @@ for gen in ['1.21.1', '26.1.2']:
         assert not any('ae2lfprobe' in n or 'immortalstorage' in n.lower() or n.endswith('.jar') for n in names)
         for cls in ['FactoryEncoderItem', 'FactoryEncodingPanel', 'FactoryEncoderAction']:
             assert f'com/example/ae2lightoptimizer/factory/{cls}.class' in names
-        en = json.loads(z.read('assets/ae2lightoptimizer/lang/en_us.json'))
-        zh = json.loads(z.read('assets/ae2lightoptimizer/lang/zh_cn.json'))
-        keys = {k for k in en if k.startswith('gui.ae2lightoptimizer.factory.')}
+        en = json.loads(z.read('assets/ae2lpt/lang/en_us.json'))
+        zh = json.loads(z.read('assets/ae2lpt/lang/zh_cn.json'))
+        keys = {k for k in en if k.startswith('gui.ae2lpt.factory.')}
         assert keys and keys <= set(zh)
         assert all(not any('\u4e00' <= c <= '\u9fff' for c in en[k]) for k in keys)
     summary['generations'][gen] = {'steps': len(audit['results']), 'categories': dict(counts),

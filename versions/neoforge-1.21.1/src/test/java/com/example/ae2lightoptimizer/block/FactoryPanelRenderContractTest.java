@@ -14,7 +14,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class FactoryPanelRenderContractTest {
-    private static final Path ASSETS = Path.of("src/main/resources/assets/ae2lightoptimizer");
+    private static final Path ASSETS = Path.of("src/main/resources/assets/ae2lpt");
 
     @Test
     void panelUsesNativeAe2CompositionWithOnlyCoreMasks() throws IOException {
@@ -37,7 +37,7 @@ class FactoryPanelRenderContractTest {
                 itemTextures.keySet());
         assertEquals("ae2:part/pattern_encoding_terminal", itemTextures.get("front").getAsString());
         assertEquals(
-                "ae2lightoptimizer:part/loop_factory_pattern_encoding_panel_bright",
+                "ae2lpt:part/loop_factory_pattern_encoding_panel_bright",
                 itemTextures.get("front_bright").getAsString());
         assertFalse(item.has("gui_light"));
         assertFalse(itemTextures.has("front_base"));
@@ -46,14 +46,14 @@ class FactoryPanelRenderContractTest {
         ClassLoader loader = getClass().getClassLoader();
         for (String layer : new String[] {"bright", "medium", "dark"}) {
             assertNotNull(loader.getResource(
-                    "assets/ae2lightoptimizer/textures/part/loop_factory_pattern_encoding_panel_"
+                    "assets/ae2lpt/textures/part/loop_factory_pattern_encoding_panel_"
                             + layer + ".png"));
         }
         assertFalse(loader.getResource(
-                "assets/ae2lightoptimizer/textures/part/loop_factory_pattern_encoding_panel_item_base.png")
+                "assets/ae2lpt/textures/part/loop_factory_pattern_encoding_panel_item_base.png")
                 != null);
         assertFalse(loader.getResource(
-                "assets/ae2lightoptimizer/textures/part/loop_factory_pattern_encoding_panel_empty.png")
+                "assets/ae2lpt/textures/part/loop_factory_pattern_encoding_panel_empty.png")
                 != null);
     }
 
@@ -62,13 +62,13 @@ class FactoryPanelRenderContractTest {
                 Set.of("lightsBright", "lightsMedium", "lightsDark"),
                 textures.keySet());
         assertEquals(
-                "ae2lightoptimizer:part/loop_factory_pattern_encoding_panel_bright",
+                "ae2lpt:part/loop_factory_pattern_encoding_panel_bright",
                 textures.get("lightsBright").getAsString());
         assertEquals(
-                "ae2lightoptimizer:part/loop_factory_pattern_encoding_panel_medium",
+                "ae2lpt:part/loop_factory_pattern_encoding_panel_medium",
                 textures.get("lightsMedium").getAsString());
         assertEquals(
-                "ae2lightoptimizer:part/loop_factory_pattern_encoding_panel_dark",
+                "ae2lpt:part/loop_factory_pattern_encoding_panel_dark",
                 textures.get("lightsDark").getAsString());
     }
 

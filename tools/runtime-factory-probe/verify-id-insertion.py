@@ -20,7 +20,7 @@ def digest(text):
 
 def plan(mode):
     seed = '# alpha OMEGA\ndone'
-    energy = 'ae2lightoptimizer:portable_1k_loop_storage_cell'
+    energy = 'ae2lpt:portable_1k_loop_storage_cell'
     rows = []
     def add(name, token, code=seed, start=8, end=8):
         rows.append((name, token, code, start, end))

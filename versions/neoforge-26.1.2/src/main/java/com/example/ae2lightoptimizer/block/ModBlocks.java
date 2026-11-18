@@ -9,7 +9,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS =
-            DeferredRegister.createBlocks(Ae2LightOptimizer.MOD_ID);
+            DeferredRegister.createBlocks(Ae2LightOptimizer.NAMESPACE);
 
     public static final DeferredBlock<Block> RECIPE_RING_SOLVER_TERMINAL = BLOCKS.registerBlock(
             "recipe_ring_solver_terminal",

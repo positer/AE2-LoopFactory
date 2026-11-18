@@ -56,7 +56,7 @@ for gen in ['1.21.1', '26.1.2']:
     with zipfile.ZipFile(jar) as z:
         foreign = [n for n in z.namelist() if 'ae2lfprobe' in n or 'immortalstorage' in n.lower() or n.endswith('.jar')]
         assert not foreign
-        assert 'assets/ae2lightoptimizer/textures/block/loop_factory_provider_back.png' in z.namelist()
+        assert 'assets/ae2lpt/textures/block/loop_factory_provider_back.png' in z.namelist()
     summary['generations'][gen] = {
         'steps': len(rows), 'failed': [n for n, (r, _) in rows.items() if not r['passed']],
         'allRecordedWindowsInvisible': all(r.get('windowVisible') == 0 for r, _ in rows.values()),

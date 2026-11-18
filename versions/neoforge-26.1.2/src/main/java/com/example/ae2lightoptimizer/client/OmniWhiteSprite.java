@@ -11,11 +11,11 @@ import net.minecraft.server.packs.resources.ResourceManager;
 
 /** Runtime palette adapter: preserves the original UV grid and alpha, including resource-pack overrides. */
 public final class OmniWhiteSprite implements SpriteSource {
-    public static final Identifier ID = Identifier.fromNamespaceAndPath("ae2lightoptimizer", "block/omni_white");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath("ae2lpt", "block/omni_white");
     public static final MapCodec<OmniWhiteSprite> CODEC = MapCodec.unit(OmniWhiteSprite::new);
     public static volatile int sourceWidth, sourceHeight, changedPixels, coloredPixelsRemaining;
     public static void register(net.neoforged.neoforge.client.event.RegisterSpriteSourcesEvent event) {
-        event.register(Identifier.fromNamespaceAndPath("ae2lightoptimizer", "omni_white"), CODEC);
+        event.register(Identifier.fromNamespaceAndPath("ae2lpt", "omni_white"), CODEC);
     }
     @Override public MapCodec<? extends SpriteSource> codec() { return CODEC; }
     @Override public void run(ResourceManager manager, Output output) {

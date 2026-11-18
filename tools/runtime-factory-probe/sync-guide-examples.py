@@ -23,7 +23,7 @@ zh=[
 ('SFM 有限配方','配方供应器。 配置一个圆石产出一个石头， 绑定 Furnace 并预先供燃料。 INPUT 声明本次分配的 P1， OUTPUT 从顶部进料， FORGET 清除旧来源， 再从底部取得 O1 并返回。 本轮材料与产物结清后结束， 不作为无配方定时器永久运行。')]
 for gen in ('1.21.1','26.1.2'):
  for locale,descriptions in (('',en),('_zh_cn/',zh)):
-  p=root/f'versions/neoforge-{gen}/src/main/resources/assets/ae2lightoptimizer/ae2guide/{locale}items-blocks-machines/loop_factory.md'
+  p=root/f'versions/neoforge-{gen}/src/main/resources/assets/ae2lpt/ae2guide/{locale}items-blocks-machines/loop_factory.md'
   text=p.read_text(encoding='utf-8'); start='{/* factory-examples:start */}'; end='{/* factory-examples:end */}'
   text=re.sub(r'<!-- factory-examples:start -->.*?<!-- factory-examples:end -->\n*','',text,flags=re.S)
   text=re.sub(re.escape(start)+r'.*?'+re.escape(end)+r'\n*','',text,flags=re.S)

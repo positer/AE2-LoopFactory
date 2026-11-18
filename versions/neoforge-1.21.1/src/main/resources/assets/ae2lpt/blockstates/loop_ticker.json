@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=up": {
+      "model": "ae2lpt:block/loop_ticker"
+    },
+    "facing=down": {
+      "model": "ae2lpt:block/loop_ticker",
+      "x": 180
+    },
+    "facing=north": {
+      "model": "ae2lpt:block/loop_ticker",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "ae2lpt:block/loop_ticker",
+      "x": 90,
+      "y": 180
+    },
+    "facing=east": {
+      "model": "ae2lpt:block/loop_ticker",
+      "x": 90,
+      "y": 90
+    },
+    "facing=west": {
+      "model": "ae2lpt:block/loop_ticker",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

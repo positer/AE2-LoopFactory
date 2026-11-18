@@ -1,0 +1,19 @@
+{
+  "category": "misc",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CKC",
+    "LML",
+    "CKC"
+  ],
+  "key": {
+    "C": "#c:gems/loop_crystal",
+    "K": "ae2lpt:4k_loop_storage_core",
+    "L": "ae2:logic_processor",
+    "M": "ae2:condenser"
+  },
+  "result": {
+    "id": "ae2lpt:loop_condenser",
+    "count": 1
+  }
+}

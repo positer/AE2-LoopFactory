@@ -1,0 +1,17 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ae2cs"
+    }
+  ],
+  "type": "ae2cs:crystal_pulverizer_recipe_serializer",
+  "energy_cost": 8000,
+  "input": {
+    "count": 1,
+    "ingredient": "#c:gems/loop_crystal"
+  },
+  "result": {
+    "id": "ae2lpt:loop_crystal_powder"
+  }
+}

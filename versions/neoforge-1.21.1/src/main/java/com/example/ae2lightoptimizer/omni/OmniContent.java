@@ -7,19 +7,19 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public final class OmniContent {
-    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks("ae2lightoptimizer");
-    public static final DeferredRegister<net.minecraft.core.particles.ParticleType<?>> PARTICLES = DeferredRegister.create(Registries.PARTICLE_TYPE, "ae2lightoptimizer");
+    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks("ae2lpt");
+    public static final DeferredRegister<net.minecraft.core.particles.ParticleType<?>> PARTICLES = DeferredRegister.create(Registries.PARTICLE_TYPE, "ae2lpt");
     public static final DeferredHolder<net.minecraft.core.particles.ParticleType<?>, net.minecraft.core.particles.SimpleParticleType> PULSE = PARTICLES.register("omni_pulse", () -> new net.minecraft.core.particles.SimpleParticleType(false) {});
     /** Ring particle shown while a formed Loop Factory structure is wirelessly bridged. */
     public static final DeferredHolder<net.minecraft.core.particles.ParticleType<?>, net.minecraft.core.particles.SimpleParticleType> ORBIT = PARTICLES.register("omni_orbit", () -> new net.minecraft.core.particles.SimpleParticleType(false) {});
-    public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems("ae2lightoptimizer");
-    public static final DeferredRegister<BlockEntityType<?>> ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, "ae2lightoptimizer");
+    public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems("ae2lpt");
+    public static final DeferredRegister<BlockEntityType<?>> ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, "ae2lpt");
     public static final DeferredBlock<OmniConnectorBlock> BLOCK = BLOCKS.register("omnidirectional_connector", OmniConnectorBlock::new);
     public static final DeferredItem<BlockItem> ITEM = ITEMS.registerSimpleBlockItem(BLOCK);
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<OmniConnectorBlockEntity>> ENTITY = ENTITIES.register("omnidirectional_connector",
             () -> BlockEntityType.Builder.of(OmniConnectorBlockEntity::new, BLOCK.get()).build(null));
     public static void register(IEventBus bus) {
-        BLOCKS.register(bus); ITEMS.register(bus); PARTICLES.register(bus); ENTITIES.register(bus); OmniConnectorMenu.MENUS.register(bus);
+        com.example.ae2lightoptimizer.LegacyNamespace.bind(BLOCKS, bus); com.example.ae2lightoptimizer.LegacyNamespace.bind(ITEMS, bus); com.example.ae2lightoptimizer.LegacyNamespace.bind(PARTICLES, bus); com.example.ae2lightoptimizer.LegacyNamespace.bind(ENTITIES, bus); com.example.ae2lightoptimizer.LegacyNamespace.bind(OmniConnectorMenu.MENUS, bus);
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(OmniNetworks::stopped);
     }
     public static void setup() {

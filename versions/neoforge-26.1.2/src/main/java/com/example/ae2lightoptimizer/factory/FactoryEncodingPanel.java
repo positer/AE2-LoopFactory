@@ -15,7 +15,7 @@ public final class FactoryEncodingPanel extends PatternEncodingTerminalPart impl
     @Override public String factoryDraft() { return draft; }
     @Override public void setFactoryDraft(String value) { draft = value; markForSave(); }
     @Override public IGrid editorGrid() { return getMainNode().getGrid(); }
-    @Override public String editorTitleKey() { return "item.ae2lightoptimizer.loop_factory_pattern_encoding_panel"; }
+    @Override public String editorTitleKey() { return "item.ae2lpt.loop_factory_pattern_encoding_panel"; }
     @Override public MenuType<?> getMenuType(Player player) { return FactoryPanelRecipeMenu.TYPE.get(); }
     @Override public void readFromNBT(net.minecraft.world.level.storage.ValueInput tag) {
         super.readFromNBT(tag); draft=tag.read("FactoryDraft",FactoryPatternData.TEXT).orElse("");

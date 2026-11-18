@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "L L",
+    "CIC",
+    " Q "
+  ],
+  "key": {
+    "L": {
+      "item": "ae2:logic_processor"
+    },
+    "C": {
+      "tag": "c:gems/loop_crystal"
+    },
+    "I": {
+      "item": "ae2:interface"
+    },
+    "Q": {
+      "item": "ae2:quartz_glass"
+    }
+  },
+  "result": {
+    "id": "ae2lpt:loop_factory_network_terminal",
+    "count": 1
+  }
+}

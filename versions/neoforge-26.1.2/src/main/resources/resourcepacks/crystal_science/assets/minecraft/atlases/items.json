@@ -1,0 +1,17 @@
+{
+  "sources": [
+    {
+      "type": "minecraft:paletted_permutations",
+      "textures": [
+        "ae2cs:item/certus_quartz_seed_0",
+        "ae2cs:item/certus_quartz_seed_1",
+        "ae2cs:item/certus_quartz_seed_2",
+        "ae2cs:item/purified_certus_quartz_crystal"
+      ],
+      "palette_key": "ae2lpt:palette/crystal_science_key",
+      "permutations": {
+        "ae2lt_silver": "ae2lpt:palette/loop_silver"
+      }
+    }
+  ]
+}

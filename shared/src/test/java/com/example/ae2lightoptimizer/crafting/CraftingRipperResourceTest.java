@@ -16,11 +16,11 @@ import org.junit.jupiter.api.Test;
 
 class CraftingRipperResourceTest {
     private static final Path RESOURCES = Path.of("src/main/resources");
-    private static final String ASSETS = "assets/ae2lightoptimizer/";
+    private static final String ASSETS = "assets/ae2lpt/";
 
     @Test
     void preservesTheExactRequestedMachineAndAdvancedCardRecipes() throws Exception {
-        JsonObject ripper = json("data/ae2lightoptimizer/recipe/crafting_ripper.json");
+        JsonObject ripper = json("data/ae2lpt/recipe/crafting_ripper.json");
         assertEquals("minecraft:crafting_shaped", ripper.get("type").getAsString());
         assertEquals(List.of("ISI", "FCD", "ISI"), ripper.getAsJsonArray("pattern")
                 .asList().stream().map(JsonElement::getAsString).toList());
@@ -28,13 +28,13 @@ class CraftingRipperResourceTest {
         assertEquals("minecraft:iron_ingot", ingredient(key.get("I")));
         assertEquals("ae2:quantum_entangled_singularity", ingredient(key.get("S")));
         assertEquals("ae2:formation_core", ingredient(key.get("F")));
-        assertEquals("ae2lightoptimizer:256m_loop_storage_core", ingredient(key.get("C")));
+        assertEquals("ae2lpt:256m_loop_storage_core", ingredient(key.get("C")));
         assertEquals("ae2:annihilation_core", ingredient(key.get("D")));
-        assertEquals("ae2lightoptimizer:crafting_ripper", ripper.getAsJsonObject("result").get("id").getAsString());
-        JsonObject card = json("data/ae2lightoptimizer/recipe/loop_card.json");
+        assertEquals("ae2lpt:crafting_ripper", ripper.getAsJsonObject("result").get("id").getAsString());
+        JsonObject card = json("data/ae2lpt/recipe/loop_card.json");
         assertEquals("minecraft:crafting_shapeless", card.get("type").getAsString());
         assertEquals(2, card.getAsJsonArray("ingredients").size());
-        assertEquals(Set.of("ae2:advanced_card", "ae2lightoptimizer:loop_crystal"),
+        assertEquals(Set.of("ae2:advanced_card", "#c:gems/loop_crystal"),
                 card.getAsJsonArray("ingredients").asList().stream()
                         .map(CraftingRipperResourceTest::ingredient).collect(Collectors.toSet()));
     }
@@ -90,8 +90,8 @@ class CraftingRipperResourceTest {
             }
         }
         JsonObject states = json(ASSETS + "blockstates/crafting_ripper.json").getAsJsonObject("variants");
-        assertEquals("ae2lightoptimizer:block/crafting_ripper", states.getAsJsonObject("connected=false").get("model").getAsString());
-        assertEquals("ae2lightoptimizer:block/crafting_ripper_connected", states.getAsJsonObject("connected=true").get("model").getAsString());
+        assertEquals("ae2lpt:block/crafting_ripper", states.getAsJsonObject("connected=false").get("model").getAsString());
+        assertEquals("ae2lpt:block/crafting_ripper_connected", states.getAsJsonObject("connected=true").get("model").getAsString());
     }
 
     private BufferedImage image(String path) throws Exception {
@@ -103,6 +103,8 @@ class CraftingRipperResourceTest {
     }
 
     private static String ingredient(JsonElement value) {
-        return value.isJsonPrimitive() ? value.getAsString() : value.getAsJsonObject().get("item").getAsString();
+        if (value.isJsonPrimitive()) return value.getAsString();
+        var object = value.getAsJsonObject();
+        return object.has("tag") ? "#" + object.get("tag").getAsString() : object.get("item").getAsString();
     }
 }

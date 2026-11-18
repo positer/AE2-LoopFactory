@@ -16,7 +16,7 @@ import net.minecraft.resources.Identifier;
 public final class CraftingRipperJeiPlugin implements IModPlugin {
     @Override
     public Identifier getPluginUid() {
-        return Identifier.fromNamespaceAndPath(Ae2LightOptimizer.MOD_ID, "crafting_ripper_ui");
+        return Identifier.fromNamespaceAndPath(Ae2LightOptimizer.NAMESPACE, "crafting_ripper_ui");
     }
 
     @Override

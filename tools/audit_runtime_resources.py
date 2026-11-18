@@ -68,12 +68,12 @@ for generation, ae_version in (("1.21.1", "19.2.17"), ("26.1.2", "26.1.10-beta")
     assert len(jars) == 1, jars
     checked = set()
     with zipfile.ZipFile(jars[0]) as ae:
-        for path in (resources / "assets/ae2lightoptimizer/models").rglob("*.json"):
+        for path in (resources / "assets/ae2lpt/models").rglob("*.json"):
             model = json.loads(path.read_text(encoding="utf-8"))
-            target = path.relative_to(resources / "assets/ae2lightoptimizer/models").with_suffix("").as_posix()
+            target = path.relative_to(resources / "assets/ae2lpt/models").with_suffix("").as_posix()
             include_particle = "/item/" not in path.as_posix()
             referenced = referenced_texture_keys(
-                ae, resources, "ae2lightoptimizer", target, include_particle
+                ae, resources, "ae2lpt", target, include_particle
             )
             for key, ref in model.get("textures", {}).items():
                 if key not in referenced:
@@ -89,16 +89,16 @@ for generation, ae_version in (("1.21.1", "19.2.17"), ("26.1.2", "26.1.10-beta")
                 width, height = struct.unpack(">II", data[16:24])
                 assert width > 0 and height > 0, entry
                 checked.add(entry)
-        for recipe in (resources / "data/ae2lightoptimizer/recipe").rglob("*.json"):
+        for recipe in (resources / "data/ae2lpt/recipe").rglob("*.json"):
             json.loads(recipe.read_text(encoding="utf-8"))
         for item in ("crafting_ripper", "loop_card"):
             for language in ("en_us", "zh_cn"):
-                lang = json.loads((resources / f"assets/ae2lightoptimizer/lang/{language}.json").read_text(encoding="utf-8"))
+                lang = json.loads((resources / f"assets/ae2lpt/lang/{language}.json").read_text(encoding="utf-8"))
                 prefix = "block" if item == "crafting_ripper" else "item"
-                assert lang[f"{prefix}.ae2lightoptimizer.{item}"]
+                assert lang[f"{prefix}.ae2lpt.{item}"]
             for prefix in ("", "_zh_cn/"):
-                guide = resources / f"assets/ae2lightoptimizer/ae2guide/{prefix}items-blocks-machines/{item}.md"
+                guide = resources / f"assets/ae2lpt/ae2guide/{prefix}items-blocks-machines/{item}.md"
                 text = guide.read_text(encoding="utf-8")
-                assert f"item_ids:\n- ae2lightoptimizer:{item}" in text
-                assert f'<RecipeFor id="ae2lightoptimizer:{item}" />' in text
+                assert f"item_ids:\n- ae2lpt:{item}" in text
+                assert f'<RecipeFor id="ae2lpt:{item}" />' in text
     print(f"{generation}: {len(checked)} unique runtime texture references resolved; recipes and new bilingual guides valid")
