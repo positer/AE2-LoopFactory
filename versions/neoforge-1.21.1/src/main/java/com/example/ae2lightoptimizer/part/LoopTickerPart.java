@@ -172,17 +172,25 @@ public final class LoopTickerPart extends AEBasePart
         accelerate();
     }
 
-    private boolean networkPowered() {
-        if (!isActive()) return false;
+    /**
+     * Any AE2 network with energy qualifies, controller or not: ad-hoc networks are networks too.
+     * Only a missing grid or a fully drained network stops the accelerator.
+     */
+    private boolean networkReady() {
         var grid = getMainNode().getGrid();
         if (grid == null) return false;
-        IEnergyService energy = grid.getEnergyService();
-        return energy != null && energy.isNetworkPowered();
+        var energy = grid.getEnergyService();
+        return energy != null && (energy.getStoredPower() > 0 || energy.getAvgPowerInjection() > 0);
     }
 
     /** Runs the block behind the face this part is mounted on. */
     private void accelerate() {
-        if (!(getLevel() instanceof ServerLevel server) || !networkPowered()) return;
+        if (!(getLevel() instanceof ServerLevel server)) return;
+        if (getMainNode().getNode() == null) {
+            // The node may not exist yet if the part was restored before its host was ready.
+            getMainNode().create(getLevel(), getBlockEntity().getBlockPos());
+        }
+        if (!networkReady()) return;
         // The part is mounted on one face of the cable; the block it acts on is the one that face points at.
         Direction side = getSide();
         BlockPos target = getBlockEntity().getBlockPos().relative(side);
