@@ -8,8 +8,6 @@ AE2 LoopTech adds programmable factories, cross-dimensional ME connections, shar
 
 - Combine four Loop Crystal Fragments in any arrangement to make one Loop Crystal. Break down one crystal to recover four fragments. A second recipe alternates four Certus Quartz Crystals in the corners and four Loop Crystal Fragments on the edges of a crafting grid, with the center empty, to make four Loop Crystals.
 - Arrange four Loop Crystals in a 2×2 square to make a Loop Crystal Block. Process a crystal in an Inscriber to make Loop Crystal Powder. Create milling and Mekanism crushing also produce the powder when available.
-- With AE2 Crystal Science, combine one powder and one sand to make two Loop Crystal Seeds. Grow the seeds in water or in a Crystal Growth Chamber. They have three visible growth stages and mature into Purified Loop Crystals. Both crystal types can be mixed in recipes that consume Loop Crystals, including the crystal block.
-- The Crystal Science Crystal Aggregator makes 32 seeds from eight powder and 32 sand for 51,200 AE. Its Crystal Pulverizer makes one powder from either crystal type for 8,000 AE.
 
 ### Shared and portable storage
 
@@ -36,27 +34,12 @@ For portable access, combine an ME Chest and an Energy Cell with the matching Lo
 
 ### Loop machines
 
-| Crafting-table output | Top row | Middle row | Bottom row |
-| --- | --- | --- | --- |
-| Loop Tick Accelerator | Loop Crystal, Acceleration Card, Loop Crystal | Engineering Processor, Cell Workbench, Engineering Processor | Empty, ME Export Bus, Empty |
-| Loop Matter Condenser | Loop Crystal, 4k Loop Storage Core, Loop Crystal | Logic Processor, Matter Condenser, Logic Processor | Loop Crystal, 4k Loop Storage Core, Loop Crystal |
-| Supercomputing Crafting Optimizer Interface | Calculation Processor, Engineering Processor, Calculation Processor | Engineering Processor, Crafting Co-Processing Unit, Engineering Processor | Calculation Processor, Engineering Processor, Calculation Processor |
-| Recipe Ring Solver Terminal | Iron Ingot, Calculation Processor, Iron Ingot | Logic Processor, Loop Crystal, Logic Processor | Iron Ingot, Calculation Processor, Iron Ingot |
-| Crafting Ripper | Iron Ingot, Quantum Entangled Singularity, Iron Ingot | Formation Core, 256M Loop Storage Core, Annihilation Core | Iron Ingot, Quantum Entangled Singularity, Iron Ingot |
-
 - **Loop Tick Accelerator.** Aim the block’s green top at the target. It can face any of the six directions. Craft the block alone to turn it into a cable part, or craft the part alone to get the block back. A mounted part targets the block directly in front of its mounted face. Right-click with an empty hand to open the rate controls. An online accelerator adds 1–4 calls per tick by default. Each Acceleration Card doubles the upper limit, up to 64 with four cards. Multiple block or part accelerators add their selected rates. Two units set to 2 and 3 add five calls to an eligible target each tick alongside its normal ticking. Actual throughput also depends on the target’s inputs, power and internal limits.
 - **Loop Matter Condenser.** Use a Cell Workbench to partition a Loop Storage Cell with the items you want to process. Place the cell in the condenser’s template slot, connect an active ME channel and choose the native matter-ball, singularity or trash mode. It takes matching items from ME storage every server tick and returns products to the network. An Inverter Card on the template cell excludes marked items and a Fuzzy Card enables fuzzy matching. If the network cannot take a product, the condenser retains its matter credit for later. You can also use the native manual inputs.
 
 ### Programmable Loop Factory
 
 A Blank Pattern and one Loop Crystal Powder make a Loop Factory Pattern. One Quartz Fiber, four iron ingots and two powder make eight Interface Cables. Both recipes are shapeless.
-
-| Factory device | Top row | Middle row | Bottom row |
-| --- | --- | --- | --- |
-| Network Terminal | Logic Processor, Empty, Logic Processor | Loop Crystal, ME Interface, Loop Crystal | Empty, Quartz Glass, Empty |
-| Pattern Provider | Engineering Processor, Empty, Engineering Processor | Loop Crystal, ME Pattern Provider, Loop Crystal | Empty, 4M Loop Storage Core, Empty |
-| Pattern Encoding Panel | Empty, Calculation Processor, Empty | Empty, ME Pattern Encoding Terminal, Empty | Empty, Loop Crystal, Empty |
-| Handheld Encoder | Iron Ingot, Empty, Iron Ingot | Calculation Processor, Loop Crystal, Quartz Glass | Empty, Redstone Dust, Empty |
 
 1. **Choose a controller for your program.** Use a Loop Factory Network Terminal for recipe-free logistics. For an on-demand processing recipe, connect a Loop Factory Pattern Provider to the main ME network with its arrows pointing toward an independent factory subnet. AE power crosses the provider boundary. Each side keeps its own storage and channels. Loop Factory Interface Cables connect the factory machines without consuming a device channel.
 2. **Encode your pattern.** Use the Loop Factory Pattern Encoding Panel to switch between the recipe and code pages, or use the Handheld Loop Factory Encoder to edit code. The handheld binds to a factory network when used on its cable, controller or terminal. Use it on a provider to bind the subnet on the arrow side. Sneak-use the encoder to clear its binding, or sneak-use the pattern itself to clear its recipe and code.
@@ -113,8 +96,6 @@ END
 
 - 四个循环水晶碎片无序合成一个循环水晶，一个水晶可拆回四个碎片。另一种工作台配方在四角放赛特斯石英水晶，四边中点放循环水晶碎片，中央留空，一次合成四个循环水晶。
 - 四个循环水晶排成 2×2 可合成循环水晶块。用压印器处理一个循环水晶可得到一份循环水晶粉末。机械动力的研磨和通用机械的粉碎也可制作粉末。
-- 有水晶科技时，用一份循环水晶粉末和一份沙合成两颗循环水晶种子。种子可以在水中或晶体生长室内长大，有三个可见生长阶段，成熟后成为高纯循环水晶。普通和高纯水晶可以混用于消耗循环水晶的配方，包括水晶块。
-- 水晶科技的晶体聚合器用八份粉末、32 份沙和 51,200 AE 制作 32 颗种子。它的晶体粉碎器消耗 8,000 AE，将任一种循环水晶磨成一份粉末。
 
 ### 共享存储与便携磁盘
 
@@ -141,27 +122,12 @@ END
 
 ### 循环机器
 
-| 工作台产物 | 第一行 | 第二行 | 第三行 |
-| --- | --- | --- | --- |
-| 循环进刻器 | 循环水晶、加速卡、循环水晶 | 工程处理器、元件工作台、工程处理器 | 空、ME 输出总线、空 |
-| 循环物质聚合器 | 循环水晶、4k 循环存储核心、循环水晶 | 逻辑处理器、物质聚合器、逻辑处理器 | 循环水晶、4k 循环存储核心、循环水晶 |
-| 超算合成优化接口 | 运算处理器、工程处理器、运算处理器 | 工程处理器、合成协处理单元、工程处理器 | 运算处理器、工程处理器、运算处理器 |
-| 配方环解算终端 | 铁锭、运算处理器、铁锭 | 逻辑处理器、循环水晶、逻辑处理器 | 铁锭、运算处理器、铁锭 |
-| 合成撕裂者 | 铁锭、缠绕态奇点、铁锭 | 成型核心、256M 循环存储核心、湮灭核心 | 铁锭、缠绕态奇点、铁锭 |
-
 - **循环进刻器。** 将方块的绿色顶面对准目标，支持六向旋转。把方块单独放入合成格可换成线缆部件，把部件单独合成可换回方块。线缆部件加速安装面正前方的相邻方块。空手右键打开倍率界面。在线时默认每 tick 追加 1–4 次调用，每张加速卡让倍率上限翻倍，四张最高 64。多台方块或部件对准同一目标时，追加次数相加。例如分别设置为 2 和 3，每 tick 共追加 5 次，目标本身照常运行。实际产量还受机器的原料、电力和内部限制影响。
 - **循环物质聚合器。** 先在元件工作台为循环磁盘标记要处理的物品，再把磁盘放入模板槽。给机器接上可用的 ME 频道，选择物质球、奇点或销毁模式。聚合器逐 tick 从网络抽取匹配物品，并将产物送回网络。在模板磁盘上装反相卡可排除标记物品，装模糊卡可使用模糊匹配。网络暂时装不下产物时会保留物质余额，等有空间后再结算。也可以使用机器的原生手动输入。
 
 ### 可编程循环工厂
 
 空白样板和一份循环水晶粉末无序合成一张循环工厂样板。一份石英纤维、四个铁锭和两份粉末无序合成八根循环工厂接口线缆。
-
-| 工厂设备 | 第一行 | 第二行 | 第三行 |
-| --- | --- | --- | --- |
-| 网络终端 | 逻辑处理器、空、逻辑处理器 | 循环水晶、ME 接口、循环水晶 | 空、石英玻璃、空 |
-| 样板供应器 | 工程处理器、空、工程处理器 | 循环水晶、ME 样板供应器、循环水晶 | 空、4M 循环存储核心、空 |
-| 样板编码面板 | 空、运算处理器、空 | 空、ME 样板编码终端、空 | 空、循环水晶、空 |
-| 手持编码器 | 铁锭、空、铁锭 | 运算处理器、循环水晶、石英玻璃 | 空、红石粉、空 |
 
 1. **选择运行设备。** 无配方物流程序用循环工厂网络终端。按需生产用循环工厂样板供应器，箭头指向独立的工厂子网，其余面接 ME 主网。两侧共享 AE 供电，各自分配频道和存储。循环工厂接口线缆可连接子网机器，自身不占设备频道。
 2. **写入样板。** 循环工厂样板编码面板可以在配方页和代码页间切换，手持循环工厂编码器可编辑代码。对工厂线缆、控制器或终端使用手持编码器可绑定网络，对供应器使用则绑定箭头一侧的子网。潜行使用手持编码器解除绑定，潜行使用样板清除该样板的配方和代码。
