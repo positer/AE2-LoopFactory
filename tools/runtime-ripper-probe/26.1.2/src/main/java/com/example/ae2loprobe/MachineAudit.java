@@ -284,7 +284,7 @@ public final class MachineAudit {
         String k = "ae2lpt:4k_loop_storage_core", l = "ae2:logic_processor";
         String block = "ae2lpt:loop_ticker", part = block + "_part";
         if (net.neoforged.fml.ModList.get().isLoaded("ae2cs")) testCrystalScience();
-        verifyRecipe("loop_ticker", block, c, "ae2:speed_card", c, p, "ae2:cell_workbench", p, "", "ae2:export_bus", "");
+        verifyRecipe("loop_ticker", block, c, "ae2:speed_card", c, p, "minecraft:clock", p, c, "ae2:export_bus", c);
         verifyRecipe("loop_condenser", "ae2lpt:loop_condenser", c, k, c, l, "ae2:condenser", l, c, k, c);
         verifyRecipe("loop_ticker_part_from_loop_ticker", part, block);
         verifyRecipe("loop_ticker_from_loop_ticker_part", block, part);

@@ -4,13 +4,13 @@
   "pattern": [
     "CAC",
     "PWP",
-    " B "
+    "CBC"
   ],
   "key": {
     "C": "#c:gems/loop_crystal",
     "A": "ae2:speed_card",
     "P": "ae2:engineering_processor",
-    "W": "ae2:cell_workbench",
+    "W": "minecraft:clock",
     "B": "ae2:export_bus"
   },
   "result": {
