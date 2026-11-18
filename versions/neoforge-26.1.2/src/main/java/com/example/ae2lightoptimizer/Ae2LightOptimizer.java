@@ -32,6 +32,9 @@ public final class Ae2LightOptimizer {
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
                 com.example.ae2lightoptimizer.block.CraftingRipperLogic::onDatapackSync);
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+                (net.neoforged.neoforge.event.OnDatapackSyncEvent event) ->
+                        event.sendRecipes(appeng.recipes.AERecipeTypes.CELL_DISASSEMBLY));
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
                 com.example.ae2lightoptimizer.block.CraftingRipperLogic::onServerTick);
         com.example.ae2lightoptimizer.LegacyNamespace.bind(ModBlocks.BLOCKS, modEventBus);
         com.example.ae2lightoptimizer.factory.FactoryContent.register(modEventBus);

@@ -858,3 +858,7 @@ Final native factory performance evidence is archived under `archive/2026-09-09-
 ## 2026-11-18 注册域与水晶科技
 
 两代 `compat/CrystalScienceCompat.java` 负责水晶科技可选物品；内置资源包 `resourcepacks/crystal_science/` 负责四阶段原图换色。`LegacyNamespace.java` 登记旧 ID，`LegacyRecipeLookupMixin.java` 兼容已编码配方，`tools/migrate_ae2lpt_pack.py` 转换玩家数据包和资源包。
+
+## 2026-11-18 物品指南与 JEI
+
+两代的 `assets/ae2lpt/ae2guide/` 补齐进刻器、聚合器和循环水晶系列的双语 G 键入口。高纯水晶及种子的指南放在水晶科技专用资源包内，随可选物品一起加载。`CrystalScienceJeiPlugin.java` 把循环水晶种子交给水晶科技的生长分类。`LoopRecipeJeiPlugin.java` 根据已加载的配方展示便携磁盘拆解，1.21.1 还展示压印制粉和爆炸转化。26.1.2 通过配方同步向客户端提供拆解条目。

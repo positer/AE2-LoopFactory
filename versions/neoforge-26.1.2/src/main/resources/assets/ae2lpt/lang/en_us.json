@@ -199,5 +199,7 @@
   "block.ae2lpt.loop_ticker": "Loop Tick Accelerator",
   "block.ae2lpt.loop_condenser": "Loop Matter Condenser",
   "gui.ae2lpt.loop_ticker.rate": "Rate",
-  "item.ae2lpt.loop_ticker_part": "Loop Ticker"
+  "item.ae2lpt.loop_ticker_part": "Loop Ticker",
+  "jei.ae2lpt.cell_disassembly": "Portable Cell Disassembly",
+  "jei.ae2lpt.cell_disassembly.hint": "Sneak-use the empty portable cell."
 }

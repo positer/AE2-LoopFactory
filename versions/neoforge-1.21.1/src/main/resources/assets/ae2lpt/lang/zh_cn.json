@@ -199,5 +199,9 @@
   "block.ae2lpt.loop_ticker": "循环进刻器",
   "block.ae2lpt.loop_condenser": "循环物质聚合器",
   "gui.ae2lpt.loop_ticker.rate": "倍率",
-  "item.ae2lpt.loop_ticker_part": "循环进刻器"
+  "item.ae2lpt.loop_ticker_part": "循环进刻器",
+  "jei.ae2lpt.cell_disassembly": "便携循环磁盘拆解",
+  "jei.ae2lpt.cell_disassembly.hint": "潜行使用空的便携循环磁盘。",
+  "jei.ae2lpt.inscriber": "压印器",
+  "jei.ae2lpt.explosion": "爆炸转化"
 }
