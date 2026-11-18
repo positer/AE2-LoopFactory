@@ -68,6 +68,17 @@ public final class LoopTickerPart extends AEBasePart
         }
     }
 
+    /** Empty-hand right-click opens the rate menu, exactly like the native output bus. */
+    @Override
+    public boolean onUseWithoutItem(net.minecraft.world.entity.player.Player player,
+            net.minecraft.world.phys.Vec3 pos) {
+        if (!isClientSide()) {
+            appeng.menu.MenuOpener.open(com.example.ae2lightoptimizer.menu.LoopTickerMenu.PART_TYPE.get(),
+                    player, appeng.menu.locator.MenuLocators.forPart(this));
+        }
+        return true;
+    }
+
     @Override
     public boolean onUseItemOn(net.minecraft.world.item.ItemStack stack, net.minecraft.world.entity.player.Player player,
             net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.Vec3 pos) {

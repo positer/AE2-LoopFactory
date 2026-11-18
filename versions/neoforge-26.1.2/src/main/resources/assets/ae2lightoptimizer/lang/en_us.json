@@ -196,5 +196,6 @@
   "gui.ae2lightoptimizer.omni.visibility.hint": "Locked: only you can see and join this channel",
   "block.ae2lightoptimizer.loop_ticker": "Loop Tick Accelerator",
   "block.ae2lightoptimizer.loop_condenser": "Loop Matter Condenser",
-  "gui.ae2lightoptimizer.loop_ticker.rate": "Rate"
+  "gui.ae2lightoptimizer.loop_ticker.rate": "Rate",
+  "item.ae2lightoptimizer.loop_ticker_part": "Loop Ticker"
 }

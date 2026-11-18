@@ -196,5 +196,6 @@
   "gui.ae2lightoptimizer.omni.visibility.hint": "锁定：仅你可查看与加入该频道",
   "block.ae2lightoptimizer.loop_ticker": "循环进刻器",
   "block.ae2lightoptimizer.loop_condenser": "循环物质聚合器",
-  "gui.ae2lightoptimizer.loop_ticker.rate": "倍率"
+  "gui.ae2lightoptimizer.loop_ticker.rate": "倍率",
+  "item.ae2lightoptimizer.loop_ticker_part": "循环进刻器"
 }
