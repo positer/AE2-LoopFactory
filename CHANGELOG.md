@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.1.0
+
+### English
+
+- Renamed the mod to AE2 LoopTech. Existing worlds can load the old block, item and encoded-recipe IDs.
+- Reworked the Loop Tick Accelerator into a full block with a green face that can point in all six directions. The cable part now opens its settings and accelerates the adjacent block it faces. Multiple accelerators aimed at one target add their rates.
+- Craft the block accelerator with a clock in the center and a Loop Crystal in each corner. Craft either form alone to switch between the block and cable part.
+- Powered controllerless ME networks can run LoopTech machines within AE2's channel limits. The Loop Matter Condenser processes matching items every server tick.
+- With AE2 Crystal Science, grow Loop Crystal Seeds into Purified Loop Crystals. Both crystal forms work in Loop Crystal recipes, including mixed crystal blocks. JEI shows seed growth and the supported crystal processing recipes.
+- Added missing bilingual G-key guide entries and JEI views for portable cell disassembly. Added the missing Inscriber and explosion transformation views on Minecraft 1.21.1.
+- Redrew the handheld factory encoder as a 16×16 sprite with beveled corners. The Omnidirectional Connector has a shorter name, and the creative tab shows the full mod name in the selected language.
+
+### 简体中文
+
+- 模组更名为「应用能源：循环科技」。旧存档中的方块、物品及已编码配方仍可通过旧 ID 读取。
+- 循环进刻器方块为完整立方体，绿色加速面支持六向旋转。线缆部件可以打开设置，并加速朝向的相邻方块。多台进刻器对准同一目标时，追加次数相加。
+- 方块进刻器的合成配方为中心放时钟、四角放循环水晶。将进刻器单独放入合成格，可在方块和线缆部件之间互换。
+- 有电的无控制器 ME 网络也能运行循环科技设备，设备遵循 AE2 的频道上限。循环物质聚合器每个服务端刻处理符合筛选条件的物品。
+- 安装水晶科技后，循环水晶种子可长成高纯循环水晶。普通和高纯循环水晶可混用于消耗循环水晶的配方，包括合成水晶块。JEI 显示种子生长与受支持的水晶加工配方。
+- 补齐中英文 G 键指南入口及便携循环磁盘拆解的 JEI 页面。Minecraft 1.21.1 补充压印和爆炸转化的 JEI 页面。
+- 手持工厂样板编码终端改为带倒角的 16×16 贴图。全向连接器使用简洁名称，创造模式标签按游戏语言显示完整模组名。
+
 ## 0.0.8
 
 ### English

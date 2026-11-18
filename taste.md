@@ -267,3 +267,7 @@ Recipe output references: O1, O2, ... select native recipe outputs in order, ind
 ## 手持工厂样板编码终端
 
 使用透明底 16×16 像素图，保留浅灰金属机身、蓝色代码屏和阶梯倒角。采用整像素色块，编辑源与产品贴图同步。只改此物品时使用 `tools/align_ae2_visuals.py --only-handheld`。
+
+## Changelog 发布说明
+
+沿用版本号标题、English 和简体中文小节。只记录相对上一公开版本的玩家可见变化，英文与中文逐项对应。编译、部署和验收过程写入归档。
