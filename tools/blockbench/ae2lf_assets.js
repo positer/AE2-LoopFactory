@@ -1,6 +1,6 @@
 /* Local Blockbench production exporter. No network access; writes only this repository. */
 (function () {
-    const root = 'C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace';
+    const root = 'C:/Users/12252/Desktop/Files/Code/AE2-LoopTech';
     let action;
     Plugin.register('ae2lf_assets', {
         title: 'AE2LF Assets', author: 'AE2LF', version: '1.0.0',

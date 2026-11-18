@@ -196,7 +196,7 @@ New and changed source/tool responsibilities:
 English name: AE2-LoopFactory (AE2LF).
 中文名称：应用能源 2 循环工厂（AE2LF）。
 
-Current release: **[0.0.5](https://github.com/positer/AE2-LoopFactory/releases/tag/v0.0.5)**.
+Current release: **[0.1.0](https://github.com/positer/AE2-LoopTech/releases/tag/v0.1.0)**.
 
 ## 2026-09-12 complete recipe sets P and O
 
@@ -251,7 +251,7 @@ A player-world investigation (`archive/2026-09-11-minimal-redstone/USER-WORLD-FI
 
 Provide a clean, dual-generation workspace for `AE2-LoopFactory`, an AE2 addon whose universal Loop Storage cells share capacity across every dynamically registered AE2 key type and whose network blocks solve crafting cycles, accelerate eligible global crafting calculations and execute validated crafting chains. The workspace is isolated from ImmortalStorage and hard-separates incompatible Minecraft generations.
 
-The canonical upstream is the standalone GitHub repository `https://github.com/positer/AE2-LoopFactory`. Its Git root, history, branches, tags, and remote are independent from ImmortalStorage; no repository nesting, subtree, submodule, or shared worktree is used.
+The canonical upstream is the standalone GitHub repository `https://github.com/positer/AE2-LoopTech`. Its Git root, history, branches, tags, and remote are independent from ImmortalStorage; no repository nesting, subtree, submodule, or shared worktree is used.
 
 Release 0.0.4 adds the Crafting Ripper and Loop Card in both maintained generations. The complete stationary and portable storage families, dynamic storage-key compatibility, recipes and existing solver services are retained. Minecraft 1.20.1 is intentionally not maintained.
 

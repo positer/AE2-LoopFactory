@@ -11,7 +11,7 @@
         "loop_factory_provider_side",
         "loop_factory_provider_back"
       ],
-      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/1.21.1/loop_factory_pattern_provider.bbmodel"
+      "project": "C:/Users/12252/Desktop/Files/Code/AE2-LoopTech/design/loop_factory/1.21.1/loop_factory_pattern_provider.bbmodel"
     },
     {
       "gen": "1.21.1",
@@ -21,7 +21,7 @@
         "loop_factory_terminal",
         "loop_factory_terminal_top"
       ],
-      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/1.21.1/loop_factory_network_terminal.bbmodel"
+      "project": "C:/Users/12252/Desktop/Files/Code/AE2-LoopTech/design/loop_factory/1.21.1/loop_factory_network_terminal.bbmodel"
     },
     {
       "gen": "1.21.1",
@@ -30,7 +30,7 @@
       "textures": [
         "loop_factory_cable"
       ],
-      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/1.21.1/loop_factory_interface_cable.bbmodel"
+      "project": "C:/Users/12252/Desktop/Files/Code/AE2-LoopTech/design/loop_factory/1.21.1/loop_factory_interface_cable.bbmodel"
     },
     {
       "gen": "1.21.1",
@@ -39,7 +39,7 @@
       "textures": [
         "loop_factory_pattern"
       ],
-      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/1.21.1/loop_factory_pattern.bbmodel"
+      "project": "C:/Users/12252/Desktop/Files/Code/AE2-LoopTech/design/loop_factory/1.21.1/loop_factory_pattern.bbmodel"
     },
     {
       "gen": "1.21.1",
@@ -48,7 +48,7 @@
       "textures": [
         "handheld_loop_factory_encoder"
       ],
-      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/1.21.1/handheld_loop_factory_encoder.bbmodel"
+      "project": "C:/Users/12252/Desktop/Files/Code/AE2-LoopTech/design/loop_factory/1.21.1/handheld_loop_factory_encoder.bbmodel"
     },
     {
       "gen": "1.21.1",
@@ -59,7 +59,7 @@
         "loop_factory_pattern_encoding_panel_medium",
         "loop_factory_pattern_encoding_panel_dark"
       ],
-      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/1.21.1/loop_factory_pattern_encoding_panel.bbmodel"
+      "project": "C:/Users/12252/Desktop/Files/Code/AE2-LoopTech/design/loop_factory/1.21.1/loop_factory_pattern_encoding_panel.bbmodel"
     },
     {
       "gen": "26.1.2",
@@ -70,7 +70,7 @@
         "loop_factory_provider_side",
         "loop_factory_provider_back"
       ],
-      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/26.1.2/loop_factory_pattern_provider.bbmodel"
+      "project": "C:/Users/12252/Desktop/Files/Code/AE2-LoopTech/design/loop_factory/26.1.2/loop_factory_pattern_provider.bbmodel"
     },
     {
       "gen": "26.1.2",
@@ -80,7 +80,7 @@
         "loop_factory_terminal",
         "loop_factory_terminal_top"
       ],
-      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/26.1.2/loop_factory_network_terminal.bbmodel"
+      "project": "C:/Users/12252/Desktop/Files/Code/AE2-LoopTech/design/loop_factory/26.1.2/loop_factory_network_terminal.bbmodel"
     },
     {
       "gen": "26.1.2",
@@ -89,7 +89,7 @@
       "textures": [
         "loop_factory_cable"
       ],
-      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/26.1.2/loop_factory_interface_cable.bbmodel"
+      "project": "C:/Users/12252/Desktop/Files/Code/AE2-LoopTech/design/loop_factory/26.1.2/loop_factory_interface_cable.bbmodel"
     },
     {
       "gen": "26.1.2",
@@ -98,7 +98,7 @@
       "textures": [
         "loop_factory_pattern"
       ],
-      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/26.1.2/loop_factory_pattern.bbmodel"
+      "project": "C:/Users/12252/Desktop/Files/Code/AE2-LoopTech/design/loop_factory/26.1.2/loop_factory_pattern.bbmodel"
     },
     {
       "gen": "26.1.2",
@@ -107,7 +107,7 @@
       "textures": [
         "handheld_loop_factory_encoder"
       ],
-      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/26.1.2/handheld_loop_factory_encoder.bbmodel"
+      "project": "C:/Users/12252/Desktop/Files/Code/AE2-LoopTech/design/loop_factory/26.1.2/handheld_loop_factory_encoder.bbmodel"
     },
     {
       "gen": "26.1.2",
@@ -118,7 +118,7 @@
         "loop_factory_pattern_encoding_panel_medium",
         "loop_factory_pattern_encoding_panel_dark"
       ],
-      "project": "C:/Users/12252/Desktop/Files/Code/Minecraft Multi-Version Mod Workspace/design/loop_factory/26.1.2/loop_factory_pattern_encoding_panel.bbmodel"
+      "project": "C:/Users/12252/Desktop/Files/Code/AE2-LoopTech/design/loop_factory/26.1.2/loop_factory_pattern_encoding_panel.bbmodel"
     }
   ],
   "projectRevision": {
