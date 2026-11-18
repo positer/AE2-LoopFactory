@@ -263,3 +263,7 @@ Recipe output references: O1, O2, ... select native recipe outputs in order, ind
 ## README 展示页
 
 仓库 README.md 是可直接粘贴到独立 Markdown 展示页的单文件玩法指南。英文在前，中文在后，两部分均须完整覆盖核心玩法和操作说明。README 省略合成表和水晶科技兼容说明。所需示例、表格和操作步骤直接写入正文，避免依赖其他文件、图片或链接。正文仅含玩法，不含版本号、部署、编译、开发过程、实现细节、验证记录或 changelog。
+
+## 手持工厂样板编码终端
+
+使用透明底 16×16 像素图，保留浅灰金属机身、蓝色代码屏和阶梯倒角。采用整像素色块，编辑源与产品贴图同步。只改此物品时使用 `tools/align_ae2_visuals.py --only-handheld`。

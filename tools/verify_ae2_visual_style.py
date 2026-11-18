@@ -33,26 +33,43 @@ def verify_terminal(gen, baseline):
     for name in ('loop_factory_terminal', 'loop_factory_terminal_top', 'loop_factory_terminal_case'):
         path = prefix+f'textures/block/{name}.png'
         assert (ROOT/path).read_bytes() == original(baseline, path), path
-    for path in ('blockstates/loop_factory_network_terminal.json',
-                 'models/item/loop_factory_network_terminal.json', 'models/item/handheld_loop_factory_encoder.json'):
+    for path in ('blockstates/loop_factory_network_terminal.json', 'models/item/loop_factory_network_terminal.json'):
         assert (ROOT/(prefix+path)).read_bytes() == original(baseline, prefix+path), path
-    for name, size in (('block/loop_factory_terminal_side', 16), ('block/loop_factory_terminal_back', 16),
-                       ('item/handheld_loop_factory_encoder', 32)):
-        path = ROOT/(prefix+'textures/'+name+'.png')
-        art = Image.open(path).convert('RGBA')
-        assert art.size == (size, size)
-        assert set(art.getchannel('A').getdata()) == ({0, 255} if size == 32 else {255})
-    for name in ('loop_factory_network_terminal', 'handheld_loop_factory_encoder'):
-        project = json.loads((ROOT/f'design/loop_factory/{gen}/{name}.bbmodel').read_bytes())
-        for tex in project['textures']:
-            path = ROOT/(prefix+'textures/'+tex['folder']+'/'+tex['name'])
-            assert base64.b64decode(tex['source'].split(',', 1)[1]) == path.read_bytes(), path
-        if name == 'loop_factory_network_terminal':
-            for face, texture in expected.items():
-                index = project['elements'][0]['faces'][face]['texture']
-                assert project['textures'][index]['name'] == model['textures'][texture].split('/')[-1]+'.png'
+    for name in ('loop_factory_terminal_side', 'loop_factory_terminal_back'):
+        art = Image.open(ROOT/(prefix+f'textures/block/{name}.png')).convert('RGBA')
+        assert art.size == (16, 16)
+        assert set(art.getchannel('A').getdata()) == {255}
+    project = json.loads((ROOT/f'design/loop_factory/{gen}/loop_factory_network_terminal.bbmodel').read_bytes())
+    for tex in project['textures']:
+        path = ROOT/(prefix+'textures/'+tex['folder']+'/'+tex['name'])
+        assert base64.b64decode(tex['source'].split(',', 1)[1]) == path.read_bytes(), path
+    for face, texture in expected.items():
+        index = project['elements'][0]['faces'][face]['texture']
+        assert project['textures'][index]['name'] == model['textures'][texture].split('/')[-1]+'.png'
     return dict(terminalFacesAndEditableSources=True, frontLidAndSavedStatesUnchanged=True,
-                handheldTransparent32px=True)
+                **verify_handheld(gen, baseline))
+
+
+def verify_handheld(gen, baseline):
+    prefix = f'versions/neoforge-{gen}/src/main/resources/assets/ae2lpt/'
+    name = 'handheld_loop_factory_encoder'
+    path = ROOT/(prefix+f'textures/item/{name}.png')
+    with Image.open(path) as image:
+        assert image.size == (16, 16)
+        alpha = image.convert('RGBA').getchannel('A')
+        assert set(alpha.getdata()) == {0, 255}
+        contours = [alpha.crop((0, y, 16, y+1)).getbbox() for y in (1, 2, 3, 12, 13, 14)]
+        assert [(b[0], b[2]) for b in contours] == [(5, 11), (4, 12), (3, 13), (3, 13), (4, 12), (5, 11)]
+    project = json.loads((ROOT/f'design/loop_factory/{gen}/{name}.bbmodel').read_bytes())
+    texture = project['textures'][0]
+    assert (texture['width'], texture['height']) == (16, 16)
+    assert (texture['uv_width'], texture['uv_height']) == (16, 16)
+    assert texture['namespace'] == 'ae2lpt'
+    assert base64.b64decode(texture['source'].split(',', 1)[1]) == path.read_bytes()
+    for model in (f'models/item/{name}.json', f'items/{name}.json'):
+        if (ROOT/(prefix+model)).exists():
+            assert (ROOT/(prefix+model)).read_bytes() == original(baseline, prefix+model), model
+    return dict(handheldTransparent16px=True, handheldBeveledSilhouette=True)
 
 
 def verify(gen, version, baseline):

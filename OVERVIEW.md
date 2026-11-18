@@ -862,3 +862,7 @@ Final native factory performance evidence is archived under `archive/2026-09-09-
 ## 2026-11-18 物品指南与 JEI
 
 两代的 `assets/ae2lpt/ae2guide/` 补齐进刻器、聚合器和循环水晶系列的双语 G 键入口。高纯水晶及种子的指南放在水晶科技专用资源包内，随可选物品一起加载。`CrystalScienceJeiPlugin.java` 把循环水晶种子交给水晶科技的生长分类。`LoopRecipeJeiPlugin.java` 根据已加载的配方展示便携磁盘拆解，1.21.1 还展示压印制粉和爆炸转化。26.1.2 通过配方同步向客户端提供拆解条目。
+
+## 2026-11-18 手持工厂样板编码终端像素调整
+
+手持编码终端贴图重绘为 16×16，外壳四角为两级像素倒角，屏幕四角各收一格。生成器的 `--only-handheld` 同步两代 PNG 与 Blockbench 内嵌图。专项检查 `verify_handheld` 核对贴图、外轮廓和物品模型引用。

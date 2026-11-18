@@ -75,40 +75,42 @@ def restore_cable(gen, resources, ae):
 
 def handheld_encoder(gen, assets):
     """Pixel source of truth for the rugged handheld code terminal, including its editor."""
-    art = Image.new('RGBA', (32, 32))
+    art = Image.new('RGBA', (16, 16))
     d = ImageDraw.Draw(art)
-    d.rectangle((7, 2, 24, 29), fill='#454b58')
-    d.rectangle((5, 4, 26, 27), fill='#454b58')
-    d.rectangle((7, 3, 24, 28), fill='#a9adb8')
-    d.rectangle((6, 5, 25, 26), fill='#a9adb8')
-    d.line((8, 3, 23, 3), fill='#e0e2e8')
-    d.line((6, 5, 6, 25), fill='#d1d5dd')
-    d.line((25, 6, 25, 26), fill='#767e8e')
-    d.line((8, 28, 23, 28), fill='#697181')
-    d.rectangle((8, 6, 23, 22), fill='#5e6574')
-    d.rectangle((9, 7, 22, 21), fill='#151f2b')
-    d.line((10, 8, 21, 8), fill='#2e4355')
-    # Indented program lines remain readable at inventory size; no miniature lettering.
-    for y, indent, a, b in ((10, 0, 4, 3), (12, 2, 3, 2), (14, 2, 4, 2), (16, 0, 3, 4), (18, 2, 3, 2)):
-        x = 10+indent
-        d.line((x, y, x+a-1, y), fill='#77d3ef')
-        d.line((x+a+1, y, x+a+b, y), fill='#3989b0')
-    d.line((10, 20, 12, 20), fill='#b3dce8')
-    d.rectangle((10, 24, 13, 25), fill='#596575')
-    d.line((10, 24, 13, 24), fill='#e0e2e8')
-    d.rectangle((17, 24, 21, 25), fill='#596575')
-    d.line((17, 24, 21, 24), fill='#e0e2e8')
-    d.line((13, 5, 18, 5), fill='#626c7d')
-    d.point((21, 5), fill='#b5e2ef')
-    for x, y in ((8, 4), (23, 4), (8, 27), (23, 27)):
-        d.point((x, y), fill='#5c6574')
+    edge = '#414752'
+    steel = '#a7aab2'
+    light = '#d3d5da'
+    shadow = '#747985'
+    glass = '#202a38'
+    cyan = '#70c3dd'
+    blue = '#4389aa'
+
+    # Step both shoulders inward twice to make the case corners read at 16px.
+    d.rectangle((5, 1, 10, 14), fill=edge)
+    d.rectangle((4, 2, 11, 13), fill=edge)
+    d.rectangle((3, 3, 12, 12), fill=edge)
+    d.rectangle((4, 3, 11, 12), fill=steel)
+    d.line((5, 2, 10, 2), fill=light)
+    d.line((4, 3, 4, 11), fill=light)
+    d.line((11, 4, 11, 12), fill=shadow)
+    d.line((5, 13, 10, 13), fill=shadow)
+
+    # Three stepped bars suggest code without subpixel lettering.
+    d.rectangle((6, 4, 9, 10), fill=glass)
+    d.rectangle((5, 5, 10, 9), fill=glass)
+    d.line((5, 5, 8, 5), fill=cyan)
+    d.line((6, 7, 9, 7), fill=blue)
+    d.line((5, 9, 7, 9), fill=cyan)
+    d.line((6, 12, 8, 12), fill=edge)
+
     path = assets/'textures/item/handheld_loop_factory_encoder.png'
     art.save(path)
     editable = ROOT/f'design/loop_factory/{gen}/handheld_loop_factory_encoder.bbmodel'
-    raw = editable.read_bytes()
-    old_source = json.loads(raw)['textures'][0]['source']
-    new_source = 'data:image/png;base64,'+base64.b64encode(path.read_bytes()).decode()
-    editable.write_bytes(raw.replace(old_source.encode(), new_source.encode()))
+    project = json.loads(editable.read_bytes())
+    project['textures'][0].update(
+        namespace=MOD, width=16, height=16, uv_width=16, uv_height=16,
+        source='data:image/png;base64,'+base64.b64encode(path.read_bytes()).decode())
+    editable.write_text(json.dumps(project, separators=(',', ':')), encoding='utf-8')
 
 
 def terminal_housing(gen, resources, ae):
@@ -223,6 +225,12 @@ if __name__ == '__main__':
     modes = parser.add_mutually_exclusive_group()
     modes.add_argument('--only-cable', action='store_true')
     modes.add_argument('--only-terminal', action='store_true')
+    modes.add_argument('--only-handheld', action='store_true')
     args = parser.parse_args()
     for gen, version in (('1.21.1', '19.2.17'), ('26.1.2', '26.1.10-beta')):
-        generate(gen, version, args.only_cable, args.only_terminal)
+        if args.only_handheld:
+            assets = ROOT/f'versions/neoforge-{gen}/src/main/resources/assets/{MOD}'
+            handheld_encoder(gen, assets)
+            print(f'{gen}: 16px handheld encoder and editable source generated')
+        else:
+            generate(gen, version, args.only_cable, args.only_terminal)
