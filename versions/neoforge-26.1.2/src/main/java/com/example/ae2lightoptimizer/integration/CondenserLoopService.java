@@ -23,14 +23,12 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /**
- * Drives a marked loop storage cell on the loop condenser. Every five ticks it drains the marked keys from the
+ * Drives a marked loop storage cell on the loop condenser. Every server tick it drains the marked keys from the
  * network into the condenser's own power balance and settles the output directly, so the native
  * output slot never throttles the conversion.
  */
 public final class CondenserLoopService {
     private static final Set<LoopCondenserBlockEntity> LOADED = Collections.newSetFromMap(new WeakHashMap<>());
-    private static final int INTERVAL_TICKS = 5;
-    private static int tickCounter;
 
     private CondenserLoopService() {
     }
@@ -44,7 +42,7 @@ public final class CondenserLoopService {
     }
 
     public static void onServerTick(ServerTickEvent.Post event) {
-        if (++tickCounter % INTERVAL_TICKS != 0 || LOADED.isEmpty()) {
+        if (LOADED.isEmpty()) {
             return;
         }
         for (LoopCondenserBlockEntity condenser : new ArrayList<>(LOADED)) {
@@ -71,34 +69,44 @@ public final class CondenserLoopService {
                 .ae2lf$storageSlot().getStackInSlot(0);
         if (!(cell.getItem() instanceof com.example.ae2lightoptimizer.storage.LoopStorageCellItem workbench)) return;
         var config = workbench.getConfigInventory(cell);
-        if (config.keySet().isEmpty()) return; // Unmarked cell: no behaviour at all.
-
-        boolean inverted = workbench.getUpgrades(cell).isInstalled(AEItems.INVERTER_CARD);
-        var builder = IPartitionList.builder();
-        if (workbench.getUpgrades(cell).isInstalled(AEItems.FUZZY_CARD))
-            builder.fuzzyMode(workbench.getFuzzyMode(cell));
-        builder.addAll(config.keySet());
-        IPartitionList partition = builder.build();
-        IncludeExclude mode = inverted ? IncludeExclude.BLACKLIST : IncludeExclude.WHITELIST;
-
+        var keys = config.keySet();
+        if (keys.isEmpty()) return;
+        var upgrades = workbench.getUpgrades(cell);
+        boolean inverted = upgrades.isInstalled(AEItems.INVERTER_CARD);
+        boolean fuzzy = upgrades.isInstalled(AEItems.FUZZY_CARD);
         var storage = grid.getStorageService().getInventory();
         var source = new BaseActionSource();
 
-        var available = new appeng.api.stacks.KeyCounter();
-        storage.getAvailableStacks(available);
-        for (var entry : available) {
-            AEKey key = entry.getKey();
-            if (!(key instanceof AEItemKey) || !partition.matchesFilter(key, mode)) continue;
-            long extracted = storage.extract(key, entry.getLongValue(), Actionable.MODULATE, source);
-            if (extracted > 0) {
-                // AE2 native CondenserMEStorage divides by amount-per-operation.
-                double credit = extracted / (double) key.getAmountPerOperation();
-                ((com.example.ae2lightoptimizer.mixin.CondenserStorageSlotAccessor) (Object) condenser)
-                        .ae2lf$setStoredPower(condenser.getStoredPower() + credit);
+        if (!inverted && !fuzzy) {
+            for (AEKey key : keys) {
+                if (key instanceof AEItemKey) drain(condenser, storage, source, key, Long.MAX_VALUE);
+            }
+        } else {
+            var builder = IPartitionList.builder();
+            if (fuzzy) builder.fuzzyMode(workbench.getFuzzyMode(cell));
+            builder.addAll(keys);
+            var partition = builder.build();
+            var mode = inverted ? IncludeExclude.BLACKLIST : IncludeExclude.WHITELIST;
+            var available = new appeng.api.stacks.KeyCounter();
+            storage.getAvailableStacks(available);
+            for (var entry : available) {
+                var key = entry.getKey();
+                if (key instanceof AEItemKey && partition.matchesFilter(key, mode)) {
+                    drain(condenser, storage, source, key, entry.getLongValue());
+                }
             }
         }
-
         settle(condenser, storage, source);
+    }
+
+    private static void drain(CondenserBlockEntity condenser, appeng.api.storage.MEStorage storage,
+                              BaseActionSource source, AEKey key, long limit) {
+        long extracted = storage.extract(key, limit, Actionable.MODULATE, source);
+        if (extracted > 0) {
+            double credit = extracted / (double) key.getAmountPerOperation();
+            ((com.example.ae2lightoptimizer.mixin.CondenserStorageSlotAccessor) (Object) condenser)
+                    .ae2lf$setStoredPower(condenser.getStoredPower() + credit);
+        }
     }
 
     /** Converts stored power into the configured output in the same tick and pushes it to the network. */

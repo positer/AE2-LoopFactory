@@ -88,6 +88,7 @@ public final class RecipeRingSolver {
         int explored = 0;
         boolean depthLimited = false;
 
+        long[] next = new long[initial.length];
         while (!queue.isEmpty()) {
             SearchNode node = queue.remove();
             explored++;
@@ -106,11 +107,12 @@ public final class RecipeRingSolver {
                 if (!canApply(node.stock, recipe)) {
                     continue;
                 }
-                long[] next = apply(node.stock, recipe, caps);
+                apply(node.stock, recipe, caps, next);
                 if (!acceptIntoFrontier(next, frontier)) {
                     continue;
                 }
                 queue.add(new SearchNode(next, node, recipeIndex, node.depth + 1));
+                next = new long[initial.length];
             }
         }
         return failed(depthLimited ? RingSolveStatus.BUDGET_EXHAUSTED : RingSolveStatus.NO_GROWTH_PATH,
@@ -215,14 +217,13 @@ public final class RecipeRingSolver {
         return true;
     }
 
-    private static long[] apply(long[] stock, CompiledRecipe recipe, long[] caps) {
-        long[] result = stock.clone();
+    private static void apply(long[] stock, CompiledRecipe recipe, long[] caps, long[] result) {
+        System.arraycopy(stock, 0, result, 0, stock.length);
         for (int i = 0; i < recipe.touchedIndexes.length; i++) {
             int index = recipe.touchedIndexes[i];
             long remaining = result[index] - recipe.touchedInputs[i];
             result[index] = Math.min(caps[index], saturatingAdd(remaining, recipe.touchedOutputs[i]));
         }
-        return result;
     }
 
     private static boolean acceptIntoFrontier(long[] candidate, List<long[]> frontier) {

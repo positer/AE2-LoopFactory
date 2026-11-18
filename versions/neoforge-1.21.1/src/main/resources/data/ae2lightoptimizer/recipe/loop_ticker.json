@@ -1,0 +1,30 @@
+{
+  "category": "misc",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CAC",
+    "PWP",
+    " B "
+  ],
+  "key": {
+    "C": {
+      "item": "ae2lightoptimizer:loop_crystal"
+    },
+    "A": {
+      "item": "ae2:speed_card"
+    },
+    "P": {
+      "item": "ae2:engineering_processor"
+    },
+    "W": {
+      "item": "ae2:cell_workbench"
+    },
+    "B": {
+      "item": "ae2:export_bus"
+    }
+  },
+  "result": {
+    "id": "ae2lightoptimizer:loop_ticker",
+    "count": 1
+  }
+}

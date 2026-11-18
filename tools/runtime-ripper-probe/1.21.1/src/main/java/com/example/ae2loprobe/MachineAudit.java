@@ -106,6 +106,7 @@ public final class MachineAudit {
                     if (ticks < 80 || !condenser.mainNode().isActive() || !ticker.getMainNode().isActive()) return;
                     grid = condenser.mainNode().getGrid();
                     var node = condenser.mainNode().getNode();
+                    testMachineRecipes();
                     check("condenser_physically_joined", node.getConnections().size() > 0
                             && ticker.getMainNode().getGrid() == grid);
                     int downstream = 0;
@@ -139,12 +140,12 @@ public final class MachineAudit {
                 }
                 case 2 -> {
                     long planks = count(Items.OAK_PLANKS);
-                    if (planks == 1025 && since <= 5) return;
-                    check("marked_pulls_within_five_ticks", since <= 5 && planks == 0);
+                    check("marked_pulls_next_tick", since == 1 && planks == 0);
                     check("same_tick_native_quota_output", count(AEItems.MATTER_BALL.asItem()) == 4);
                     check("remainder_retained", condenser.getStoredPower() == 1);
                     report.put("firstSettlementDelayTicks", since);
                     report.put("firstSettlementBalance", condenser.getStoredPower());
+                    benchmarkCondenser();
                     // Force network output rejection using a partitioned destination cell.
                     var drive = (appeng.blockentity.storage.DriveBlockEntity) level.getBlockEntity(C.east());
                     drive.getInternalInventory().setItemDirect(0, ItemStack.EMPTY);
@@ -254,6 +255,91 @@ public final class MachineAudit {
         } catch (Throwable failure) {
             report.put("failure", failure.toString()); report.put("stage", stage); report.put("passed", false); finish();
         }
+    }
+
+    private static void testMachineRecipes() {
+        String c = "ae2lightoptimizer:loop_crystal", p = "ae2:engineering_processor";
+        String k = "ae2lightoptimizer:4k_loop_storage_core", l = "ae2:logic_processor";
+        String block = "ae2lightoptimizer:loop_ticker", part = block + "_part";
+        verifyRecipe("loop_ticker", block, c, "ae2:speed_card", c, p, "ae2:cell_workbench", p, "", "ae2:export_bus", "");
+        verifyRecipe("loop_condenser", "ae2lightoptimizer:loop_condenser", c, k, c, l, "ae2:condenser", l, c, k, c);
+        verifyRecipe("loop_ticker_part_from_loop_ticker", part, block);
+        verifyRecipe("loop_ticker_from_loop_ticker_part", block, part);
+    }
+
+    private static void verifyRecipe(String path, String outputId, String... ingredients) {
+        var registry = net.minecraft.core.registries.BuiltInRegistries.ITEM;
+        var stacks = new java.util.ArrayList<ItemStack>();
+        for (String id : ingredients) {
+            stacks.add(id.isEmpty() ? ItemStack.EMPTY : new ItemStack(registry.get(net.minecraft.resources.ResourceLocation.parse(id))));
+        }
+        var recipe = (net.minecraft.world.item.crafting.CraftingRecipe) level.getRecipeManager().byKey(net.minecraft.resources.ResourceLocation.parse("ae2lightoptimizer:" + path)).orElseThrow().value();
+        int width = ingredients.length == 1 ? 1 : 3;
+        var input = net.minecraft.world.item.crafting.CraftingInput.of(width, width, stacks);
+        check("recipe_matches_" + path, recipe.matches(input, level));
+        var result = recipe.assemble(input, level.registryAccess());
+        check("recipe_result_" + path, result.getCount() == 1 && registry.getKey(result.getItem()).toString().equals(outputId));
+        if (width == 3) {
+            java.util.Collections.swap(stacks, 0, 1);
+            input = net.minecraft.world.item.crafting.CraftingInput.of(width, width, stacks);
+            check("recipe_order_" + path, !recipe.matches(input, level));
+        }
+    }
+
+    // Measure the actual drive against an idle marked whitelist in native ME storage.
+    private static void benchmarkCondenser() throws Exception {
+        var drive = com.example.ae2lightoptimizer.integration.CondenserLoopService.class
+                .getDeclaredMethod("drive", LoopCondenserBlockEntity.class);
+        drive.setAccessible(true);
+        var sampleItems = new java.util.ArrayList<net.minecraft.world.item.Item>();
+        var storage = grid.getStorageService().getInventory();
+        for (var item : net.minecraft.core.registries.BuiltInRegistries.ITEM) {
+            if (item == Items.AIR || item == Items.OAK_PLANKS || item == AEItems.MATTER_BALL.asItem()) continue;
+            if (storage.insert(AEItemKey.of(item), 1, Actionable.MODULATE, SOURCE) == 1) sampleItems.add(item);
+            if (sampleItems.size() == 256) break;
+        }
+        check("benchmark_has_256_distinct_items", sampleItems.size() == 256);
+        java.lang.reflect.Method baseline = baselineDrive();
+        for (boolean fuzzy : new boolean[]{false, true}) {
+            var upgrades = ((LoopStorageCellItem)marked.getItem()).getUpgrades(marked);
+            if (fuzzy) upgrades.addItems(AEItems.FUZZY_CARD.stack());
+            String mode = fuzzy ? "fuzzy" : "exact";
+            if (baseline != null) report.put(mode + "BaselineMedianNs", medianDriveNanos(baseline));
+            report.put(mode + "MedianNs", medianDriveNanos(drive));
+            if (fuzzy) upgrades.clear();
+        }
+        for (var item : sampleItems) storage.extract(AEItemKey.of(item), 1, Actionable.MODULATE, SOURCE);
+    }
+
+    // Optional A/B run. Load only the historical service and use the current native world for both.
+    private static java.lang.reflect.Method baselineDrive() throws Exception {
+        String path = System.getenv("AE2LF_PROBE_CONDENSER_BASELINE");
+        if (path == null || path.isBlank()) return null;
+        String name = com.example.ae2lightoptimizer.integration.CondenserLoopService.class.getName();
+        byte[] code;
+        try (var jar = new java.util.jar.JarFile(path)) {
+            try (var in = jar.getInputStream(jar.getJarEntry(name.replace('.', '/') + ".class"))) {
+                code = in.readAllBytes();
+            }
+        }
+        var loader = new ClassLoader(MachineAudit.class.getClassLoader()) {
+            Class<?> service() { return defineClass(name, code, 0, code.length); }
+        };
+        var drive = loader.service().getDeclaredMethod("drive", LoopCondenserBlockEntity.class);
+        drive.setAccessible(true);
+        return drive;
+    }
+
+    private static long medianDriveNanos(java.lang.reflect.Method drive) throws Exception {
+        for (int i = 0; i < 120; i++) drive.invoke(null, condenser);
+        long[] batches = new long[9];
+        for (int batch = 0; batch < batches.length; batch++) {
+            long start = System.nanoTime();
+            for (int i = 0; i < 50; i++) drive.invoke(null, condenser);
+            batches[batch] = (System.nanoTime() - start) / 50;
+        }
+        java.util.Arrays.sort(batches);
+        return batches[4];
     }
 
     private static void testRates() throws Exception {

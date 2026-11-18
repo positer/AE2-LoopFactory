@@ -1,5 +1,7 @@
 # AE2-LoopFactory (AE2LF) Project Overview
 
+`docs/loop-machine-performance.md` 说明聚合器白名单与全量扫描成本、超算无环调度、循环种子调度及环搜索的基准和边界。`docs/loop-machines.md` 收录两种机器的工作台布局与形态互换。
+
 两代 `integration/LoopTickerTarget.java` 执行朝向目标的追加 tick。部件通过 AE2 网格调度，方块通过现有服务器 tick 服务调用。六向方块模型、物品模型和工作台贴图由 `tools/verify_loop_machine_assets.py` 对照同代 AE2 校验。
 
 ## 2026-11-17 循环机器独立验收树

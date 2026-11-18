@@ -340,7 +340,7 @@ public final class GlobalCraftingPlanner {
 
         seedExternalInputs(remaining, byId, stock, required, emitted, emittable);
 
-        while (remaining.values().stream().anyMatch(value -> value > 0)) {
+        while (!remaining.isEmpty()) {
             if (schedule.size() >= budget.maxScheduleBatches()) {
                 return new ScheduleResult(GlobalPlanStatus.BUDGET_EXHAUSTED,
                         List.of(), Map.of(), Map.of(), schedule.size());
@@ -362,7 +362,8 @@ public final class GlobalCraftingPlanner {
             }
 
             if (runnable == null) {
-                GlobalPattern sourceReady = chooseSourceReadyPattern(remaining, byId);
+                Set<String> stillProduced = remainingProducedResources(remaining, byId);
+                GlobalPattern sourceReady = chooseSourceReadyPattern(remaining, byId, stillProduced);
                 GlobalPattern seedPattern = sourceReady != null
                         ? sourceReady : chooseCheapestSeedPattern(
                                 remaining, byId, stock, required, availableStock,
@@ -371,7 +372,6 @@ public final class GlobalCraftingPlanner {
                     return new ScheduleResult(GlobalPlanStatus.NO_FEASIBLE_PLAN,
                             List.of(), Map.of(), Map.of(), schedule.size());
                 }
-                Set<String> stillProduced = remainingProducedResources(remaining, byId);
                 for (var input : seedPattern.inputs().entrySet()) {
                     long repetitions = sourceReady != null || !stillProduced.contains(input.getKey())
                             ? remaining.get(seedPattern.id()) : 1L;
@@ -391,7 +391,9 @@ public final class GlobalCraftingPlanner {
             }
 
             applyBatch(stock, runnable, runnableBatch);
-            remaining.merge(runnable.id(), -runnableBatch, Math::addExact);
+            long left = remaining.get(runnable.id()) - runnableBatch;
+            if (left == 0) remaining.remove(runnable.id());
+            else remaining.put(runnable.id(), left);
             appendBatch(schedule, runnable.id(), runnableBatch);
         }
 
@@ -465,8 +467,7 @@ public final class GlobalCraftingPlanner {
     }
 
     private static GlobalPattern chooseSourceReadyPattern(Map<String, Long> remaining,
-                                                          Map<String, GlobalPattern> byId) {
-        Set<String> stillProduced = remainingProducedResources(remaining, byId);
+                                                          Map<String, GlobalPattern> byId, Set<String> stillProduced) {
         for (var entry : remaining.entrySet()) {
             if (entry.getValue() <= 0) {
                 continue;

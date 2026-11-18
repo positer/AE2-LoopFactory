@@ -28,6 +28,48 @@ public final class LoopTickerPartFixture {
     static final String MENU_FRAME = "ae2lo-ripper-loop-ticker-part-menu.png";
     private static LoopTickerPart lastPart;
     private static final Map<Direction, BlockPos> blockFurnaces = new java.util.EnumMap<>(Direction.class);
+    private record Station(BlockPos pos, Direction face, boolean part) {}
+    private static final java.util.List<Station> stations = new java.util.ArrayList<>();
+
+    private static void addStation(BlockPos pos, Direction face, boolean part) {
+        if (part) {
+            level.setBlockAndUpdate(pos, AEBlocks.CABLE_BUS.block().defaultBlockState());
+            IPartHost host = (IPartHost) level.getBlockEntity(pos);
+            host.addPart(appeng.core.definitions.AEParts.GLASS_CABLE.item(appeng.api.util.AEColor.TRANSPARENT), face, null);
+            host.addPart(com.example.ae2lightoptimizer.item.ModItems.LOOP_TICKER_PART.get(), face, null);
+        } else {
+            var machine = com.example.ae2lightoptimizer.block.ModBlocks.LOOP_TICKER.get();
+            level.setBlockAndUpdate(pos, machine.getOrientationStrategy().setFacing(machine.defaultBlockState(), face));
+        }
+        for (Direction side : Direction.values()) placeFurnace(pos.relative(side));
+        level.setBlockAndUpdate(pos.above(3), AEBlocks.CREATIVE_ENERGY_CELL.block().defaultBlockState());
+        stations.add(new Station(pos, face, part));
+    }
+
+    private static void powerStations() {
+        for (Station station : stations) {
+            var machine = level.getBlockEntity(station.pos());
+            var node = station.part()
+                    ? ((LoopTickerPart)((IPartHost)machine).getPart(station.face())).getGridNode()
+                    : ((com.example.ae2lightoptimizer.block.LoopTickerBlockEntity)machine).getMainNode().getNode();
+            var battery = (appeng.api.networking.IInWorldGridNodeHost)level.getBlockEntity(station.pos().above(3));
+            appeng.api.networking.GridHelper.createConnection(battery.getGridNode(Direction.DOWN), node);
+        }
+    }
+
+    private static boolean checkStations(int control) {
+        boolean passed = true;
+        for (Station station : stations) {
+            Map<String, Integer> yields = new LinkedHashMap<>();
+            for (Direction side : Direction.values()) {
+                int amount = count(station.pos().relative(side));
+                yields.put(side.getName(), amount);
+                passed &= side == station.face() ? amount > control : amount == control;
+            }
+            summary.put((station.part() ? "part_" : "block_") + station.face().getName(), yields);
+        }
+        return passed;
+    }
     private static BlockPos controlFurnace;
     private static BlockPos fastFurnace;
     private static final Map<String, Object> summary = new LinkedHashMap<>();
@@ -87,6 +129,9 @@ public final class LoopTickerPartFixture {
             var target = blockPos.relative(face);
             placeFurnace(target);
             blockFurnaces.put(face, target);
+            var testPos = base.offset(-12 + 5 * (face.ordinal() % 3), 10, 5 * (face.ordinal() / 3));
+            addStation(testPos, face, false);
+            addStation(testPos.north(12), face, true);
         }
 
     }
@@ -104,10 +149,13 @@ public final class LoopTickerPartFixture {
 
     public static void tick() {
         if (!started || finished) return;
-        if (++waited < WAIT_TICKS) return;
+        ++waited;
+        if (phase == 0 && waited == 20) powerStations();
+        if (waited < WAIT_TICKS) return;
         if (phase == 0) {
             int plain = count(controlFurnace);
             int fast = count(fastFurnace);
+            summary.put("onlyFacingAccelerated", checkStations(plain));
             var server = (net.minecraft.server.level.ServerLevel) level;
             var player = server.players().getFirst();
             var cable = fastFurnace.below();
@@ -165,6 +213,7 @@ public final class LoopTickerPartFixture {
                 && Boolean.TRUE.equals(summary.get("partMenuOpened"))
                 && "NO_CONTROLLER".equals(summary.get("controllerState"))
                 && Boolean.TRUE.equals(summary.get("allBlockFacesAccelerated"))
+                && Boolean.TRUE.equals(summary.get("onlyFacingAccelerated"))
                 && isolatedOutput >= 0 && isolatedOutput <= (int) summary.get("controlOutput") + 1;
     }
 
