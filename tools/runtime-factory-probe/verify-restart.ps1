@@ -12,7 +12,7 @@ if (-not (Test-Path -LiteralPath $helper)) { throw 'Build the generation-specifi
 $runMods = Join-Path $taskRoot "versions/neoforge-$Generation/run/mods"
 New-Item -ItemType Directory -Force -Path $runMods | Out-Null
 Copy-Item -LiteralPath $helper -Destination (Join-Path $runMods "ae2lf-runtime-probe-mc$Generation-1.jar")
-$dependencyPath="C:/Users/12252/Desktop/Files/Minecraft/PCL/.minecraft/versions/AE2-lightoptimizer-$Generation/mods"
+$dependencyPath="C:/Users/12252/Desktop/Files/Minecraft/PCL/.minecraft/versions/AE2 LoopTech-$Generation/mods"
 Get-ChildItem -LiteralPath $dependencyPath | Where-Object { $_.Name -like 'AppliedFlux*' -or $_.Name -like 'Glodium*' } | Copy-Item -Destination $runMods
 $originalOptions = $env:JAVA_TOOL_OPTIONS
 $summary = [ordered]@{generation=$Generation; status='running'}

@@ -71,7 +71,7 @@ function Quote-JavaArgument([string] $Value) { '"' + $Value.Replace('\', '\\').R
 
 $minecraftRoot = Get-ChildPath (Get-FullPath $PclRoot) '.minecraft'
 $script:versionsRoot = Get-ChildPath $minecraftRoot 'versions'
-$instanceName = 'AE2-lightoptimizer-' + $Generation
+$instanceName = 'AE2 LoopTech-' + $Generation
 $gameDir = Get-ChildPath $script:versionsRoot $instanceName
 $libraryDir = Get-ChildPath $minecraftRoot 'libraries'
 $assetsDir = Get-ChildPath $minecraftRoot 'assets'

@@ -28,8 +28,8 @@ $dependencyDownloads = @{
 
 $instances = @(
     @{
-        Name = 'AE2-lightoptimizer-1.21.1'
-        SourceCandidates = @('1.21.1-NeoForge_21.1.235', 'AE2-lightoptimizer-1.21.1')
+        Name = 'AE2 LoopTech-1.21.1'
+        SourceCandidates = @('1.21.1-NeoForge_21.1.235', 'AE2 LoopTech-1.21.1')
         Dependencies = @(
             'appliedenergistics2-19.2.17.jar'
             'guideme-21.1.17.jar'
@@ -40,8 +40,8 @@ $instances = @(
         Artifact = 'versions\neoforge-1.21.1\build\libs\ae2lf-neoforge-mc1.21.1-0.0.5.jar'
     }
     @{
-        Name = 'AE2-lightoptimizer-26.1.2'
-        SourceCandidates = @('neoforge-26.1.2.94', 'AE2-lightoptimizer-26.1.2')
+        Name = 'AE2 LoopTech-26.1.2'
+        SourceCandidates = @('neoforge-26.1.2.94', 'AE2 LoopTech-26.1.2')
         Dependencies = @(
             'appliedenergistics2-26.1.10-beta.jar'
             'guideme-26.1.12-beta.jar'

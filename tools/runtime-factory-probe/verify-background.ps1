@@ -393,7 +393,7 @@ $productionHash=(Get-FileHash -LiteralPath $productionJar -Algorithm SHA256).Has
 @{generation=$Generation;productionSha256=$productionHash;helperSha256=(Get-FileHash -LiteralPath (Join-Path $runMods "ae2lf-runtime-probe-mc$Generation-1.jar") -Algorithm SHA256).Hash.ToLower()} | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $reportPath 'artifact.json')
 Assert-RuntimeIdentity 'before'
 
-$dependencyPath="C:/Users/12252/Desktop/Files/Minecraft/PCL/.minecraft/versions/AE2-lightoptimizer-$Generation/mods"
+$dependencyPath="C:/Users/12252/Desktop/Files/Minecraft/PCL/.minecraft/versions/AE2 LoopTech-$Generation/mods"
 if(-not $MekOnly){Get-ChildItem -LiteralPath $dependencyPath | Where-Object { $_.Name -like 'AppliedFlux*' -or $_.Name -like 'Glodium*' } | Copy-Item -Destination $runMods}
 $agentPath=(Join-Path $PSScriptRoot 'background-agent/hidden-window-agent.jar').Replace('\','/')
 if($MekOnly){

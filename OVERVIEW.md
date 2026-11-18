@@ -866,3 +866,7 @@ Final native factory performance evidence is archived under `archive/2026-09-09-
 ## 2026-11-18 手持工厂样板编码终端像素调整
 
 手持编码终端贴图重绘为 16×16，外壳四角为两级像素倒角，屏幕四角各收一格。生成器的 `--only-handheld` 同步两代 PNG 与 Blockbench 内嵌图。专项检查 `verify_handheld` 核对贴图、外轮廓和物品模型引用。
+
+## 2026-11-18 PCL 实例与游戏内名称
+
+两套专用实例使用 `AE2 LoopTech-1.21.1` 和 `AE2 LoopTech-26.1.2`。PCL 启动、预置及探针脚本按这两个目录查找。中英文创造模式标签分别使用应用能源：循环科技和 AE2 LoopTech。全向连接器物品与菜单共用简洁的本地化标题。

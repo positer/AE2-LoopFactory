@@ -12,10 +12,10 @@ def write(path, value):
     path.write_bytes((json.dumps(value, ensure_ascii=False, indent=2) + '\n').encode('utf-8'))
 
 LABELS = {
-    'zh_cn': {'title': 'AE2 全向连接器', 'create': '创建或加入同名连接频道', 'previous': '上一页', 'next': '下一页',
+    'zh_cn': {'title': '全向连接器', 'create': '创建或加入同名连接频道', 'previous': '上一页', 'next': '下一页',
               'unlink': '断开此连接器', 'name': '连接频道名称', 'none': '未连接', 'selected': '当前：%s',
               'page': '第 %s / %s 页', 'invalid': '名称须为 1–48 个可显示字符', 'links': '全服连接频道（括号内为已加载端点数）'},
-    'en_us': {'title': 'AE2 Omnidirectional Connector', 'create': 'Create or join a named link', 'previous': 'Previous page', 'next': 'Next page',
+    'en_us': {'title': 'Omnidirectional Connector', 'create': 'Create or join a named link', 'previous': 'Previous page', 'next': 'Next page',
               'unlink': 'Unlink this connector', 'name': 'Link name', 'none': 'Not linked', 'selected': 'Current: %s',
               'page': 'Page %s / %s', 'invalid': 'Use 1–48 visible characters', 'links': 'Server links (loaded endpoints in brackets)'}
 }

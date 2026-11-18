@@ -24,7 +24,7 @@ try {
     $fixtures = @(
         @{
             Source = '1.21.1-NeoForge_21.1.235'
-            Target = 'AE2-lightoptimizer-1.21.1'
+            Target = 'AE2 LoopTech-1.21.1'
             Dependencies = @(
                 'appliedenergistics2-19.2.17.jar'
                 'guideme-21.1.17.jar'
@@ -35,7 +35,7 @@ try {
         }
         @{
             Source = 'neoforge-26.1.2.94'
-            Target = 'AE2-lightoptimizer-26.1.2'
+            Target = 'AE2 LoopTech-26.1.2'
             Dependencies = @(
                 'appliedenergistics2-26.1.10-beta.jar'
                 'guideme-26.1.12-beta.jar'

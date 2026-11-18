@@ -6,7 +6,7 @@ $workspaceRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $versionsRoot = Join-Path $env:USERPROFILE 'Desktop/Files/Minecraft/PCL/.minecraft/versions'
 $evidencePath = [IO.Path]::GetFullPath($EvidenceDir)
 $targets = foreach ($generation in @('1.21.1','26.1.2')) {
-    $instance = Join-Path $versionsRoot "AE2-lightoptimizer-$generation"
+    $instance = Join-Path $versionsRoot "AE2 LoopTech-$generation"
     $productionName = "ae2lf-neoforge-mc$generation-0.0.5.jar"
     $probeName = "ae2lo-runtime-probe-mc$generation-1.jar"
     [pscustomobject]@{
