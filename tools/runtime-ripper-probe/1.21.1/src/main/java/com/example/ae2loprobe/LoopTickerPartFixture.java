@@ -25,7 +25,9 @@ public final class LoopTickerPartFixture {
     private static boolean passed;
     private static int waited;
     private static Level level;
+    static final String MENU_FRAME = "ae2lo-ripper-loop-ticker-part-menu.png";
     private static LoopTickerPart lastPart;
+    private static final Map<Direction, BlockPos> blockFurnaces = new java.util.EnumMap<>(Direction.class);
     private static BlockPos controlFurnace;
     private static BlockPos fastFurnace;
     private static final Map<String, Object> summary = new LinkedHashMap<>();
@@ -39,11 +41,12 @@ public final class LoopTickerPartFixture {
         level = value;
         // Control furnace and an identical one that the part will accelerate.
         controlFurnace = base;
-        fastFurnace = base.east(4);
+
         placeFurnace(controlFurnace);
-        placeFurnace(fastFurnace);
-        // Attach a cable bus to the probe's own powered network (next to the drive), then mount the part.
-        BlockPos cablePos = new BlockPos(-2, 100, 0);
+
+        // A dedicated controllerless island powers both forms.
+        BlockPos cablePos = base.east(4).below();
+        level.setBlockAndUpdate(cablePos.west(), AEBlocks.CREATIVE_ENERGY_CELL.block().defaultBlockState());
         level.setBlockAndUpdate(cablePos, AEBlocks.CABLE_BUS.block().defaultBlockState());
         if (!(level.getBlockEntity(cablePos) instanceof IPartHost host)) {
             fail("cable bus did not create a part host");
@@ -70,6 +73,21 @@ public final class LoopTickerPartFixture {
         summary.put("partClass", part.getClass().getSimpleName());
         summary.put("partSide", String.valueOf(part.getSide()));
         lastPart = ticker;
+        var machine = com.example.ae2lightoptimizer.block.ModBlocks.LOOP_TICKER.get();
+        for (Direction face : Direction.values()) {
+            var blockPos = base.offset(4 * (face.ordinal() % 3), 4, 4 + 4 * (face.ordinal() / 3));
+            var state = machine.getOrientationStrategy().setFacing(machine.defaultBlockState(), face);
+            level.setBlockAndUpdate(blockPos, state);
+            if (!net.minecraft.world.level.block.Block.isShapeFullBlock(state.getCollisionShape(level, blockPos))) {
+                fail("incomplete collision shape: " + face);
+                return;
+            }
+            level.setBlockAndUpdate(blockPos.relative(face.getOpposite()),
+                    AEBlocks.CREATIVE_ENERGY_CELL.block().defaultBlockState());
+            var target = blockPos.relative(face);
+            placeFurnace(target);
+            blockFurnaces.put(face, target);
+        }
 
     }
 
@@ -90,8 +108,25 @@ public final class LoopTickerPartFixture {
         if (phase == 0) {
             int plain = count(controlFurnace);
             int fast = count(fastFurnace);
+            var server = (net.minecraft.server.level.ServerLevel) level;
+            var player = server.players().getFirst();
+            var cable = fastFurnace.below();
+            var hit = new net.minecraft.world.phys.BlockHitResult(
+                    new net.minecraft.world.phys.Vec3(cable.getX() + .75, cable.getY() + .8, cable.getZ() + .5),
+                    Direction.EAST, cable, false);
+            player.connection.teleport(cable.getX() + 2.5, cable.getY() + 1, cable.getZ() + .5, 90, 20);
+            level.getBlockState(cable).useWithoutItem(level, player, hit);
+            summary.put("partMenuOpened", player.containerMenu instanceof com.example.ae2lightoptimizer.menu.LoopTickerMenu
+                    && player.containerMenu.getType() == com.example.ae2lightoptimizer.menu.LoopTickerMenu.PART_TYPE.get());
+            var grid = lastPart.getMainNode().getGrid();
+            summary.put("controllerState", grid == null ? "missing" : grid.getPathingService().getControllerState().name());
+            Map<String, Integer> outputs = new LinkedHashMap<>();
+            blockFurnaces.forEach((face, pos) -> outputs.put(face.getName(), count(pos)));
+            summary.put("blockOutputs", outputs);
+            summary.put("allBlockFacesAccelerated", outputs.size() == 6
+                    && outputs.values().stream().allMatch(amount -> amount > plain));
             if (lastPart != null) {
-                summary.put("tickCount", lastPart.tickCount);
+
                 summary.put("nodeActiveAtEnd", lastPart.isActive());
             }
             summary.put("controlOutput", plain);
@@ -127,7 +162,10 @@ public final class LoopTickerPartFixture {
         int plain = count(controlFurnace);
         summary.put("controlOutputAfterSecondPhase", plain);
         passed = ((int) summary.get("acceleratedOutput")) > ((int) summary.get("controlOutput"))
-                && isolatedOutput <= plain;
+                && Boolean.TRUE.equals(summary.get("partMenuOpened"))
+                && "NO_CONTROLLER".equals(summary.get("controllerState"))
+                && Boolean.TRUE.equals(summary.get("allBlockFacesAccelerated"))
+                && isolatedOutput >= 0 && isolatedOutput <= (int) summary.get("controlOutput") + 1;
     }
 
     private static BlockPos isolatedFurnace;

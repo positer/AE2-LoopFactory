@@ -1,6 +1,10 @@
 package com.example.ae2lightoptimizer.part;
 
-import appeng.api.networking.energy.IEnergyService;
+import appeng.api.networking.IGridNode;
+import appeng.api.networking.ticking.IGridTickable;
+import appeng.api.networking.ticking.TickRateModulation;
+import appeng.api.networking.ticking.TickingRequest;
+import com.example.ae2lightoptimizer.integration.LoopTickerTarget;
 import appeng.api.parts.IPartCollisionHelper;
 import appeng.api.parts.IPartItem;
 import appeng.api.parts.IPartModel;
@@ -9,17 +13,12 @@ import appeng.api.upgrades.IUpgradeableObject;
 import appeng.api.upgrades.UpgradeInventories;
 import appeng.parts.AEBasePart;
 import appeng.parts.PartModel;
-import java.util.List;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * The loop ticker as a cable part: it mounts on one face of a cable exactly like the ME output bus,
@@ -27,7 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * while the grid is powered.
  */
 public final class LoopTickerPart extends AEBasePart
-        implements IUpgradeableObject, com.example.ae2lightoptimizer.api.LoopTickerHost {
+        implements IGridTickable, IUpgradeableObject, com.example.ae2lightoptimizer.api.LoopTickerHost {
     private static final int BASE_CAP = 4;
     private static final int MAX_CARDS = 4;
 
@@ -45,7 +44,7 @@ public final class LoopTickerPart extends AEBasePart
 
     public LoopTickerPart(IPartItem<?> partItem) {
         super(partItem);
-        getMainNode().setIdlePowerUsage(0);
+        getMainNode().setIdlePowerUsage(0).addService(IGridTickable.class, this);
         this.upgrades = UpgradeInventories.forMachine(partItem, MAX_CARDS, this::onUpgradesChanged);
     }
 
@@ -106,11 +105,6 @@ public final class LoopTickerPart extends AEBasePart
             }
             return true;
         }
-        if (stack.isEmpty() && !isClientSide()) {
-            appeng.menu.MenuOpener.open(com.example.ae2lightoptimizer.menu.LoopTickerMenu.PART_TYPE.get(), player,
-                    appeng.menu.locator.MenuLocators.forPart(this));
-            return true;
-        }
         return super.onUseItemOn(stack, player, hand, pos);
     }
 
@@ -123,10 +117,10 @@ public final class LoopTickerPart extends AEBasePart
 
     @Override
     public void getBoxes(IPartCollisionHelper bch) {
-        bch.addBox(4, 4, 2, 12, 12, 4);
-        bch.addBox(5, 5, 1, 11, 11, 2);
-        bch.addBox(6, 6, 0, 10, 10, 1);
-        bch.addBox(6, 6, 4, 10, 10, 5);
+        bch.addBox(4, 4, 12, 12, 12, 14);
+        bch.addBox(5, 5, 14, 11, 11, 15);
+        bch.addBox(6, 6, 15, 10, 10, 16);
+        bch.addBox(6, 6, 11, 10, 10, 12);
     }
 
     @Override
@@ -152,63 +146,15 @@ public final class LoopTickerPart extends AEBasePart
     }
 
     @Override
-    public void addToWorld() {
-        super.addToWorld();
-        com.example.ae2lightoptimizer.integration.LoopTickerPartService.register(this);
+    public TickingRequest getTickingRequest(IGridNode node) {
+        return new TickingRequest(1, 1, false);
     }
 
     @Override
-    public void removeFromWorld() {
-        com.example.ae2lightoptimizer.integration.LoopTickerPartService.unregister(this);
-        super.removeFromWorld();
-    }
-
-    /** Diagnostic: how often the server tick service called this part. */
-    public int tickCount;
-
-    /** Called once per server tick by the tick service. */
-    public void serverTick() {
-        tickCount++;
-        accelerate();
-    }
-
-    /**
-     * Any AE2 network with energy qualifies, controller or not: ad-hoc networks are networks too.
-     * Only a missing grid or a fully drained network stops the accelerator.
-     */
-    private boolean networkReady() {
-        var grid = getMainNode().getGrid();
-        if (grid == null) return false;
-        var energy = grid.getEnergyService();
-        return energy != null && (energy.getStoredPower() > 0 || energy.getAvgPowerInjection() > 0);
-    }
-
-    /** Runs the block behind the face this part is mounted on. */
-    private void accelerate() {
-        if (!(getLevel() instanceof ServerLevel server)) return;
-        if (getMainNode().getNode() == null) {
-            // The node may not exist yet if the part was restored before its host was ready.
-            getMainNode().create(getLevel(), getBlockEntity().getBlockPos());
+    public TickRateModulation tickingRequest(IGridNode node, int ticksSinceLastCall) {
+        if (node.isActive() && getLevel() instanceof ServerLevel server) {
+            LoopTickerTarget.accelerate(this, server, getBlockEntity().getBlockPos().relative(getSide()), rate());
         }
-        if (!networkReady()) return;
-        // The part is mounted on one face of the cable; the block it acts on is the one that face points at.
-        Direction side = getSide();
-        BlockPos target = getBlockEntity().getBlockPos().relative(side);
-        BlockState targetState = server.getBlockState(target);
-        if (targetState.isAir()) return;
-        BlockEntity targetEntity = server.getBlockEntity(target);
-        BlockEntityTicker<BlockEntity> ticker = null;
-        if (targetEntity != null && targetState.getBlock() instanceof EntityBlock entityBlock) {
-            @SuppressWarnings("unchecked")
-            var found = (BlockEntityTicker<BlockEntity>) entityBlock.getTicker(
-                    server, targetState, targetEntity.getType());
-            ticker = found;
-        }
-        for (int i = 0; i < rate(); i++) {
-            targetState.randomTick(server, target, server.random);
-            if (ticker != null) {
-                ticker.tick(server, target, targetState, targetEntity);
-            }
-        }
+        return TickRateModulation.SAME;
     }
 }

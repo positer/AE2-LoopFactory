@@ -101,7 +101,7 @@ function Assert-GameplayEvidence([string]$world) {
     $chainNames = @{omni='omni_connector';omni_access='omni_access';ae2lt_capacity='ae2lt_capacity';factory_wireless='factory_wireless';channel_capacity='channel_capacity';template='template_growth';smithing='template_growth_then_netherite_pickaxe_smithing';layered='logs_planks_sticks_tool_and_template_growth_then_smithing';core256m='all_ten_core_tiers_crystal_growth_and_netherite_ingots';native_catalog='native_catalog_map_extension';exact_components='exact_components';catalog_audit='catalog_audit';pack_catalog='pack_catalog';loop_condenser='loop_condenser';loop_ticker='loop_ticker';machine_audit='machine_audit';omni_memory_card='omni_memory_card';loop_ticker_part='loop_ticker_part';tool_components='tool_components'}
     if ($report.chain -ne $chainNames[$Chain]) { throw 'The requested chain is not the completed fixture' }
     # 0.0.6 removed the ripper's own idle drain; older evidence keeps its recorded 5 AE/t.
-    if ($Chain -notin @('omni','omni_access','ae2lt_capacity','factory_wireless','machine_audit') -and $report.ripperConfiguredIdleAEPerTick -ne 0) { throw 'Ripper idle drain is not zero' }
+    if ($Chain -notin @('omni','omni_access','ae2lt_capacity','factory_wireless','machine_audit','loop_ticker_part') -and $report.ripperConfiguredIdleAEPerTick -ne 0) { throw 'Ripper idle drain is not zero' }
     if ($Chain -eq 'omni_access' -and $report.ripperIdlePower -ne 0) { throw 'Ripper idle drain is no longer zero' }
     if ($Chain -eq 'omni') {
         foreach ($check in @('four_loaded_endpoints','one_star_hub','connected_without_power','connectors_require_no_channels',
@@ -242,6 +242,7 @@ function Assert-GameplayEvidence([string]$world) {
         }
     }
     $requiredFrames = if ($Chain -eq 'machine_audit') { @('ae2lo-ripper-machine-ticker-ui.png','ae2lo-ripper-machine-condenser-ui.png') }
+        elseif ($Chain -eq 'loop_ticker_part') { @('ae2lo-ripper-loop-ticker-part-menu.png') }
         elseif ($Chain -eq 'omni') { @('ae2lo-ripper-omni-ui.png','ae2lo-ripper-omni-world.png') }
         elseif ($Chain -eq 'omni_access') { @('ae2lo-ripper-omni-access-ui.png','ae2lo-ripper-omni-access-private-toggle.png','ae2lo-ripper-omni-access-private-created.png','ae2lo-ripper-omni-access-zh-2x.png','ae2lo-ripper-omni-access-en-2x.png') }
         elseif ($Chain -eq 'ae2lt_capacity' -or $Chain -eq 'factory_wireless') { @() }

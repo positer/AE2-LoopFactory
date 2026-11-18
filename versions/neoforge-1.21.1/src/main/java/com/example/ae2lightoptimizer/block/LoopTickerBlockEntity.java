@@ -9,9 +9,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
@@ -28,13 +26,25 @@ public final class LoopTickerBlockEntity extends AENetworkedBlockEntity
     private final IUpgradeInventory upgrades;
     /** 0 means "follow the maximum"; a stored value is the player's explicit pick. */
     private double selectedBaseRate;
-    private static final ThreadLocal<java.util.Set<LoopTickerBlockEntity>> RUNNING =
-            ThreadLocal.withInitial(() -> java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>()));
 
     public LoopTickerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.LOOP_TICKER.get(), pos, state);
         getMainNode().setFlags(appeng.api.networking.GridFlags.REQUIRE_CHANNEL).setIdlePowerUsage(0);
         this.upgrades = UpgradeInventories.forMachine(ModBlocks.LOOP_TICKER.get(), MAX_CARDS, this::saveChanges);
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide()) {
+            com.example.ae2lightoptimizer.integration.LoopTickerService.register(this);
+        }
+    }
+
+    @Override
+    public void setRemoved() {
+        com.example.ae2lightoptimizer.integration.LoopTickerService.unregister(this);
+        super.setRemoved();
     }
 
     @Override
@@ -98,25 +108,6 @@ public final class LoopTickerBlockEntity extends AENetworkedBlockEntity
     public void accelerate() {
         if (!(level instanceof ServerLevel server) || !getMainNode().isActive()) return;
         BlockPos target = getBlockPos().relative(facing());
-        if (!server.hasChunkAt(target) || !server.shouldTickBlocksAt(target)) return;
-        var running = RUNNING.get();
-        if (!running.add(this)) return;
-        try {
-            for (int i = 0, times = rate(); i < times; i++) {
-                BlockState state = server.getBlockState(target);
-                if (state.isAir()) break;
-                BlockEntity entity = server.getBlockEntity(target);
-                if (entity != null && !entity.isRemoved() && state.getBlock() instanceof EntityBlock block) {
-                    @SuppressWarnings("unchecked")
-                    var ticker = (BlockEntityTicker<BlockEntity>) block.getTicker(server, state, entity.getType());
-                    if (ticker != null) ticker.tick(server, target, state, entity);
-                }
-                state = server.getBlockState(target);
-                if (state.isRandomlyTicking()) state.randomTick(server, target, server.getRandom());
-            }
-        } finally {
-            running.remove(this);
-            if (running.isEmpty()) RUNNING.remove();
-        }
+        com.example.ae2lightoptimizer.integration.LoopTickerTarget.accelerate(this, server, target, rate());
     }
 }

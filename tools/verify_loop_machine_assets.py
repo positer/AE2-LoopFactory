@@ -54,12 +54,36 @@ with zipfile.ZipFile(a.ae2_jar) as z:
             if old != new:
                 assert old[2] > old[0] and old[2] > old[1], 'a non-blue native pixel changed'
                 assert new[1] > new[0] and new[1] > new[2] and old[3] == new[3], 'blue must become green'
-    model = json.loads((assets/'models/block/loop_ticker.json').read_text(encoding='utf-8'))
+    model = json.loads((assets/'models/part/loop_ticker_base.json').read_text(encoding='utf-8'))
     original_model = json.loads(z.read('assets/ae2/models/part/export_bus_base.json'))
     assert original_model['elements'] == model['elements'], 'world model geometry differs'
-    item = json.loads((assets/'models/item/loop_ticker.json').read_text(encoding='utf-8'))
+    item = json.loads((assets/'models/item/loop_ticker_part.json').read_text(encoding='utf-8'))
     original_item = json.loads(z.read('assets/ae2/models/item/export_bus.json'))
     assert item['elements'] == original_item['elements'] and item['parent'] == original_item['parent'], 'item model differs'
+    def asset(path):
+        return json.loads((assets / path).read_text(encoding='utf-8'))
+
+    block = asset('models/block/loop_ticker.json')
+    workbench = json.loads(z.read('assets/ae2/models/block/cell_workbench.json'))
+    assert block['parent'] == workbench['parent'] == 'minecraft:block/cube_bottom_top'
+    assert block['textures']['bottom'] == workbench['textures']['bottom']
+    assert asset('models/item/loop_ticker.json') == {'parent':'ae2lightoptimizer:block/loop_ticker'}
+    palette = {(112,140,186):(112,186,140), (125,169,210):(125,210,169),
+               (156,211,255):(156,255,211), (218,255,255):(218,255,218)}
+    for face in ('top', 'side'):
+        native_name = workbench['textures'][face].split(':')[1]
+        source = Image.open(io.BytesIO(z.read(f'assets/ae2/textures/{native_name}.png'))).convert('RGBA')
+        name = block['textures'][face].split(':')[1]
+        result = Image.open(assets / f'textures/{name}.png').convert('RGBA')
+        assert result.size == source.size
+        assert list(result.getdata()) == [(*palette.get(c[:3], c[:3]), c[3]) for c in source.getdata()]
+    variants = asset('blockstates/loop_ticker.json')['variants']
+    assert len(variants) == 6
+    for direction, angles in {'up':(0,0), 'down':(180,0), 'north':(90,0), 'south':(90,180),
+                              'east':(90,90), 'west':(90,270)}.items():
+        variant = variants['facing=' + direction]
+        assert variant['model'] == 'ae2lightoptimizer:block/loop_ticker'
+        assert (variant.get('x', 0), variant.get('y', 0)) == angles
     for language in ['en_us', 'zh_cn']:
         names = json.loads((assets/('lang/'+language+'.json')).read_text(encoding='utf-8'))
         for machine in ['loop_ticker', 'loop_condenser']:

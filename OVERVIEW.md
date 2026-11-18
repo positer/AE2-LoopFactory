@@ -1,5 +1,7 @@
 # AE2-LoopFactory (AE2LF) Project Overview
 
+两代 `integration/LoopTickerTarget.java` 执行朝向目标的追加 tick。部件通过 AE2 网格调度，方块通过现有服务器 tick 服务调用。六向方块模型、物品模型和工作台贴图由 `tools/verify_loop_machine_assets.py` 对照同代 AE2 校验。
+
 ## 2026-11-17 循环机器独立验收树
 
 - `docs/loop-machines.md`：聚合器的网络与离线流程、磁盘分区、回网背压，进刻器的倍率、卡槽、追加 tick 与共存边界；包含两代复现命令。

@@ -1,27 +1,30 @@
 {
   "variants": {
-    "facing=north": {
-      "model": "ae2lightoptimizer:block/loop_ticker"
-    },
-    "facing=south": {
-      "model": "ae2lightoptimizer:block/loop_ticker",
-      "y": 180
-    },
-    "facing=west": {
-      "model": "ae2lightoptimizer:block/loop_ticker",
-      "y": 270
-    },
-    "facing=east": {
-      "model": "ae2lightoptimizer:block/loop_ticker",
-      "y": 90
-    },
     "facing=up": {
-      "model": "ae2lightoptimizer:block/loop_ticker",
-      "x": 270
+      "model": "ae2lightoptimizer:block/loop_ticker"
     },
     "facing=down": {
       "model": "ae2lightoptimizer:block/loop_ticker",
+      "x": 180
+    },
+    "facing=north": {
+      "model": "ae2lightoptimizer:block/loop_ticker",
       "x": 90
+    },
+    "facing=south": {
+      "model": "ae2lightoptimizer:block/loop_ticker",
+      "x": 90,
+      "y": 180
+    },
+    "facing=east": {
+      "model": "ae2lightoptimizer:block/loop_ticker",
+      "x": 90,
+      "y": 90
+    },
+    "facing=west": {
+      "model": "ae2lightoptimizer:block/loop_ticker",
+      "x": 90,
+      "y": 270
     }
   }
 }

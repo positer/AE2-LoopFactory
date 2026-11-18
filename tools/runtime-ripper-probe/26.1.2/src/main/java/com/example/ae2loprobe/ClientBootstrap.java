@@ -87,6 +87,14 @@ public final class ClientBootstrap {
             if (ProbeState.finished) advanceNormalShutdown(minecraft);
             return;
         }
+        if (LoopTickerPartFixture.ENABLED) {
+            if (minecraft.screen instanceof com.example.ae2lightoptimizer.client.LoopTickerScreen
+                    && !CAPTURED.contains(LoopTickerPartFixture.MENU_FRAME) && ++uiDelay >= 10) {
+                capture(LoopTickerPartFixture.MENU_FRAME);
+            }
+            if (ProbeState.finished) advanceNormalShutdown(minecraft);
+            return;
+        }
         if (MachineAudit.ENABLED) {
             MachineAuditClient.tick(minecraft);
             var frame = ProbeState.screenshotRequest;
