@@ -1,7 +1,7 @@
 {
   "gui.ae2lightoptimizer.factory.recovery_native_pending": "原生接口恢复资源仍待处理。",
   "gui.ae2lightoptimizer.factory.recovery_saved": "已保存缓存资源，放回网络归还。",
-  "itemGroup.ae2lightoptimizer": "AE2LF - 应用能源 2 循环工厂",
+  "itemGroup.ae2lightoptimizer": "AE2LT · 应用能源：循环科技",
   "block.ae2lightoptimizer.recipe_ring_solver_terminal": "配方环解算终端",
   "block.ae2lightoptimizer.supercomputing_crafting_optimizer_interface": "超算合成优化接口",
   "item.ae2lightoptimizer.loop_crystal": "循环水晶",

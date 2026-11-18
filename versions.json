@@ -1,8 +1,9 @@
 {
   "schema_version": 1,
   "mod_id": "ae2lightoptimizer",
-  "display_name": "AE2-LoopFactory",
-  "mod_version": "0.0.4",
+  "display_name": "AE2 LoopTech",
+  "short_id": "ae2lt",
+  "mod_version": "0.0.9",
   "entries": [
     {
       "minecraft": "1.21.1",
@@ -15,8 +16,8 @@
     {
       "minecraft": "26.1.2",
       "loader": "neoforge",
-      "loader_version": "26.1.2.94",
-      "ae2_version": "26.1.10-beta",
+      "loader_version": "26.1.2.126",
+      "ae2_version": "26.1.13-beta",
       "java": 25,
       "project": "versions/neoforge-26.1.2"
     }

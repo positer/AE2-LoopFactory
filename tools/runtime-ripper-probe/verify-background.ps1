@@ -21,7 +21,7 @@ $agent = Join-Path $taskRoot 'tools/runtime-factory-probe/background-agent/hidde
 $versionLine = @(Get-Content -LiteralPath (Join-Path $projectRoot 'gradle.properties') | Where-Object { $_ -match '^mod_version=' })
 if ($versionLine.Count -ne 1) { throw 'Expected one mod_version in the generation properties' }
 $modVersion = ($versionLine[0] -split '=',2)[1].Trim()
-$production = Join-Path $projectRoot "build/libs/ae2lf-neoforge-mc$Generation-$modVersion.jar"
+$production = Join-Path $projectRoot "build/libs/ae2lt-neoforge-mc$Generation-$modVersion.jar"
 
 function Assert-WorkspacePath([string]$Path) {
     $resolved = [IO.Path]::GetFullPath($Path)

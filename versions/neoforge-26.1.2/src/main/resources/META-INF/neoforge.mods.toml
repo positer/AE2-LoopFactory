@@ -15,7 +15,7 @@ modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
 logoFile="ae2lightoptimizer.png"
-description='''Network crafting optimization, atomic recipe-chain execution, and unified loop storage for Applied Energistics 2.'''
+description='''Programmable factories, wireless ME links, universal storage and recipe planning for Applied Energistics 2. 应用能源：循环科技。'''
 
 [[dependencies.${mod_id}]]
 modId="neoforge"

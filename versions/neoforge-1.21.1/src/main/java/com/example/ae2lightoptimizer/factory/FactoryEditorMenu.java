@@ -15,7 +15,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class FactoryEditorMenu extends AEBaseMenu {
-    public static final SlotSemantic PATTERN = appeng.menu.SlotSemantics.register("AE2LF_FACTORY_PATTERN", false, 1);
+    public static final SlotSemantic PATTERN = appeng.menu.SlotSemantics.register("AE2LT_FACTORY_PATTERN", false, 1);
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, Ae2LightOptimizer.MOD_ID);
     public static final DeferredHolder<MenuType<?>, MenuType<FactoryEditorMenu>> TYPE = MENUS.register("factory_editor",
             () -> MenuTypeBuilder.create(FactoryEditorMenu::new, FactoryEditorHost.class)

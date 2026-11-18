@@ -70,6 +70,61 @@ public final class LoopTickerPartFixture {
         }
         return passed;
     }
+    private record Pair(String name, BlockPos target, boolean westPart, boolean eastPart) {}
+    private static final java.util.List<Pair> pairs = new java.util.ArrayList<>();
+    private static final Map<String, Integer> progressBefore = new LinkedHashMap<>();
+    private static boolean stackingPassed = true;
+
+    private static void installPair(String name, BlockPos target, boolean westPart, boolean eastPart) {
+        Pair pair = new Pair(name, target, westPart, eastPart);
+        pairs.add(pair);
+        placeFurnace(target);
+        installSource(target.west(), Direction.EAST, westPart, 2);
+        installSource(target.east(), Direction.WEST, eastPart, 3);
+    }
+
+    private static void installSource(BlockPos pos, Direction face, boolean part, int rate) {
+        level.setBlockAndUpdate(pos.below(), AEBlocks.CREATIVE_ENERGY_CELL.block().defaultBlockState());
+        if (part) {
+            level.setBlockAndUpdate(pos, AEBlocks.CABLE_BUS.block().defaultBlockState());
+            var host = (IPartHost)level.getBlockEntity(pos);
+            host.addPart(appeng.core.definitions.AEParts.GLASS_CABLE.item(appeng.api.util.AEColor.TRANSPARENT), face, null);
+            var ticker = (LoopTickerPart)host.addPart(
+                    com.example.ae2lightoptimizer.item.ModItems.LOOP_TICKER_PART.get(), face, null);
+            ticker.setRate(rate);
+        } else {
+            var block = com.example.ae2lightoptimizer.block.ModBlocks.LOOP_TICKER.get();
+            level.setBlockAndUpdate(pos, block.getOrientationStrategy().setFacing(block.defaultBlockState(), face));
+            ((com.example.ae2lightoptimizer.block.LoopTickerBlockEntity)level.getBlockEntity(pos)).setRate(rate);
+        }
+    }
+
+    private static int cookedTicks(BlockPos pos) {
+        var furnace = (AbstractFurnaceBlockEntity)level.getBlockEntity(pos);
+        try {
+            var field = AbstractFurnaceBlockEntity.class.getDeclaredField("dataAccess");
+            field.setAccessible(true);
+            var data = (net.minecraft.world.inventory.ContainerData)field.get(furnace);
+            return furnace.getItem(2).getCount() * data.get(3) + data.get(2);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Cannot read native furnace progress", e);
+        }
+    }
+
+    private static void observePairs() {
+        if (waited == 100 || waited == 210) {
+            for (var pair : pairs) progressBefore.put(pair.name(), cookedTicks(pair.target()));
+        }
+        if (waited == 200 || waited == 310) {
+            boolean both = waited == 200;
+            for (var pair : pairs) {
+                int delta = cookedTicks(pair.target()) - progressBefore.get(pair.name());
+                summary.put(pair.name() + (both ? "_both" : "_one"), delta);
+                stackingPassed &= delta == (both ? 600 : 300);
+                if (both) level.removeBlock(pair.target().east(), false);
+            }
+        }
+    }
     private static BlockPos controlFurnace;
     private static BlockPos fastFurnace;
     private static final Map<String, Object> summary = new LinkedHashMap<>();
@@ -85,6 +140,9 @@ public final class LoopTickerPartFixture {
         controlFurnace = base;
 
         placeFurnace(controlFurnace);
+        installPair("block_block", base.offset(0, 16, 0), false, false);
+        installPair("part_part", base.offset(0, 16, 5), true, true);
+        installPair("block_part", base.offset(0, 16, 10), false, true);
 
         // A dedicated controllerless island powers both forms.
         BlockPos cablePos = base.east(4).below();
@@ -150,6 +208,7 @@ public final class LoopTickerPartFixture {
     public static void tick() {
         if (!started || finished) return;
         ++waited;
+        if (phase == 0) observePairs();
         if (phase == 0 && waited == 20) powerStations();
         if (waited < WAIT_TICKS) return;
         if (phase == 0) {
@@ -214,6 +273,7 @@ public final class LoopTickerPartFixture {
                 && "NO_CONTROLLER".equals(summary.get("controllerState"))
                 && Boolean.TRUE.equals(summary.get("allBlockFacesAccelerated"))
                 && Boolean.TRUE.equals(summary.get("onlyFacingAccelerated"))
+                && stackingPassed
                 && isolatedOutput >= 0 && isolatedOutput <= (int) summary.get("controlOutput") + 1;
     }
 
